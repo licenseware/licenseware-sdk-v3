@@ -1,7 +1,8 @@
 import unittest
 from licenseware.utils.file_validators import (
     validate_text_contains_all,
-    validate_text_contains_any
+    validate_text_contains_any,
+    validate_filename
 )
 
 
@@ -25,3 +26,11 @@ class TestValidateTextContainsAll(unittest.TestCase):
 
         assert validate_text_contains_any(text="valid with one input", text_contains_any=["valid", "string"])
 
+
+    def test_validate_filename(self):
+
+        assert validate_filename(
+            filename="rv_tools.xlsx",
+            contains=["rv", "tools"],
+            endswith=[".xlsx"]
+        )

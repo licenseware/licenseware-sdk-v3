@@ -37,6 +37,11 @@ You can also import individually the function bellow:
 """
 
 
+
+# TODO - this need a refactor we should remove all flask `stream` stuff and create convertors to BytesIO
+
+
+
 import os, re
 import itertools
 import pandas as pd
@@ -109,19 +114,32 @@ def _get_columns(df, required_sheets):
     return given_columns
 
 
-def validate_columns(df, required_columns, required_sheets=[]):
-    if not required_columns: return
+def validate_columns(df, required_columns: list, required_sheets: list = None):
+    """
+    Simple columns:
+    - required_columns = ["col1", "col2"]
+    Alternate columns:
+    - required_columns = [["col1", "col2"], ["col5", "col3"]] 
+    Here if one of the nested list matches the columns will not raise any errors
+
+    """
+
+    if not required_columns: return True
+    if required_sheets is None:
+        required_sheets = []
     
     file_columns = _get_columns(df, required_sheets)
     
-    if isinstance(required_columns[0], tuple) and len(required_columns) > 1:
+    if (isinstance(required_columns[0], tuple) or isinstance(required_columns[0], list)) and len(required_columns) > 1:
         for rc in required_columns:
             if _columns_validator(file_columns, rc, raise_error=False):
-                return
+                return True
         else:
             raise ValueError(f'Table does not contain required columns: {required_columns}')
     else:
         _columns_validator(file_columns, required_columns, raise_error=True)
+
+    return True
 
 
 def _sheets_validator(sheets, required_sheets, raise_error=True):
@@ -152,7 +170,7 @@ def validate_sheets(file, required_sheets):
 
     """
 
-    if not required_sheets: return
+    if not required_sheets: return True
 
     sheets = pd.ExcelFile(file).sheet_names
     
@@ -160,26 +178,32 @@ def validate_sheets(file, required_sheets):
     if (isinstance(required_sheets[0], tuple) or isinstance(required_sheets[0], list)) and len(required_sheets) > 1:
         for rs in required_sheets:
             if _sheets_validator(sheets, rs, raise_error=False):
-                return # one validation succeded
-    else:
-        _sheets_validator(sheets, required_sheets, raise_error=True)
+                return True # one validation succeded
+
+    _sheets_validator(sheets, required_sheets, raise_error=True)
+    return True
 
 
-def validate_rows_number(df, min_rows_number, required_sheets=[]):
+def validate_rows_number(df, min_rows_number: int, required_sheets: list = None):
     """
         Raise error if minimum_rows_number is not satisfied
     """
 
-    if not min_rows_number: return
+    assert df
+    if not min_rows_number: return True
+    if required_sheets is None:
+        required_sheets = []
 
     if isinstance(df, dict):
         for sheet, table in df.items():
             if sheet not in required_sheets: continue
-            if table.shape[0] < min_rows_number:
+            if table.shape[0] >= min_rows_number:
                 raise ValueError(f'Expected {sheet} to have at least {min_rows_number} row(s)')
     else:
-        if df.count("\n") < min_rows_number:
+        if df.count("\n") >= min_rows_number:
             raise ValueError(f'Expected table to have at least {min_rows_number} row(s)')
+
+    return True
 
 
 def validate_filename(filename:str, contains:list, endswith:list = None, regex_escape:bool = True):
@@ -196,10 +220,12 @@ def validate_filename(filename:str, contains:list, endswith:list = None, regex_e
     
     if endswith:
         for file_type in endswith:
-            if filename.lower().endswith(file_type): return
+            if filename.lower().endswith(file_type): return True
 
         raise ValueError(f"Filename doesn't end with any of the specified values: {', '.join(endswith)}")
 
+    return True
+    
 
 class GeneralValidator:
 
