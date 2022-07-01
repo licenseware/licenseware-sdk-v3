@@ -1,0 +1,7 @@
+loguru==0.6.0
+openpyxl==3.0.7
+pandas==1.2.4
+# Development
+pytest<7
+coverage<7
+coverage-badge<1
