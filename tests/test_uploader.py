@@ -52,10 +52,6 @@ def test_uploader(mocker):
         flags=None,
         status=None,
         icon=None,
-        upload_url=None,
-        upload_validation_url=None,
-        quota_validation_url=None,
-        status_check_url=None,
         # External config object 
         # From which we would get uploader-registry-url
         config=config

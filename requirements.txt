@@ -1,6 +1,8 @@
-loguru==0.6.0
-openpyxl==3.0.7
-pandas==1.2.4
+requests~=2.28
+loguru~=0.6
+fastapi~=0.78
+python-multipart
+uvicorn~=0.18
 # Development
 pytest<7
 coverage<7
