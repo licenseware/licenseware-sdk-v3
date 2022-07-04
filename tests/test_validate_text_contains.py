@@ -1,36 +1,45 @@
+import pytest
 import unittest
-from licenseware.utils.file_validators import (
-    validate_text_contains_all,
-    validate_text_contains_any,
-    validate_filename
-)
+from licenseware.validators import validate_text_contains_all, validate_text_contains_any, validate_required_input_type
+ 
+# pytest tests/test_validate_text_contains.py
 
 
-# python3 -m unittest tests/test_validate_text_contains.py
+t = unittest.TestCase()
 
 
-class TestValidateTextContainsAll(unittest.TestCase):
+def test_validate_text_contains_all():
 
-    def test_validate_text_contains_all(self):
+    with t.assertRaises(ValueError):
+        validate_text_contains_all(text="invalid string", text_contains_all=["some", "text"])
 
-        with self.assertRaises(ValueError):
-            validate_text_contains_all(text="invalid string", text_contains_all=["some", "text"])
-
-        assert validate_text_contains_all(text="valid string", text_contains_all=["valid", "string"])
+    assert validate_text_contains_all(text="valid string", text_contains_all=["valid", "string"])
 
 
-    def test_validate_text_contains_any(self):
+def test_validate_text_contains_any():
 
-        with self.assertRaises(ValueError):
-            validate_text_contains_any(text="invalid string", text_contains_any=["some", "text"])
+    with t.assertRaises(ValueError):
+        validate_text_contains_any(text="invalid string", text_contains_any=["some", "text"])
 
-        assert validate_text_contains_any(text="valid with one input", text_contains_any=["valid", "string"])
+    assert validate_text_contains_any(text="valid with one input", text_contains_any=["valid", "string"])
 
 
-    def test_validate_filename(self):
+# pytest -s -v tests/test_validate_text_contains.py::test_validate_required_input_type_no_raise
+def test_validate_required_input_type_no_raise():
 
-        assert validate_filename(
-            filename="rv_tools.xlsx",
-            contains=["rv", "tools"],
-            endswith=[".xlsx"]
-        )
+    res = validate_required_input_type("rvtools.xlsx", required_input_type=".xlsx", raise_error=False)
+    assert res is True
+
+    res = validate_required_input_type("rvtools.xlsx", required_input_type=[".csv", ".xlsx"], raise_error=False)
+    assert res is True
+
+
+# pytest -s -v tests/test_validate_text_contains.py::test_validate_required_input_type_with_raise
+def test_validate_required_input_type_with_raise():
+
+    with t.assertRaises(ValueError):
+        validate_required_input_type("rvtools.xlsx", required_input_type=".csv", raise_error=True)
+    
+    with t.assertRaises(ValueError):
+        validate_required_input_type("rvtools.xlsx", required_input_type=[".xml", ".csv"], raise_error=True)
+    
