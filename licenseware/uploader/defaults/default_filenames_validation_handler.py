@@ -11,19 +11,19 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
     
     validation_response = []
 
-    filenames_ignored = [
-        NameValidationResponse(
-            status=states.SKIPPED,
-            filename=filename, 
-            message=validation_parameters.filename_ignored_message
-        ) 
-        for fn in filenames if fn in validation_parameters.ignore_filenames
-    ]
+    if validation_parameters.ignore_filenames:
+        filenames_ignored = [
+            NameValidationResponse(
+                status=states.SKIPPED,
+                filename=filename, 
+                message=validation_parameters.filename_ignored_message
+            ) 
+            for fn in filenames if fn in validation_parameters.ignore_filenames
+        ]
+        validation_response.extend(filenames_ignored)
+        filenames = [fn for fn in filenames if fn not in validation_parameters.ignore_filenames]
 
-    validation_response.extend(filenames_ignored)
-
-    filenames_to_validate = [fn for fn in filenames if fn not in validation_parameters.ignore_filenames]
-    for filename in filenames_to_validate:
+    for filename in filenames:
 
         filename_contains_msg = validate_text_contains_any(
             filename, 
@@ -53,7 +53,7 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
                 NameValidationResponse(
                     status=states.FAILED,
                     filename=filename, 
-                    message=validation_parameters.filename_invalid_message or filename_contains_msg + " " + filename_endswith_msg
+                    message=validation_parameters.filename_invalid_message or filename_contains_msg or "" + " " + filename_endswith_msg or ""
                 )
             )
             
