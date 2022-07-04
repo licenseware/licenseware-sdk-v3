@@ -5,3 +5,4 @@ pandas==1.2.4
 pytest<7
 coverage<7
 coverage-badge<1
+pytest-mock<3

@@ -1,10 +1,12 @@
+import requests
 from dataclasses import dataclass
-from typing import Callable, Tuple, List
+from typing import Callable, Tuple, List, Any
+from licenseware.constants import states
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
 from licenseware.uploader.defaults import default_filenames_validation_handler, default_filecontents_validation_handler
 from licenseware.uiresponses import FileNameResponse, FileContentResponse
-
+from licenseware.utils.logger import log
 
 
 @dataclass
@@ -25,6 +27,7 @@ class NewUploader:
     status_check_url: str = None
     filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileNameResponse] = None
     filecontents_validation_handler: Callable = None
+    config: Any = None
 
 
     def validate_filenames(self, filenames: List[str]) -> FileNameResponse:
@@ -65,5 +68,27 @@ class NewUploader:
         }
 
         return payload
+
+
+    def register(self):
+
+        payload = self.get_registration_payload()
+
+        response = requests.post(
+            url=self.config.REGISTER_UPLOADER_URL, 
+            json=payload, 
+            headers={"Authorization": self.config.get_auth_token()}
+        )
+
+        if response.status_code == 200:
+            return {
+                    "status": states.SUCCESS,
+                    "message": f"Uploader '{self.uploader_id}' register successfully",
+                    "content": payload
+                }, 200
+
+        nokmsg = f"Could not register uploader '{self.uploader_id}'"
+        log.error(nokmsg)
+        return {"status": states.FAILED, "message": nokmsg, "content": payload}, 400
 
     

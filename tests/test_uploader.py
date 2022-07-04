@@ -6,40 +6,27 @@ from licenseware.uploader import (
 )
 
 
-
-# What goes to registry service 
-# payload = {
-#     'data': [{
-#         "app_id": kwargs['app_id'],
-#         "uploader_id": kwargs['uploader_id'],
-#         "name": kwargs['name'],
-#         "description": kwargs['description'],
-#         "accepted_file_types": kwargs['accepted_file_types'],
-#         "flags": kwargs['flags'] if len(kwargs['flags']) > 0 else None,
-#         "status": kwargs['status'],
-#         "icon": kwargs['icon'],
-#         "upload_url": kwargs['upload_url'],
-#         "upload_validation_url": kwargs['upload_validation_url'],
-#         "quota_validation_url": kwargs['quota_validation_url'],
-#         "status_check_url": kwargs['status_check_url'],
-#         "validation_parameters": kwargs['validation_parameters'],
-#         "encryption_parameters": kwargs['encryption_parameters']
-#     }]
-# }
-
-
 # pytest tests/test_uploader.py
 
-def test_uploader():
+def test_uploader(mocker):
 
-    # def validate_filenames(filenames, validation_parameters: UploaderValidationParameters):
-    #     print(validation_parameters.ignore_filenames)
-    #     return filenames
+    class RequestsResponse:
+        status_code = 200
 
+    mocker.patch(
+        "requests.post",
+        return_value=RequestsResponse
+    )
+    
+    # External configuration
+    class Config:
+        REGISTER_UPLOADER_URL = ""
 
-    # def validate_filecontents(file):
-    #     if file: return True
-    #     return False
+        @staticmethod
+        def get_auth_token():
+            return "machine token from envs"
+
+    config = Config()
 
 
     filenames = ["notok.csv", "rv_tools.xlsx"]
@@ -58,6 +45,8 @@ def test_uploader():
         accepted_file_types=[".xls", ".xlsx"],
         validation_parameters=rv_tools_validation_parameters,
         encryption_parameters=rv_tools_encryption_parameters,
+        # There are some cases where you may need to replace these
+        # validation handlers with some custom handlers (hover to see types)
         filenames_validation_handler=None,
         filecontents_validation_handler=None,
         flags=None,
@@ -67,6 +56,9 @@ def test_uploader():
         upload_validation_url=None,
         quota_validation_url=None,
         status_check_url=None,
+        # External config object 
+        # From which we would get uploader-registry-url
+        config=config
     )
 
     response = rv_tools_uploader.validate_filenames(filenames)
@@ -77,7 +69,10 @@ def test_uploader():
         if resp.filename == "rv_tools":
             assert resp.status == "success"
 
+        
+    payload = rv_tools_uploader.get_registration_payload()
+    assert "data" in payload
 
-    registration_payload = rv_tools_uploader.get_registration_payload()
-    # print(registration_payload)
-    assert "data" in registration_payload
+    response, status_code = rv_tools_uploader.register()
+    assert status_code == 200
+    assert "success" == response['status']
