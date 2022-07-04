@@ -1,7 +1,6 @@
 # Licenseware-sdk-v3
 <img src="./coverage.svg">
 
-
 ## Developing
 
 - clone the repository;
