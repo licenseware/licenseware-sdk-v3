@@ -37,23 +37,23 @@ class TestSheetsValidator(unittest.TestCase):
         ])
 
     
-    def test_validate_rows_number(self):
+    # def test_validate_rows_number(self):
 
-        filepath = "./test_files/RVTools.xlsx"
+    #     filepath = "./test_files/RVTools.xlsx"
 
-        df = GeneralValidator(input_object=filepath)._parse_excel()
+    #     df = GeneralValidator(input_object=filepath)._parse_excel()
 
-        assert isinstance(df, dict) 
-        assert len(df) > 1 
+    #     assert isinstance(df, dict) 
+    #     assert len(df) > 1 
 
-        assert validate_rows_number(df, min_rows_number=12)
-        assert validate_rows_number(df, min_rows_number=12, required_sheets=['tabvInfo'])
+    #     assert validate_rows_number(df, min_rows_number=12)
+    #     assert validate_rows_number(df, min_rows_number=12, required_sheets=['tabvInfo'])
 
-        with self.assertRaises(ValueError):
-            validate_rows_number(df, min_rows_number=100000000)
+    #     with self.assertRaises(ValueError):
+    #         validate_rows_number(df, min_rows_number=100000000)
 
-        with self.assertRaises(ValueError):
-            validate_rows_number(df, min_rows_number=100000000, required_sheets=['tabvInfo'])
+    #     with self.assertRaises(ValueError):
+    #         validate_rows_number(df, min_rows_number=100000000, required_sheets=['tabvInfo'])
 
         
 

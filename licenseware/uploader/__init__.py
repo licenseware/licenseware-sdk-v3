@@ -1,2 +1,3 @@
-from .uploader import New
-from .file_validator import FileValidator
+from .uploader import NewUploader
+from .encryption_parameters import UploaderEncryptionParameters
+from .validation_parameters import UploaderValidationParameters

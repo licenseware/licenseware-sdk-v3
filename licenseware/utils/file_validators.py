@@ -189,7 +189,6 @@ def validate_rows_number(df, min_rows_number: int, required_sheets: list = None)
         Raise error if minimum_rows_number is not satisfied
     """
 
-    assert df
     if not min_rows_number: return True
     if required_sheets is None:
         required_sheets = []
