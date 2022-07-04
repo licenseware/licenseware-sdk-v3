@@ -56,7 +56,6 @@ class TestSheetsValidator(unittest.TestCase):
     #         validate_rows_number(df, min_rows_number=100000000, required_sheets=['tabvInfo'])
 
         
-
     def test_validate_columns(self):
         import pandas as pd
 
