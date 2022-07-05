@@ -7,7 +7,7 @@ from licenseware.uploader import NewUploader, UploaderEncryptionParameters, Uplo
 # Config stuff
 
 class Config(BaseSettings):
-    SERVICE_ID = "ifmp-service"
+    APP_ID = "ifmp-service"
     BASE_URL = "http://127.0.0.1:3000"
     PATH_PREFIX = "/ifmp"
     REGISTER_UPLOADER_URL = ""
@@ -24,7 +24,6 @@ rv_tools_validation_parameters = UploaderValidationParameters(
 )
 
 rv_tools_uploader = NewUploader(
-    app_id="ifmp-service",
     uploader_id="rv_tools",
     name="RVTools",
     description="XLSX export from RVTools after scanning your Vmware infrastructure.",
@@ -33,13 +32,13 @@ rv_tools_uploader = NewUploader(
     encryption_parameters=rv_tools_encryption_parameters,
     # There are some cases where you may need to replace these
     # validation handlers with some custom handlers (hover to see types)
-    filenames_validation_handler=None,
-    filecontents_validation_handler=None,
-    flags=None,
-    status=None,
-    icon=None,
+    # filenames_validation_handler=None,
+    # filecontents_validation_handler=None,
+    # flags=None,
+    # status=None,
+    # icon=None,
     # External config object 
-    # From which we would get uploader-registry-url
+    # From which we would get uploader-registry-url, app_id and other external configs
     config=config
 )
 
@@ -68,20 +67,30 @@ class QuotaModel(BaseModel):
     quota_reset_date:str
 
 
-@rv_tools_uploader_router.post(rv_tools_uploader.upload_validation_url)
+class NameValidationResponseModel(BaseModel):
+    status: str
+    filename: str
+    message: str
+
+class FileNameResponseModel(BaseModel):
+    status: str
+    message: str
+    validation: List[NameValidationResponseModel]
+    event_id: str
+
+
+@rv_tools_uploader_router.post(rv_tools_uploader.upload_validation_url, response_model=FileNameResponseModel)
 def validate_filenames(filenames: FilenamesModel):
     """ Validating the list of filenames provided """
-    return filenames.dict()
+    return rv_tools_uploader.validate_filenames(filenames.filenames)
 
 
 @rv_tools_uploader_router.post(rv_tools_uploader.upload_url)
 def upload_files(files: List[fastapi.UploadFile], clear_data: bool = None, event_id: str = None):
     """ Upload files received on `files` for processing """
-    return {
-        "files": [file.filename for file in files],
-        "clear_data": clear_data,
-        "event_id": event_id
-    }
+    
+    return type(files[0])
+    # return rv_tools_uploader.validate_filecontents(files)
 
 
 @rv_tools_uploader_router.get(rv_tools_uploader.status_check_url, response_model=UploaderStatusModel)

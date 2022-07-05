@@ -1,3 +1,4 @@
 from .uploader import NewUploader
 from .encryption_parameters import UploaderEncryptionParameters
 from .validation_parameters import UploaderValidationParameters
+from .file_upload_handler import FileUploadHandler
