@@ -7,4 +7,4 @@ from licenseware.uploader.defaults import default_filecontents_validation_handle
 
 
 def test_default_filecontents_validation_handler():
-    default_filecontents_validation_handler
+    default_filecontents_validation_handler()

@@ -47,7 +47,7 @@ def test_file_handler_flask_file_storage_input():
             content_type="application/*",
         )
 
-
+    # flaskfilestorage.filename
     f = FileUploadHandler(flaskfilestorage)
 
     # Same test as for file path as input
@@ -83,6 +83,7 @@ def test_file_handler_fastapi_uploadfile_input():
             content_type="application/*",
         )
 
+    # fastapiuploadfile.filename
     f = FileUploadHandler(fastapiuploadfile)
 
     # Same test as for file path as input

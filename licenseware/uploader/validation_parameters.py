@@ -2,7 +2,6 @@ from typing import Tuple
 from dataclasses import dataclass, asdict
 
 
-
 @dataclass
 class UploaderValidationParameters:
     required_input_type: str = None

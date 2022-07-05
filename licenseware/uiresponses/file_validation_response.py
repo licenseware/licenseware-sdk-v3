@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 
 
 @dataclass
-class NameValidationResponse:
+class ValidationResponse:
     status: str
     filename: str
     message: str
@@ -13,10 +13,10 @@ class NameValidationResponse:
 
 
 @dataclass
-class FileNameResponse:
+class FileValidationResponse:
     status: str
     message: str
-    validation: Tuple[NameValidationResponse]
+    validation: Tuple[ValidationResponse]
     event_id: str
 
     def dict(self):

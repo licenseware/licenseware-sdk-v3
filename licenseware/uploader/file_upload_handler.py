@@ -9,17 +9,20 @@ class FileUploadHandler:
 
     def __init__(self, fileorbuffer: Union[str, IO]) -> None:
         self.fileorbuffer = fileorbuffer
+        self.filename = None
         if isinstance(self.fileorbuffer, str):
             if not os.path.isfile(self.fileorbuffer):
                 raise FileNotFoundError(f"File {self.fileorbuffer} was not found on disk")
-        
+
         if isinstance(self.fileorbuffer, str):
             self._data = open(self.fileorbuffer, "rb") 
+            self.filename = os.path.basename(self.fileorbuffer)
         else:
             attrs = ["read", "seek", "close"]
             if not all(hasattr(self.fileorbuffer, attr) for attr in attrs):
                 raise AttributeError(f"Mandatory attributes '{':'.join(attrs)}' not found on provided IO object.")
             self._data = self.fileorbuffer
+            self.filename = self._data.filename if hasattr(self._data, "filename") else None
 
         self.runsync = True
 
@@ -32,7 +35,6 @@ class FileUploadHandler:
             
     def sync(self, co):
         return asyncio.get_event_loop().run_until_complete(co)
-
 
     def data(self):
         return self

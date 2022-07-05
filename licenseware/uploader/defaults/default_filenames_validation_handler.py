@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Union
 from licenseware import states
-from licenseware.uiresponses.filename_response import FileNameResponse, NameValidationResponse
+from licenseware.uiresponses.file_validation_response import FileValidationResponse, ValidationResponse
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.validators import validate_text_contains_any, validate_required_input_type
 
@@ -18,13 +18,13 @@ def _get_error_message(filename_contains_msg: Union[str, bool], filename_endswit
     return (contains_msg + " " + endswith_msg).strip()
 
 
-def default_filenames_validation_handler(filenames:List[str], validation_parameters: UploaderValidationParameters) -> FileNameResponse:
+def default_filenames_validation_handler(filenames:List[str], validation_parameters: UploaderValidationParameters) -> FileValidationResponse:
     
     validation_response = []
 
     if validation_parameters.ignore_filenames:
         filenames_ignored = [
-            NameValidationResponse(
+            ValidationResponse(
                 status=states.SKIPPED,
                 filename=filename, 
                 message=validation_parameters.filename_ignored_message
@@ -52,7 +52,7 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
         if filename_contains_msg is True and filename_endswith_msg is True:
 
             validation_response.append(
-                NameValidationResponse(
+                ValidationResponse(
                     status=states.SUCCESS,
                     filename=filename, 
                     message=validation_parameters.filename_valid_message
@@ -61,14 +61,14 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
 
         else:
             validation_response.append(
-                NameValidationResponse(
+                ValidationResponse(
                     status=states.FAILED,
                     filename=filename, 
                     message=_get_error_message(filename_contains_msg, filename_endswith_msg)
                 )
             )
             
-    filename_response = FileNameResponse(
+    filename_response = FileValidationResponse(
         event_id=str(uuid.uuid4()),
         status=states.SUCCESS,
         message="File names were analysed",
