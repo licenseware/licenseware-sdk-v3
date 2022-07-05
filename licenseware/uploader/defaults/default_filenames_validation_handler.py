@@ -1,10 +1,21 @@
 import uuid
-from typing import List
+from typing import List, Union
 from licenseware import states
 from licenseware.uiresponses.filename_response import FileNameResponse, NameValidationResponse
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.validators import validate_text_contains_any, validate_required_input_type
 
+def _get_error_message(filename_contains_msg: Union[str, bool], filename_endswith_msg: Union[str, bool]) -> str:
+    
+    contains_msg = ""
+    if isinstance(filename_contains_msg, str):
+        contains_msg = filename_contains_msg
+
+    endswith_msg = ""
+    if isinstance(filename_endswith_msg, str):
+        endswith_msg = filename_endswith_msg
+
+    return (contains_msg + " " + endswith_msg).strip()
 
 
 def default_filenames_validation_handler(filenames:List[str], validation_parameters: UploaderValidationParameters) -> FileNameResponse:
@@ -53,7 +64,7 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
                 NameValidationResponse(
                     status=states.FAILED,
                     filename=filename, 
-                    message=validation_parameters.filename_invalid_message or filename_contains_msg or "" + " " + filename_endswith_msg or ""
+                    message=_get_error_message(filename_contains_msg, filename_endswith_msg)
                 )
             )
             

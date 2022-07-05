@@ -20,6 +20,7 @@ def test_uploader(mocker):
     
     # External configuration
     class Config:
+        APP_ID = "ifmp"
         REGISTER_UPLOADER_URL = ""
 
         @staticmethod
@@ -38,10 +39,9 @@ def test_uploader(mocker):
     )
 
     rv_tools_uploader = NewUploader(
-        app_id="ifmp-service",
-        uploader_id="rv_tools",
         name="RVTools",
         description="XLSX export from RVTools after scanning your Vmware infrastructure.",
+        uploader_id="rv_tools",
         accepted_file_types=[".xls", ".xlsx"],
         validation_parameters=rv_tools_validation_parameters,
         encryption_parameters=rv_tools_encryption_parameters,
@@ -52,10 +52,6 @@ def test_uploader(mocker):
         flags=None,
         status=None,
         icon=None,
-        upload_url=None,
-        upload_validation_url=None,
-        quota_validation_url=None,
-        status_check_url=None,
         # External config object 
         # From which we would get uploader-registry-url
         config=config

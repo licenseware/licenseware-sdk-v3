@@ -11,24 +11,25 @@ from licenseware.utils.logger import log
 
 @dataclass
 class NewUploader:
-    app_id: str
-    uploader_id: str
     name: str 
     description: str
+    uploader_id: str
     accepted_file_types: tuple
     validation_parameters: UploaderValidationParameters = None
     encryption_parameters: UploaderEncryptionParameters = None
-    flags: Tuple[str] =None
+    flags: Tuple[str] = None
     status: str = None
     icon: str = None
-    upload_url: str = None
-    upload_validation_url: str = None
-    quota_validation_url: str = None
-    status_check_url: str = None
     filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileNameResponse] = None
     filecontents_validation_handler: Callable = None
     config: Any = None
 
+    def __post_init__(self):
+        self.app_id= self.config.APP_ID
+        self.upload_validation_url = f"/{self.uploader_id}/validation"
+        self.upload_url = f"/{self.uploader_id}/files"
+        self.quota_validation_url = f"/{self.uploader_id}/quota"
+        self.status_check_url = f"/{self.uploader_id}/status" 
 
     def validate_filenames(self, filenames: List[str]) -> FileNameResponse:
 

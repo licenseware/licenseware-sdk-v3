@@ -14,8 +14,9 @@ def validate_text_contains_any(text: str, text_contains_any: List[str], regex_es
         match = re.search(pattern, text)
         if match: return True
 
+    err_msg = f'File must contain at least one of the following keywords: {", ".join(text_contains_any)}'
     if raise_error:
-        raise ValueError(f'File must contain at least one of the following keywords: {", ".join(text_contains_any)}')
-    
-    
+        raise ValueError(err_msg)
+        
+    return err_msg
 

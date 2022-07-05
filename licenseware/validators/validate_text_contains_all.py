@@ -16,11 +16,12 @@ def validate_text_contains_all(text: str, text_contains_all: List[str], regex_es
         match = re.search(pattern, text)
         if match: matches_count += 1
 
+    err_msg = f'File must contain the all following keywords: {", ".join(text_contains_all)}'
     if matches_count < len(text_contains_all):
         if raise_error:
-            raise ValueError(f'File must contain the all following keywords: {", ".join(text_contains_all)}')
+            raise ValueError(err_msg)
         else:
-            return False
+            return err_msg
     return True
 
     
