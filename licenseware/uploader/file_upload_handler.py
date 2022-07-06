@@ -1,6 +1,6 @@
 import os
+import io
 import shutil
-import asyncio
 from typing import Union, IO
 
 
@@ -10,6 +10,7 @@ class FileUploadHandler:
     def __init__(self, fileorbuffer: Union[str, IO]) -> None:
         self.fileorbuffer = fileorbuffer
         self.filename = None
+        self._data = None
         if isinstance(self.fileorbuffer, str):
             if not os.path.isfile(self.fileorbuffer):
                 raise FileNotFoundError(f"File {self.fileorbuffer} was not found on disk")
@@ -18,38 +19,42 @@ class FileUploadHandler:
             self._data = open(self.fileorbuffer, "rb") 
             self.filename = os.path.basename(self.fileorbuffer)
         else:
-            attrs = ["read", "seek", "close"]
-            if not all(hasattr(self.fileorbuffer, attr) for attr in attrs):
-                raise AttributeError(f"Mandatory attributes '{':'.join(attrs)}' not found on provided IO object.")
-            self._data = self.fileorbuffer
-            self.filename = self._data.filename if hasattr(self._data, "filename") else None
-
-        self.runsync = True
-
-        co =  asyncio.iscoroutine(self._data.read) 
-        cofunc = asyncio.iscoroutinefunction(self._data.read)
-        cofuture = asyncio.isfuture(self._data.read)
-
-        if any([co, cofunc, cofuture]):
-            self.runsync = False
             
-    def sync(self, co):
-        return asyncio.get_event_loop().run_until_complete(co)
+            attrs = ["read", "seek", "close", "tell", "seekable"]
+            
+            for name, val in vars(self.fileorbuffer).items():
+                if isinstance(val, io.BytesIO) and all(hasattr(val, attr) for attr in attrs) and self._data is None:
+                    self._data = val
+                if name in ["filename", "name"] and self.filename is None:
+                    self.filename = val
+                    
+            if self._data is None:
+                raise AttributeError(f"Mandatory attributes '{', '.join(attrs)}' not found on provided BytesIO object.")
+            
+            if self.filename is None:
+                raise AttributeError("Can't find `filename` for this file")
 
-    def data(self):
+
+    def __call__(self):
         return self
 
     def read(self, buffering: int = None) -> bytes:
-        return self._data.read(buffering) if self.runsync else self.sync(self._data.read(buffering))
+        return self._data.read(buffering)
 
-    def seek(self, offset: int) -> int:
-        return self._data.seek(offset) if self.runsync else self.sync(self._data.seek(offset))
+    def seek(self, offset: int, whence: int = 0) -> int:
+        return self._data.seek(offset, whence)
+        
+    def tell(self):
+        return self._data.tell()
+
+    def seekable(self):
+        return self._data.seekable()
 
     def reset(self):
-        return self._data.seek(0) if self.runsync else self.sync(self._data.seek(0))
+        return self._data.seek(0) 
 
     def close(self):
-        self._data.close() if self.runsync else self.sync(self._data.close())
+        self._data.close()
 
     def save(self, dst:str, buffer_size=16384):
 
@@ -59,7 +64,7 @@ class FileUploadHandler:
         dst = open(dst, "wb")
         self.reset()
         try:
-            shutil.copyfileobj(self.data(), dst, buffer_size)
+            shutil.copyfileobj(self, dst, buffer_size)
         finally:
             dst.close()
             self.close()

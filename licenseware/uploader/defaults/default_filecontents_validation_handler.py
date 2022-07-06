@@ -55,28 +55,28 @@ def _text_contains_any_response(f: FileUploadHandler, validation_parameters: Upl
 def _get_csv_df(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
 
     df = pd.read_csv(
-        f.data(), 
+        f, 
         nrows=validation_parameters.min_rows_number, 
         skiprows=validation_parameters.header_starts_at,
-        delimiter=_sniff_delimiter(f.data(), f.filename)
+        delimiter=_sniff_delimiter(f, f.filename)
     )
 
     return df
 
 
 def _get_df_sheets(f: FileUploadHandler):
-    sheets = pd.ExcelFile(f.data()).sheet_names
+    sheets = pd.ExcelFile(f).sheet_names
     return sheets
 
 
 def _get_excel_dfs(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
 
     dfs = {}
-    sheets = pd.ExcelFile(f.data()).sheet_names
+    sheets = pd.ExcelFile(f).sheet_names
 
     if len(sheets) == 1:
         dfs[sheets[0]] = pd.read_excel(
-            f.data(), 
+            f, 
             nrows=validation_parameters.min_rows_number, 
             skiprows=validation_parameters.header_starts_at
         )
@@ -86,7 +86,7 @@ def _get_excel_dfs(f: FileUploadHandler, validation_parameters: UploaderValidati
                 continue
 
             dfs[sheet] = pd.read_excel(
-                f.data(), 
+                f, 
                 sheet_name=sheet, 
                 nrows=validation_parameters.min_rows_number, 
                 skiprows=validation_parameters.header_starts_at
@@ -148,6 +148,35 @@ def _required_sheets_response(f: FileUploadHandler, validation_parameters: Uploa
     return reqsheets
 
 
+
+def _min_rows_number_response(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
+
+    minrows = True
+    if validation_parameters.required_input_type in ['csv', '.csv']:
+        df = _get_csv_df(f, validation_parameters)  
+
+        minrows = v.validate_min_rows_number(
+            min_rows=validation_parameters.min_rows_number,
+            current_rows=df.shape[0]
+        )
+
+    elif validation_parameters.required_input_type in ['excel', '.xls', '.xlsx', 'xls', 'xlsx']:
+        
+        dfs = _get_excel_dfs(f, validation_parameters)
+        
+        for _, df in dfs.items():
+            minrows = v.validate_min_rows_number(
+                min_rows=validation_parameters.min_rows_number,
+                current_rows=df.shape[0]
+            )
+            if isinstance(minrows, str):
+                break
+
+    return minrows
+
+
+
+
 def _get_filenames_response(files: Union[List[bytes], List[str]], validation_parameters: UploaderValidationParameters):
 
     filename_validation_response = default_filenames_validation_handler(
@@ -162,6 +191,27 @@ def _get_filenames_response(files: Union[List[bytes], List[str]], validation_par
     return None
 
 
+def _get_error_message(failed_validations: List[str]):
+    return ", ".join(failed_validations)
+
+
+
+def _get_failed_validations(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
+
+    validations = dict(
+        ritype    =  _required_input_type_response(f, validation_parameters),
+        tconall   =  _text_contains_all_response(f, validation_parameters),
+        tconany   =  _text_contains_any_response(f, validation_parameters),
+        reqcols   =  _required_columns_response(f, validation_parameters),
+        reqsheets =  _required_sheets_response(f, validation_parameters),
+        minrows   =  _min_rows_number_response(f, validation_parameters)
+    )
+
+    failed_validations = [v for v in validations.values() if isinstance(v, str)]
+
+    return failed_validations
+
+
 def default_filecontents_validation_handler(
     files: Union[List[bytes], List[str]], 
     validation_parameters: UploaderValidationParameters
@@ -174,26 +224,40 @@ def default_filecontents_validation_handler(
 
 
     validation_response = []
-
     for file in files:
         
         f = FileUploadHandler(file)
         
-        if f.filename in validation_parameters.ignore_filenames:
-            continue
+        if validation_parameters.ignore_filenames is not None:
+            if f.filename in validation_parameters.ignore_filenames:
+                continue
         
-        ritype    =  _required_input_type_response(f, validation_parameters)
-        tconall   =  _text_contains_all_response(f, validation_parameters)
-        tconany   =  _text_contains_any_response(f, validation_parameters)
-        reqcols   =  _required_columns_response(f, validation_parameters)
-        reqsheets =  _required_sheets_response(f, validation_parameters)
+        failed_validations = _get_failed_validations(f, validation_parameters)
 
+        if not failed_validations:
+            validation_response.append(
+                ValidationResponse(
+                    status=states.SUCCESS,
+                    filename=f.filename, 
+                    message=validation_parameters.filename_valid_message
+                )
+            )
+        else:
+            validation_response.append(
+                ValidationResponse(
+                    status=states.FAILED,
+                    filename=f.filename, 
+                    message=_get_error_message(failed_validations)
+                )
+            )
 
-        
-        
+    file_response = FileValidationResponse(
+        event_id=str(uuid.uuid4()),
+        status=states.SUCCESS,
+        message="File names and contents were analysed",
+        validation=tuple(validation_response)
+    )
 
+    return file_response
 
-
-        
-        
 
