@@ -1,11 +1,11 @@
 import requests
 from dataclasses import dataclass
-from typing import Callable, Tuple, List, Any
+from typing import Callable, Tuple, List, Any, Union
 from licenseware.constants import states
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
 from licenseware.uploader.defaults import default_filenames_validation_handler, default_filecontents_validation_handler
-from licenseware.uiresponses import FileNameResponse, FileContentResponse
+from licenseware.uiresponses import FileValidationResponse
 from licenseware.utils.logger import log
 
 
@@ -20,8 +20,8 @@ class NewUploader:
     flags: Tuple[str] = None
     status: str = None
     icon: str = None
-    filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileNameResponse] = None
-    filecontents_validation_handler: Callable = None
+    filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileValidationResponse] = None
+    filecontents_validation_handler: Callable[[Union[List[str], List[bytes]], UploaderValidationParameters], FileValidationResponse] = None
     config: Any = None
 
     def __post_init__(self):
@@ -31,7 +31,7 @@ class NewUploader:
         self.quota_validation_url = f"/{self.uploader_id}/quota"
         self.status_check_url = f"/{self.uploader_id}/status" 
 
-    def validate_filenames(self, filenames: List[str]) -> FileNameResponse:
+    def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:
 
         if self.filenames_validation_handler is None:
             return default_filenames_validation_handler(filenames, self.validation_parameters)
@@ -39,7 +39,7 @@ class NewUploader:
         return self.filenames_validation_handler(filenames, self.validation_parameters)
 
 
-    def validate_filecontents(self, files: list) -> FileContentResponse:
+    def validate_filecontents(self, files: list) -> FileValidationResponse:
 
         if self.filecontents_validation_handler is None:
             return default_filecontents_validation_handler(files, self.validation_parameters)

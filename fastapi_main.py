@@ -20,7 +20,13 @@ config = Config()
 rv_tools_encryption_parameters = UploaderEncryptionParameters()
 rv_tools_validation_parameters = UploaderValidationParameters(
     filename_contains=['rv', 'tools'],
-    filename_endswith=['.xlsx']
+    filename_endswith=['.xlsx'],
+    required_sheets=['tabvInfo', 'tabvCPU', 'tabvHost', 'tabvCluster'],
+    required_columns=[
+        'VM', 'Host', 'OS', 'Sockets', 'CPUs', 'Model', 'CPU Model',
+        'Cluster', '# CPU', '# Cores', 'ESX Version', 'HT Active',
+        'Name', 'NumCpuThreads', 'NumCpuCores'
+    ]
 )
 
 rv_tools_uploader = NewUploader(
@@ -88,9 +94,7 @@ def validate_filenames(filenames: FilenamesModel):
 @rv_tools_uploader_router.post(rv_tools_uploader.upload_url)
 def upload_files(files: List[fastapi.UploadFile], clear_data: bool = None, event_id: str = None):
     """ Upload files received on `files` for processing """
-    
-    return type(files[0])
-    # return rv_tools_uploader.validate_filecontents(files)
+    return rv_tools_uploader.validate_filecontents(files)
 
 
 @rv_tools_uploader_router.get(rv_tools_uploader.status_check_url, response_model=UploaderStatusModel)

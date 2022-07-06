@@ -1,2 +1,1 @@
-from .filename_response import FileNameResponse
-from .filecontent_response import FileContentResponse
+from .file_validation_response import FileValidationResponse, ValidationResponse

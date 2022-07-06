@@ -2,7 +2,6 @@ from typing import Tuple
 from dataclasses import dataclass, asdict
 
 
-
 @dataclass
 class UploaderValidationParameters:
     required_input_type: str = None
@@ -15,7 +14,7 @@ class UploaderValidationParameters:
     text_contains_all: Tuple[str] = None
     text_contains_any: Tuple[str] = None
     ignore_filenames: Tuple[str] = None
-    buffer: int = 9000
+    buffer: int = 15000
     filename_valid_message: str = "File is valid"
     filename_ignored_message: str = "File is ignored"
     regex_escape: bool = True
