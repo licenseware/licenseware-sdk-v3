@@ -1,13 +1,61 @@
 import pytest
-from licenseware.uploader.defaults import default_filecontents_validation_handler
 import io
 import os
 from fastapi import UploadFile
 from werkzeug.datastructures import FileStorage
 from licenseware.uploader import UploaderValidationParameters
-
+from licenseware.uploader.file_upload_handler import FileUploadHandler
+from licenseware.uploader.defaults import default_filecontents_validation_handler
+from licenseware.uploader.defaults import helpers
 
 # pytest -s -v tests/test_default_filecontents_validation_handler.py
+
+
+
+# pytest -s -v tests/test_default_filecontents_validation_handler.py::test_sniff_delimiter
+def test_sniff_delimiter():
+
+    response = helpers.sniff_delimiter(f, "RVTools.xlsx")
+    print(response)
+
+
+
+
+def test_required_input_type_response():
+    helpers.required_input_type_response
+
+def test_text_contains_all_response():
+    helpers.text_contains_all_response
+
+def test_text_contains_any_response():
+    helpers.text_contains_any_response
+
+def test_get_csv_df():
+    helpers.get_csv_df
+
+def test_get_df_sheets():
+    helpers.get_df_sheets
+
+def test_get_excel_dfs():
+    helpers.get_excel_dfs
+
+def test_required_columns_response():
+    helpers.required_columns_response
+
+def test_required_sheets_response():
+    helpers.required_sheets_response
+
+def test_min_rows_number_response():
+    helpers.min_rows_number_response
+
+def test_get_filenames_response():
+    helpers.get_filenames_response
+
+def test_get_error_message():
+    helpers.get_error_message
+
+def test_get_failed_validations():
+    helpers.get_failed_validations
 
 
 def test_default_filecontents_validation_handler():
@@ -77,4 +125,9 @@ def test_default_filecontents_validation_handler():
     response = default_filecontents_validation_handler(files, rv_tools_validation_parameters)
 
     print(response)
+
+    for res in response.validation:
+        if res.filename == "RVTools.xlsx":
+            print(res.message)
+            assert res.status == 'success'
 
