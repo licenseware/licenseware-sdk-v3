@@ -1,3 +1,4 @@
+import itertools
 import pandas as pd
 from typing import List, Union, IO
 from functools import wraps
@@ -112,6 +113,12 @@ def get_excel_dfs(
             skiprows=header_starts_at
         )
     else:
+
+        if required_sheets is not None:
+            if len(required_sheets) > 0:
+                if isinstance(required_sheets[0], (list, tuple, set,)):
+                    required_sheets = list(itertools.chain(*required_sheets))
+
         for sheet in sheets:                        
             if required_sheets is not None:
                 if sheet not in required_sheets: 

@@ -16,7 +16,7 @@ def validate_required_items(items: List[str], item_type:str, required_items: Uni
         missing_items = list(set.difference(set(required_items), set(items)))
         return _handle_response(missing_items, item_type, raise_error)
 
-    if isinstance(required_items[0], list):
+    if isinstance(required_items[0], (list, tuple, set,)):
         for rs in required_items:
             missing_items = list(set.difference(set(rs), set(items)))
             res = _handle_response(missing_items, item_type, raise_error=False)
