@@ -4,10 +4,9 @@ import shutil
 from typing import Union, IO
 
 
-class FileUploadHandler:
+class FileUploadHandler(io.BufferedIOBase):
 
     def __init__(self, fileorbuffer: Union[str, IO]) -> None:
-
         self.fileorbuffer = fileorbuffer
         self.filename = None
         self.buffer = None
@@ -27,9 +26,7 @@ class FileUploadHandler:
             # 'truncate', 'writable', 'write', 'writelines']
 
             # Mandatory attrs
-            attrs = ['close', 'flush', 'mode', 
-            'raw', 'read', 'readline', 'readlines', 'seek', 'tell', 
-            'write', 'writelines']
+            attrs = ['close', 'read', 'seek', 'tell', 'write']
             
             for name, val in vars(self.fileorbuffer).items():
                 if isinstance(val, io.BytesIO) and all(hasattr(val, attr) for attr in attrs) and self.buffer is None:
@@ -67,16 +64,16 @@ class FileUploadHandler:
 
     # Proxy calls
     
-    def writelines(self, __lines):
+    def writelines(self, __lines = None):
         return self.buffer.writelines(__lines)
 
     def writable(self):
         return self.buffer.writable()
 
-    def write(self, __buffer):
+    def write(self, __buffer = None):
         return self.buffer.write(__buffer)
 
-    def truncate(self, __size):
+    def truncate(self, __size = None):
         return self.buffer.truncate(__size)
 
     def tell(self):
@@ -85,35 +82,35 @@ class FileUploadHandler:
     def seekable(self):
         return self.buffer.seekable()
 
-    def seek(self, __offset:int, __whence:int):
+    def seek(self, __offset:int, __whence:int = 0):
         return self.buffer.seek(__offset, __whence)
 
-    def readlines(self, __hint):
+    def readlines(self, __hint = None):
         return self.buffer.readlines(__hint)
 
-    def readline(self, __size):
+    def readline(self, __size = None):
         return self.buffer.readline(__size)
 
-    def readinto1(self, __buffer):
+    def readinto1(self, __buffer = None):
         return self.buffer.readinto1(__buffer)
 
-    def readinto(self, __buffer):
+    def readinto(self, __buffer = None):
         return self.buffer.readinto(__buffer)
 
     def readable(self):
         return self.buffer.readable()
 
-    def read1(self, __size: int = ...):
+    def read1(self, __size: int = None):
         return self.buffer.read1(__size)
 
-    def read(self, __size: int = ...):
+    def read(self, __size: int = None):
         return self.buffer.read(__size)
 
     @property
     def raw(self):
         return self.buffer.raw
 
-    def peek(self, __size: int = ...):
+    def peek(self, __size: int = None):
         return self.buffer.peek(__size)
 
     @property
