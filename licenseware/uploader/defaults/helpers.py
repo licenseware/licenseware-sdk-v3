@@ -46,6 +46,7 @@ def required_input_type_response(f: FileUploadHandler, validation_parameters: Up
         rit = v.validate_required_input_type(f.filename, validation_parameters.required_input_type, raise_error=False)
     return rit
 
+
 @reset_stream
 def text_contains_all_response(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
     tcall = True
@@ -276,12 +277,12 @@ def get_error_message(failed_validations: List[str]):
 def get_failed_validations(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
 
     validations = dict(
-        # ritype    =  required_input_type_response(f, validation_parameters),
-        # tconall   =  text_contains_all_response(f, validation_parameters),
-        # tconany   =  text_contains_any_response(f, validation_parameters),
+        ritype    =  required_input_type_response(f, validation_parameters),
+        tconall   =  text_contains_all_response(f, validation_parameters),
+        tconany   =  text_contains_any_response(f, validation_parameters),
         reqcols   =  required_columns_response(f, validation_parameters),
-        # reqsheets =  required_sheets_response(f, validation_parameters),
-        # minrows   =  min_rows_number_response(f, validation_parameters)
+        reqsheets =  required_sheets_response(f, validation_parameters),
+        minrows   =  min_rows_number_response(f, validation_parameters)
     )
 
     failed_validations = [v for v in validations.values() if isinstance(v, str)]

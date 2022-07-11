@@ -46,10 +46,10 @@ class NewUploader:
 
         return self.filenames_validation_handler(files, self.validation_parameters)
 
-
-    def get_registration_payload(self):
+    @property
+    def metadata(self):
         
-        payload = {
+        registry_payload = {
             'data': [{
                 "app_id": self.app_id,
                 "uploader_id": self.uploader_id,
@@ -68,16 +68,14 @@ class NewUploader:
             }]
         }
 
-        return payload
+        return registry_payload
 
 
     def register(self):
 
-        payload = self.get_registration_payload()
-
         response = requests.post(
             url=self.config.REGISTER_UPLOADER_URL, 
-            json=payload, 
+            json=self.metadata, 
             headers={"Authorization": self.config.get_auth_token()}
         )
 
@@ -85,11 +83,11 @@ class NewUploader:
             return {
                     "status": states.SUCCESS,
                     "message": f"Uploader '{self.uploader_id}' register successfully",
-                    "content": payload
+                    "content": self.metadata
                 }, 200
 
         nokmsg = f"Could not register uploader '{self.uploader_id}'"
         log.error(nokmsg)
-        return {"status": states.FAILED, "message": nokmsg, "content": payload}, 400
+        return {"status": states.FAILED, "message": nokmsg, "content": self.metadata}, 400
 
     

@@ -66,8 +66,7 @@ def test_uploader(mocker):
             assert resp.status == "success"
 
         
-    payload = rv_tools_uploader.get_registration_payload()
-    assert "data" in payload
+    assert "data" in rv_tools_uploader.metadata
 
     response, status_code = rv_tools_uploader.register()
     assert status_code == 200
