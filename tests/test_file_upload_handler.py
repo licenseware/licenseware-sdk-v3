@@ -9,8 +9,19 @@ from fastapi import UploadFile
 from licenseware.uploader import FileUploadHandler
 
 
-
 # pytest -s -v tests/test_file_upload_handler.py
+
+
+# pytest -s -v tests/test_file_upload_handler.py::test_file_handler_objects
+def test_file_handler_objects():
+
+    csvfp = "./test_files/lms_detail.csv"
+    f = FileUploadHandler(csvfp)
+
+    assert "read" in dir(f)
+    assert "seek" in dir(f)
+    assert "tell" in dir(f)
+
 
 
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_string_input
@@ -26,7 +37,7 @@ def test_file_handler_string_input():
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in str(f.read(100))
     f.reset()
 
-    dfcsv = pd.read_csv(f)
+    dfcsv = pd.read_csv(f.buffer)
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
     save_path = "./test_files/testdir/testfile.csv"
@@ -61,7 +72,7 @@ def test_file_handler_flask_file_storage_input():
     f.reset()
 
     # print(f.data, type(f.data))
-    dfcsv = pd.read_csv(f)
+    dfcsv = pd.read_csv(f.buffer)
     # print(dfcsv.columns)
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
@@ -98,7 +109,7 @@ def test_file_handler_fastapi_uploadfile_input():
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in str(f.read(100))
     f.reset()
 
-    dfcsv = pd.read_csv(f)
+    dfcsv = pd.read_csv(f.buffer)
     # print(dfcsv.columns)
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
