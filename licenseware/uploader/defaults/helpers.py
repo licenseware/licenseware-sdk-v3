@@ -119,7 +119,7 @@ def get_excel_dfs(
                 if isinstance(required_sheets[0], (list, tuple, set,)):
                     required_sheets = list(itertools.chain(*required_sheets))
 
-        for sheet in sheets:  
+        for sheet in sheets:                        
             if required_sheets is not None:
                 if sheet not in required_sheets: 
                     continue
@@ -276,12 +276,12 @@ def get_error_message(failed_validations: List[str]):
 def get_failed_validations(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
 
     validations = dict(
-        # ritype    =  required_input_type_response(f, validation_parameters),
-        # tconall   =  text_contains_all_response(f, validation_parameters),
-        # tconany   =  text_contains_any_response(f, validation_parameters),
+        ritype    =  required_input_type_response(f, validation_parameters),
+        tconall   =  text_contains_all_response(f, validation_parameters),
+        tconany   =  text_contains_any_response(f, validation_parameters),
         reqcols   =  required_columns_response(f, validation_parameters),
-        # reqsheets =  required_sheets_response(f, validation_parameters),
-        # minrows   =  min_rows_number_response(f, validation_parameters)
+        reqsheets =  required_sheets_response(f, validation_parameters),
+        minrows   =  min_rows_number_response(f, validation_parameters)
     )
 
     failed_validations = [v for v in validations.values() if isinstance(v, str)]
