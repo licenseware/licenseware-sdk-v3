@@ -1,6 +1,6 @@
 
 run-tests:
-	coverage run --source=licenseware -m unittest tests/test_* 
+	coverage run --source=licenseware -m pytest tests/test_* 
 	coverage html 
 	coverage report -m 
 	rm coverage.svg
