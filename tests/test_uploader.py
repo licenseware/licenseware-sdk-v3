@@ -7,7 +7,6 @@ from licenseware import (
 )
 
 
-
 # pytest -s -v tests/test_uploader.py
 
 def test_uploader(mocker):
@@ -61,18 +60,18 @@ def test_uploader(mocker):
             assert resp.status == "success"
         
 
-    # fp = "./test_files/RVTools.xlsx"
-    # files = [fp]
-    # response = rv_tools_uploader.validate_filecontents(files)
-    # for resp in response.validation:
-    #     if resp.filename == "notok.csv":
-    #         assert resp.status == "failed"
-    #     if resp.filename == "rv_tools.xlsx":
-    #         assert resp.status == "success"
+    fp = "./test_files/RVTools.xlsx"
+    files = [fp]
+    response = rv_tools_uploader.validate_filecontents(files)
+    for resp in response.validation:
+        if resp.filename == "notok.csv":
+            assert resp.status == "failed"
+        if resp.filename == "rv_tools.xlsx":
+            assert resp.status == "success"
 
 
-    # assert "data" in rv_tools_uploader.metadata
+    assert "data" in rv_tools_uploader.metadata
 
-    # response, status_code = rv_tools_uploader.register()
-    # assert status_code == 200
-    # assert "success" == response['status']
+    response, status_code = rv_tools_uploader.register()
+    assert status_code == 200
+    assert "success" == response['status']
