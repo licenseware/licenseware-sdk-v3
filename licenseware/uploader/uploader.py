@@ -18,7 +18,6 @@ class NewUploader:
     validation_parameters: UploaderValidationParameters = None
     encryption_parameters: UploaderEncryptionParameters = None
     flags: Tuple[str] = None
-    status: str = None
     icon: str = None
     filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileValidationResponse] = None
     filecontents_validation_handler: Callable[[Union[List[str], List[bytes]], UploaderValidationParameters], FileValidationResponse] = None
@@ -26,6 +25,7 @@ class NewUploader:
 
     def __post_init__(self):
         self.app_id= self.config.APP_ID
+        self.status = "idle"
         self.upload_validation_url = f"/{self.uploader_id}/validation"
         self.upload_url = f"/{self.uploader_id}/files"
         self.quota_validation_url = f"/{self.uploader_id}/quota"
@@ -76,7 +76,7 @@ class NewUploader:
         response = requests.post(
             url=self.config.REGISTER_UPLOADER_URL, 
             json=self.metadata, 
-            headers={"Authorization": self.config.get_auth_token()}
+            headers={"Authorization": self.config.get_machine_token()}
         )
 
         if response.status_code == 200:
