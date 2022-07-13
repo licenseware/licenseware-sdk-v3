@@ -4,7 +4,7 @@ import os
 from fastapi import UploadFile
 from werkzeug.datastructures import FileStorage
 from licenseware.uploader import UploaderValidationParameters
-from licenseware.uploader.file_upload_handler import FileUploadHandler
+from licenseware import FileUploadHandler
 from licenseware.uploader.defaults import default_filecontents_validation_handler
 from licenseware.uploader.defaults import helpers
 

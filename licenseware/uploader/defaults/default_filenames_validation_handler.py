@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Union
-from licenseware import states
+from licenseware import States
 from licenseware.uiresponses.file_validation_response import FileValidationResponse, ValidationResponse
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.validators import validate_text_contains_any, validate_required_input_type
@@ -23,16 +23,16 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
     validation_response = []
 
     if validation_parameters.ignore_filenames:
-        filenames_ignored = [
+        filenames_ignored = [ # pragma: no cover
             ValidationResponse(
-                status=states.SKIPPED,
+                status=States.SKIPPED,
                 filename=filename, 
                 message=validation_parameters.filename_ignored_message
             ) 
             for fn in filenames if fn in validation_parameters.ignore_filenames
         ]
-        validation_response.extend(filenames_ignored)
-        filenames = [fn for fn in filenames if fn not in validation_parameters.ignore_filenames]
+        validation_response.extend(filenames_ignored) # pragma: no cover
+        filenames = [fn for fn in filenames if fn not in validation_parameters.ignore_filenames] # pragma: no cover
 
     for filename in filenames:
 
@@ -53,7 +53,7 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
 
             validation_response.append(
                 ValidationResponse(
-                    status=states.SUCCESS,
+                    status=States.SUCCESS,
                     filename=filename, 
                     message=validation_parameters.filename_valid_message
                 )
@@ -62,7 +62,7 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
         else:
             validation_response.append(
                 ValidationResponse(
-                    status=states.FAILED,
+                    status=States.FAILED,
                     filename=filename, 
                     message=_get_error_message(filename_contains_msg, filename_endswith_msg)
                 )
@@ -70,7 +70,7 @@ def default_filenames_validation_handler(filenames:List[str], validation_paramet
             
     filename_response = FileValidationResponse(
         event_id=str(uuid.uuid4()),
-        status=states.SUCCESS,
+        status=States.SUCCESS,
         message="File names were analysed",
         validation=tuple(validation_response)
     )

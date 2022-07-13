@@ -1,14 +1,12 @@
-from dataclasses import dataclass
+from .base_types import BaseTypes
 
 
-
-@dataclass(frozen=True)
-class icons:
-    SERVERS:str = "ServersIcon"
-    FEATURES:str = "FeaturesIcon"
-    CPU:str = "CpuIcon"
-    DATABASE_ROUNDED:str = "DatabaseIconRounded"
-    DEVICE:str = "DeviceIcon"
-    FILE:str = "FileIcon"
+class Icons(BaseTypes):
+    SERVERS = "ServersIcon"
+    FEATURES = "FeaturesIcon"
+    CPU = "CpuIcon"
+    DATABASE_ROUNDED = "DatabaseIconRounded"
+    DEVICE = "DeviceIcon"
+    FILE = "FileIcon"
     
     

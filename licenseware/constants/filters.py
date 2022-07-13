@@ -1,13 +1,12 @@
-from dataclasses import dataclass
+from .base_types import BaseTypes
 
 
-@dataclass(frozen=True)
-class filters:
-    EQUALS:str = "equals"
-    CONTAINS:str = "contains"
-    IN_LIST:str = "in_list"
-    GREATER_THAN:str = "greater_than"
-    GREATER_THAN_OR_EQUAL_TO:str = "greater_or_equal_to"
-    LESS_THAN:str = "less_than"
-    LESS_THAN_OR_EQUAL_TO:str = "less_or_equal_to"
+class Filters(BaseTypes):
+    EQUALS = "equals"
+    CONTAINS = "contains"
+    IN_LIST = "in_list"
+    GREATER_THAN = "greater_than"
+    GREATER_THAN_OR_EQUAL_TO = "greater_or_equal_to"
+    LESS_THAN = "less_than"
+    LESS_THAN_OR_EQUAL_TO = "less_or_equal_to"
     
