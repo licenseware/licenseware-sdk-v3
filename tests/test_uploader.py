@@ -6,7 +6,7 @@ from licenseware.uploader import (
 )
 
 
-# pytest tests/test_uploader.py
+# pytest -s -v tests/test_uploader.py
 
 def test_uploader(mocker):
 
@@ -24,7 +24,7 @@ def test_uploader(mocker):
         REGISTER_UPLOADER_URL = ""
 
         @staticmethod
-        def get_auth_token():
+        def get_machine_token():
             return "machine token from envs"
 
     config = Config()
@@ -45,29 +45,29 @@ def test_uploader(mocker):
         accepted_file_types=[".xls", ".xlsx"],
         validation_parameters=rv_tools_validation_parameters,
         encryption_parameters=rv_tools_encryption_parameters,
-        # There are some cases where you may need to replace these
-        # validation handlers with some custom handlers (hover to see types)
-        filenames_validation_handler=None,
-        filecontents_validation_handler=None,
-        flags=None,
-        status=None,
-        icon=None,
-        # External config object 
-        # From which we would get uploader-registry-url
         config=config
     )
 
     response = rv_tools_uploader.validate_filenames(filenames)
-    # print(response)
+
     for resp in response.validation:
         if resp.filename == "notok.csv":
             assert resp.status == "failed"
-        if resp.filename == "rv_tools":
+        if resp.filename == "rv_tools.xlsx":
+            assert resp.status == "success"
+        
+
+    fp = "./test_files/RVTools.xlsx"
+    files = [fp]
+    response = rv_tools_uploader.validate_filecontents(files)
+    for resp in response.validation:
+        if resp.filename == "notok.csv":
+            assert resp.status == "failed"
+        if resp.filename == "rv_tools.xlsx":
             assert resp.status == "success"
 
-        
-    payload = rv_tools_uploader.get_registration_payload()
-    assert "data" in payload
+
+    assert "data" in rv_tools_uploader.metadata
 
     response, status_code = rv_tools_uploader.register()
     assert status_code == 200

@@ -46,6 +46,7 @@ def required_input_type_response(f: FileUploadHandler, validation_parameters: Up
         rit = v.validate_required_input_type(f.filename, validation_parameters.required_input_type, raise_error=False)
     return rit
 
+
 @reset_stream
 def text_contains_all_response(f: FileUploadHandler, validation_parameters: UploaderValidationParameters):
     tcall = True
@@ -119,7 +120,7 @@ def get_excel_dfs(
                 if isinstance(required_sheets[0], (list, tuple, set,)):
                     required_sheets = list(itertools.chain(*required_sheets))
 
-        for sheet in sheets:                        
+        for sheet in sheets:  
             if required_sheets is not None:
                 if sheet not in required_sheets: 
                     continue

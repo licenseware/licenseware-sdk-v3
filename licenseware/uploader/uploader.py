@@ -18,7 +18,6 @@ class NewUploader:
     validation_parameters: UploaderValidationParameters = None
     encryption_parameters: UploaderEncryptionParameters = None
     flags: Tuple[str] = None
-    status: str = None
     icon: str = None
     filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileValidationResponse] = None
     filecontents_validation_handler: Callable[[Union[List[str], List[bytes]], UploaderValidationParameters], FileValidationResponse] = None
@@ -26,6 +25,7 @@ class NewUploader:
 
     def __post_init__(self):
         self.app_id= self.config.APP_ID
+        self.status = "idle"
         self.upload_validation_url = f"/{self.uploader_id}/validation"
         self.upload_url = f"/{self.uploader_id}/files"
         self.quota_validation_url = f"/{self.uploader_id}/quota"
@@ -46,10 +46,10 @@ class NewUploader:
 
         return self.filenames_validation_handler(files, self.validation_parameters)
 
-
-    def get_registration_payload(self):
+    @property
+    def metadata(self):
         
-        payload = {
+        registry_payload = {
             'data': [{
                 "app_id": self.app_id,
                 "uploader_id": self.uploader_id,
@@ -68,28 +68,26 @@ class NewUploader:
             }]
         }
 
-        return payload
+        return registry_payload
 
 
     def register(self):
 
-        payload = self.get_registration_payload()
-
         response = requests.post(
             url=self.config.REGISTER_UPLOADER_URL, 
-            json=payload, 
-            headers={"Authorization": self.config.get_auth_token()}
+            json=self.metadata, 
+            headers={"Authorization": self.config.get_machine_token()}
         )
 
         if response.status_code == 200:
             return {
                     "status": states.SUCCESS,
                     "message": f"Uploader '{self.uploader_id}' register successfully",
-                    "content": payload
+                    "content": self.metadata
                 }, 200
 
         nokmsg = f"Could not register uploader '{self.uploader_id}'"
         log.error(nokmsg)
-        return {"status": states.FAILED, "message": nokmsg, "content": payload}, 400
+        return {"status": states.FAILED, "message": nokmsg, "content": self.metadata}, 400
 
     
