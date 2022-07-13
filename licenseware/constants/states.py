@@ -1,22 +1,21 @@
-from dataclasses import dataclass
+from .base_types import BaseTypes
 
 
 
-@dataclass(frozen=True)
-class states:
-    IDLE:str = 'idle'
-    RUNNING:str = 'running'
-    SUCCESS:str = 'success'
-    FAILED:str = 'failed'
-    TIMEOUT:str = 'timeout'
-    SKIPPED:str = 'skipped'
-    ACTION_REQUIRED:str = 'action_required'
-    REQUEST_ACCEPTED:str = 'accepted'
-    REQUEST_REJECTED:str = 'rejected'
-    REQUEST_PENDING:str = 'pending'
-    REQUEST_REQUESTED:str = 'requested'
-    REQUEST_CANCELLED:str = 'cancelled'
-    REQUEST_REVOKED:str = 'revoked'
+class States(BaseTypes):
+    IDLE = 'idle'
+    RUNNING = 'running'
+    SUCCESS = 'success'
+    FAILED = 'failed'
+    TIMEOUT = 'timeout'
+    SKIPPED = 'skipped'
+    ACTION_REQUIRED = 'action_required'
+    REQUEST_ACCEPTED = 'accepted'
+    REQUEST_REJECTED = 'rejected'
+    REQUEST_PENDING = 'pending'
+    REQUEST_REQUESTED = 'requested'
+    REQUEST_CANCELLED = 'cancelled'
+    REQUEST_REVOKED = 'revoked'
     
 
 

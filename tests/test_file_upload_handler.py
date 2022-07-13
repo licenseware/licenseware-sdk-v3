@@ -6,8 +6,7 @@ import pandas as pd
 from werkzeug.datastructures import FileStorage
 from fastapi import UploadFile
 
-from licenseware.uploader import FileUploadHandler
-
+from licenseware import FileUploadHandler
 
 # pytest -s -v tests/test_file_upload_handler.py
 
@@ -21,6 +20,9 @@ def test_file_handler_objects():
     assert "read" in dir(f)
     assert "seek" in dir(f)
     assert "tell" in dir(f)
+
+    assert isinstance(f.readlines(1), list)
+    assert isinstance(f.readline(1), bytes)
 
 
 

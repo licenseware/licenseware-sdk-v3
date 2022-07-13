@@ -12,7 +12,7 @@ class FileUploadHandler(io.BufferedIOBase):
         self.buffer = None
         if isinstance(self.fileorbuffer, str):
             if not os.path.isfile(self.fileorbuffer):
-                raise FileNotFoundError(f"File {self.fileorbuffer} was not found on disk")
+                raise FileNotFoundError(f"File {self.fileorbuffer} was not found on disk") # pragma: no cover
 
         if isinstance(self.fileorbuffer, str):
             self.buffer = open(self.fileorbuffer, "rb") 
@@ -35,10 +35,10 @@ class FileUploadHandler(io.BufferedIOBase):
                     self.filename = val
                     
             if self.buffer is None:
-                raise AttributeError(f"Mandatory attributes '{', '.join(attrs)}' not found on provided BytesIO object.")
+                raise AttributeError(f"Mandatory attributes '{', '.join(attrs)}' not found on provided BytesIO object.") # pragma: no cover
             
             if self.filename is None:
-                raise AttributeError("Can't find `filename` for this file")
+                raise AttributeError("Can't find `filename` for this file") # pragma: no cover
 
     
     def reset(self):
@@ -65,79 +65,79 @@ class FileUploadHandler(io.BufferedIOBase):
     # Proxy calls
     
     def writelines(self, __lines = None):
-        return self.buffer.writelines(__lines)
+        return self.buffer.writelines(__lines) # pragma: no cover
 
     def writable(self):
-        return self.buffer.writable()
+        return self.buffer.writable() # pragma: no cover
 
     def write(self, __buffer = None):
-        return self.buffer.write(__buffer)
+        return self.buffer.write(__buffer) # pragma: no cover
 
     def truncate(self, __size = None):
-        return self.buffer.truncate(__size)
+        return self.buffer.truncate(__size) # pragma: no cover
 
     def tell(self):
-        return self.buffer.tell()
+        return self.buffer.tell() # pragma: no cover
 
     def seekable(self):
-        return self.buffer.seekable()
+        return self.buffer.seekable() # pragma: no cover
 
     def seek(self, __offset:int, __whence:int = 0):
-        return self.buffer.seek(__offset, __whence)
+        return self.buffer.seek(__offset, __whence) # pragma: no cover
 
     def readlines(self, __hint = None):
-        return self.buffer.readlines(__hint)
+        return self.buffer.readlines(__hint) # pragma: no cover
 
     def readline(self, __size = None):
-        return self.buffer.readline(__size)
+        return self.buffer.readline(__size) # pragma: no cover
 
     def readinto1(self, __buffer = None):
-        return self.buffer.readinto1(__buffer)
+        return self.buffer.readinto1(__buffer) # pragma: no cover
 
     def readinto(self, __buffer = None):
-        return self.buffer.readinto(__buffer)
+        return self.buffer.readinto(__buffer) # pragma: no cover
 
     def readable(self):
-        return self.buffer.readable()
+        return self.buffer.readable() # pragma: no cover
 
     def read1(self, __size: int = None):
-        return self.buffer.read1(__size)
+        return self.buffer.read1(__size) # pragma: no cover
 
     def read(self, __size: int = None):
-        return self.buffer.read(__size)
+        return self.buffer.read(__size) # pragma: no cover
 
     @property
     def raw(self):
-        return self.buffer.raw
+        return self.buffer.raw # pragma: no cover
 
     def peek(self, __size: int = None):
-        return self.buffer.peek(__size)
+        return self.buffer.peek(__size) # pragma: no cover
 
     @property
     def name(self):
-        return self.buffer.name
+        return self.buffer.name # pragma: no cover
 
     @property
     def mode(self):
-        return self.buffer.mode
+        return self.buffer.mode # pragma: no cover
 
     def isatty(self):
-        return self.buffer.isatty()
+        return self.buffer.isatty() # pragma: no cover
 
     def flush(self):
-        return self.buffer.flush()
+        return self.buffer.flush() # pragma: no cover
 
     def fileno(self):
-        return self.buffer.fileno()
+        return self.buffer.fileno() # pragma: no cover
 
     def detach(self):
-        return self.buffer.detach()
+        return self.buffer.detach() # pragma: no cover
 
     @property
     def closed(self):
-        return self.buffer.closed
+        return self.buffer.closed # pragma: no cover
 
     def close(self):
-        return self.buffer.close()
+        return self.buffer.close() # pragma: no cover
 
 

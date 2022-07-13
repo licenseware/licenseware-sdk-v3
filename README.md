@@ -35,15 +35,17 @@ etc
 
 Import uploader constructors
 ```py
-from licenseware.uploader import (
+from licenseware import (
     NewUploader, 
     UploaderValidationParameters,
     UploaderEncryptionParameters, 
+    FileTypes
 )
 ```
 - `NewUploader` - this object will `hold` all the information needed (metadata) for describing file(s) which will be uploaded for processing;
 - `UploaderValidationParameters` - this object will contain metadata needed to validate file(s);
 - `UploaderEncryptionParameters` - this object will contain metadata needed to encrypt sensitive data from file(s);
+- `FileTypes` - this contains all the file types we can process (.xml, .csv, .xlsx etc);
 
 This list can grow depending on the requirements.
 
@@ -89,7 +91,7 @@ Define uploader validation parameters
 rv_tools_validation_parameters = UploaderValidationParameters(
     required_input_type="excel",
     filename_contains=["rv", "tools"],
-    filename_endswith=[".xls", ".xlsx"],
+    filename_endswith=FileTypes.GENERIC_EXCEL # or just [".xls", ".xlsx"],
     required_sheets=["sheet1", "sheet2"],
     required_columns=["col1", "col2"],
     min_rows_number=1,
@@ -129,7 +131,7 @@ Each field is `optional` so we can reduce the above uploader's validation parame
 ```py
 rv_tools_validation_parameters = UploaderValidationParameters(
     filename_contains=["rv", "tools"],
-    filename_endswith=[".xls", ".xlsx"],
+    filename_endswith=FileTypes.GENERIC_EXCEL,
     required_sheets=["sheet1", "sheet2"],
     required_columns=["col1", "col2"]
 )
@@ -144,7 +146,7 @@ rv_tools_uploader = NewUploader(
     name="RVTools",
     description="XLSX export from RVTools after scanning your Vmware infrastructure.",
     uploader_id="rv_tools",
-    accepted_file_types=[".xls", ".xlsx"],
+    accepted_file_types=FileTypes.GENERIC_EXCEL,
     validation_parameters=rv_tools_validation_parameters,
     encryption_parameters=rv_tools_encryption_parameters,
     filenames_validation_handler=None,
@@ -166,8 +168,8 @@ In the `NewUploader` object we gather all information about this uploader
 - `encryption_parameters` - here we pass the instance of `UploaderEncryptionParameters` class;
 - `filenames_validation_handler` - by default the validation is handled by `uploader.defaults.default_filenames_validation_handler` function. If you need to treat the filename validation in a different way you can always pass another function. The `filenames_validation_handler` function will receive the a list of strings as a first parameter and an instance of `UploaderValidationParameters` class and must return an instace of `uiresponses.FileValidationResponse`;
 - `filecontents_validation_handler` - by default the validation is handled by `uploader.defaults.default_filecontents_validation_handler` function. If you need to overwrite this functionality you can pass your custom `filecontents_validation_handler` function which will have the same signature as `default_filenames_validation_handler`;
-- Obs: for setting the state of the validation you need to use the states `from licenseware.constants import states`;
-- `flags`- here you can set a list of flags for this uploader. Flags will be imported from `constants` package (`from licenseware.constants import flags`);
+- Obs: for setting the state of the validation you need to use the States `from licenseware States`;
+- `flags`- here you can set a list of flags for this uploader. Flags will be imported from `constants` package (`from licenseware import Flags`);
 - `icon` - the icon of this uploader which will be displayed in frontend;
 - `config` - the configuration class instance will will need to make available the following information:
     * `config.APP_ID` - each service must have an unique ID;
@@ -183,7 +185,7 @@ rv_tools_uploader = NewUploader(
     name="RVTools",
     description="XLSX export from RVTools after scanning your Vmware infrastructure.",
     uploader_id="rv_tools",
-    accepted_file_types=[".xls", ".xlsx"],
+    accepted_file_types=FileTypes.GENERIC_EXCEL,
     validation_parameters=rv_tools_validation_parameters,
     encryption_parameters=rv_tools_encryption_parameters,
     config=config

@@ -11,4 +11,4 @@ class UploaderEncryptionParameters:
 
 
     def dict(self):
-        return asdict(self)
+        return asdict(self) # pragma: no cover

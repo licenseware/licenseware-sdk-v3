@@ -1,8 +1,9 @@
 import pytest
-from licenseware.uploader import (
+from licenseware import (
     NewUploader, 
     UploaderValidationParameters,
     UploaderEncryptionParameters, 
+    FileTypes
 )
 
 
@@ -32,17 +33,19 @@ def test_uploader(mocker):
 
     filenames = ["notok.csv", "rv_tools.xlsx"]
 
+    assert isinstance(FileTypes.GENERIC_EXCEL, tuple)
+
     rv_tools_encryption_parameters = UploaderEncryptionParameters()
     rv_tools_validation_parameters = UploaderValidationParameters(
         filename_contains=['rv', 'tools'],
-        filename_endswith=['.xlsx']
+        filename_endswith=FileTypes.GENERIC_EXCEL # or [".xls", ".xlsx"] 
     )
 
     rv_tools_uploader = NewUploader(
         name="RVTools",
         description="XLSX export from RVTools after scanning your Vmware infrastructure.",
         uploader_id="rv_tools",
-        accepted_file_types=[".xls", ".xlsx"],
+        accepted_file_types=FileTypes.GENERIC_EXCEL,
         validation_parameters=rv_tools_validation_parameters,
         encryption_parameters=rv_tools_encryption_parameters,
         config=config

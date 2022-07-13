@@ -1,11 +1,9 @@
-from dataclasses import dataclass
+from .base_types import BaseTypes
 
 
-
-@dataclass(frozen=True)
-class flags:
-    BETA:str = 'beta'
-    SOON:str = 'soon'
-    PARTENER_APP:str = 'partner_app'
+class Flags(BaseTypes):
+    BETA = 'beta'
+    SOON = 'soon'
+    PARTENER_APP = 'partner_app'
 
 
