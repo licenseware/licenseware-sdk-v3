@@ -3,4 +3,6 @@ from enum import Enum
 
 
 class BaseTypes(str, Enum):
-    pass
+
+    def __repr__(self):
+        return self._value_
