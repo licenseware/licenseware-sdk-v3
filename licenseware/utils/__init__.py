@@ -1,1 +1,2 @@
 from .file_upload_handler import FileUploadHandler
+from .alter_string import get_altered_strings

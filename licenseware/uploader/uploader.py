@@ -24,15 +24,18 @@ class NewUploader:
     config: Any = None
 
     def __post_init__(self):
+        
+        assert self.config is not None
+        assert hasattr(self.config, "APP_ID")
+        assert hasattr(self.config, "REGISTER_UPLOADER_URL")
+        assert hasattr(self.config, "get_machine_token")
+        
         self.app_id= self.config.APP_ID
         self.status = States.IDLE
         self.upload_validation_url = f"/{self.uploader_id}/validation"
         self.upload_url = f"/{self.uploader_id}/files"
         self.quota_validation_url = f"/{self.uploader_id}/quota"
         self.status_check_url = f"/{self.uploader_id}/status" 
-
-        assert hasattr(self.config, "REGISTER_UPLOADER_URL")
-        assert hasattr(self.config, "get_machine_token")
 
 
     def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:
@@ -53,7 +56,7 @@ class NewUploader:
     @property
     def metadata(self):
         
-        registry_payload = { # pragma: no cover
+        metadata_payload = { # pragma: no cover
             'data': [{
                 "app_id": self.app_id,
                 "uploader_id": self.uploader_id,
@@ -72,7 +75,7 @@ class NewUploader:
             }]
         }
 
-        return registry_payload # pragma: no cover
+        return metadata_payload # pragma: no cover
 
 
     def register(self):

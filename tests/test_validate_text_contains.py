@@ -43,3 +43,6 @@ def test_validate_required_input_type_with_raise():
     with t.assertRaises(ValueError):
         validate_required_input_type("rvtools.xlsx", required_input_type=[".xml", ".csv"], raise_error=True)
     
+    with t.assertRaises(ValueError):
+        validate_required_input_type("rvtools.xlsx", required_input_type={"file":".xml", "f2":".csv"}, raise_error=True)
+    
