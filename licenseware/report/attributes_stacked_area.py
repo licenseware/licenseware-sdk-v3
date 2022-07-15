@@ -1,5 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
-
+from .report_component_types import RCTypes
 
 
 class StackedAreaAttrs:
@@ -35,6 +35,8 @@ class StackedAreaAttrs:
 
     """
     
+    component_type = RCTypes.STACKED_AREA
+
     _metadata = { "series": {
         "xaxis": [],
         "yaxis": []

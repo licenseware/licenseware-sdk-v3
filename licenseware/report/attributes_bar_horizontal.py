@@ -1,5 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
-
+from .report_component_types import RCTypes
 
 
 class BarHorizontalAttrs:
@@ -32,6 +32,8 @@ class BarHorizontalAttrs:
     }
 
     """
+
+    component_type = RCTypes.BAR_HORIZONTAL
     
     metadata = {
         "series": []

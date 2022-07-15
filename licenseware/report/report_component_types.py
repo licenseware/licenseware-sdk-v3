@@ -1,4 +1,4 @@
-from .base_types import BaseTypes
+from licenseware.constants.base_types import BaseTypes
 
 
 class RCTypes(BaseTypes):

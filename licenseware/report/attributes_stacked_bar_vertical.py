@@ -1,6 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.constants.column_types import ColumnTypes
-
+from .report_component_types import RCTypes
 
 
 class StackedBarVerticalAttrs:
@@ -46,6 +45,8 @@ class StackedBarVerticalAttrs:
     }
 
     """
+
+    component_type = RCTypes.STACKED_BAR_VERTICAL
         
     _metadata = { "series": {
         "xaxis": [],

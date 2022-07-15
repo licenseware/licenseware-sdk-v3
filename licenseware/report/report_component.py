@@ -3,14 +3,15 @@ from typing import Callable, Union, Any, Tuple
 from dataclasses import dataclass
 from licenseware.constants.states import States
 from licenseware.utils.logger import log
+from .attributes_type import AttributesType
+
 
 
 @dataclass
 class NewReportComponent:
     title: str
     component_id: str 
-    component_type: str
-    attributes: dict
+    attributes: AttributesType
     style_attributes: dict
     get_component_data_handler: Callable[[Any], Union[list, dict]]
     order: int = 0
@@ -26,6 +27,7 @@ class NewReportComponent:
         assert hasattr(self.config, "get_machine_token")
 
         self.app_id= self.config.APP_ID
+        self.component_type = self.attributes.component_type
         self.url = f'/report-components/{self.component_id}'
         self.public_url = f'/report-components/{self.component_id}/public'
         self.snapshot_url = f'/report-components/{self.component_id}/snapshot'

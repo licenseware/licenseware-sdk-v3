@@ -1,3 +1,4 @@
+from .report_component_types import RCTypes
 
 
 
@@ -21,6 +22,8 @@ class DataNarrativeAttrs:
     }
 
     """
+    
+    component_type = RCTypes.DATA_NARRATIVE
     
     metadata = {
         "series": {}

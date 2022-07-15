@@ -1,5 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
-
+from .report_component_types import RCTypes
 
 
 class DetailedSummaryAttrs:
@@ -85,6 +85,8 @@ class DetailedSummaryAttrs:
 
     """
         
+    component_type = RCTypes.DETAILED_SUMMARY
+    
     _metadata = {
         "header_columns": [],
         "detail_columns": []

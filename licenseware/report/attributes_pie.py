@@ -1,4 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
+from .report_component_types import RCTypes
 
 
 
@@ -34,6 +35,8 @@ class PieAttrs:
         ]
     }
     """
+
+    component_type = RCTypes.PIE
     
     metadata = {
         "series": []

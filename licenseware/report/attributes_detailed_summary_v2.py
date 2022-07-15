@@ -1,5 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.constants.column_types import ColumnTypes
+from .report_component_types import RCTypes
 
 
 
@@ -55,6 +55,7 @@ class DetailedSummaryV2Attrs:
 
     """
         
+    component_type = RCTypes.DETAILED_SUMMARY_V2
     metadata = { "series": [] }
 
     def attr(self, *, value_key:str, value_description:str = None, type:str = None, currency:str = None):

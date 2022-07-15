@@ -65,7 +65,8 @@ class NewReport:
         self.filters = _update_filters(self.filters)
         
 
-    def register_component(self, component: NewReportComponent):
+    def attach(self, component: NewReportComponent):
+        """ Attach component to this report """
         if component.component_id in self.report_components.keys():
             raise ValueError(f"Report component '{component.component_id}' is already registered")
         self.report_components[component.component_id] = component

@@ -9,6 +9,8 @@ from licenseware import (
     ColumnTypes,
     Filters,
     RCTypes,
+    SummaryAttrs,
+    Icons
 )
 
 from licenseware.report.report import _update_connected_apps, _update_filters
@@ -151,22 +153,35 @@ def test_report(mocker):
     def get_fmw_summary_component_data(*args, **kwargs):
         return "mock_component_data"
 
+
+    # Declaring some attributes
+    summary = (
+        SummaryAttrs()
+        .attr(
+            value_key="missing_parent_details", 
+            value_description="Missing parent details",
+            icon=Icons.FEATURES
+        )
+        .attr(value_key="unknown_types")
+    )
+
     # Declaring the report component
     fmw_summary_component = NewReportComponent(
         title="Summary", 
         component_id="fmw_summary", 
-        component_type=RCTypes.SUMMARY,
-        attributes={},
+        attributes=summary,
         style_attributes={},
         get_component_data_handler=get_fmw_summary_component_data,
         config=config
     )
 
+    
     # Attaching a report component to a report
-    fmw_deployment_report.register_component(fmw_summary_component)
+    fmw_deployment_report.attach(fmw_summary_component)
+
 
     with t.assertRaises(ValueError):
-        fmw_deployment_report.register_component(fmw_summary_component)
+        fmw_deployment_report.attach(fmw_summary_component)
 
     assert fmw_summary_component.get_component_data() == "mock_component_data"
     assert "data" in fmw_summary_component.metadata

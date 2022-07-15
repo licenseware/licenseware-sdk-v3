@@ -1,5 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
-
+from .report_component_types import RCTypes
 
 
 class RelationshipGraphAttrs:
@@ -40,6 +40,8 @@ class RelationshipGraphAttrs:
     }
 
     """
+
+    component_type = RCTypes.RELATIONSHIP_GRAPH
     
     _metadata = {
         "series": [],
