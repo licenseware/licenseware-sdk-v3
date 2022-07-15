@@ -59,11 +59,11 @@ class StackedAreaAttrs:
 
     def attr_yaxis(self, *, label_key:str, value_key:str, label_description:str = None, value_description:str = None):
 
-        if label_description is None:
+        if label_description is None: # pragma no cover
             altstr = get_altered_strings(label_key)
             label_description = altstr.title
 
-        if value_description is None:
+        if value_description is None: # pragma no cover
             altstr = get_altered_strings(value_key)
             value_description = altstr.title
 

@@ -11,7 +11,7 @@ class AlteredStrVersions:
     underscore: str
     underscore_upper: str
 
-    def dict(self):
+    def dict(self): # pragma no cover
         return asdict(self)
 
 

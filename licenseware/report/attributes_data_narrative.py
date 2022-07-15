@@ -29,7 +29,7 @@ class DataNarrativeAttrs:
     def attr(self, *, value_key:str):
 
         if len(self.metadata["series"]) > 0:
-            raise ValueError("Only one `value_key` can be set")
+            raise ValueError("Only one `value_key` can be set") # pragma no cover
 
         self.metadata["series"].update({
             "value_key": value_key

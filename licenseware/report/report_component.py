@@ -38,7 +38,7 @@ class NewReportComponent:
     @property
     def metadata(self):
 
-        metadata_payload = {
+        metadata_payload = { # pragma no cover
             'data': [{
                 "app_id": self.app_id,
                 "component_id": self.component_id,
