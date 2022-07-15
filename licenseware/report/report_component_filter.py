@@ -5,6 +5,16 @@ from licenseware.utils.alter_string import get_altered_strings
 
 @dataclass
 class RCFilter:
+    """
+        Filter sample
+        {
+            "column": "result",
+            "allowed_filters": ["equals", "contains", "in_list"],
+            "visible_name": "Result",
+            "column_type": "string",
+            "allowed_values": ["Verify", "Used", "Licensable", "Restricted"],
+        }
+    """
     column: str 
     allowed_filters: Tuple[str]
     column_type: str = "string"  

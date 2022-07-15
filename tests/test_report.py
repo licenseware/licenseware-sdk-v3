@@ -40,20 +40,6 @@ def test_report(mocker):
 
     FMW_FILTERS = {
         "BASE": [
-            
-            RCFilter(
-                column="device_name",
-                allowed_filters=[Filters.EQUALS, Filters.CONTAINS, Filters.IN_LIST],
-                column_type=ColumnTypes.STRING,
-            ),
-            
-            # {
-            #     "column": "device_name",
-            #     "allowed_filters": ["equals", "contains", "in_list"],
-            #     "visible_name": "Device Name",
-            #     "column_type": "string",
-            # },
-
             RCFilter(
                 column="updated_at",
                 allowed_filters=[
@@ -66,21 +52,8 @@ def test_report(mocker):
                 column_type=ColumnTypes.DATE,
                 visible_name="Last Update Date"
             ),
-            # {
-            #     "column": "updated_at",
-            #     "allowed_filters": [
-            #         "equals",
-            #         "greater_than",
-            #         "greater_or_equal_to",
-            #         "less_than",
-            #         "less_or_equal_to",
-            #     ],
-            #     "visible_name": "Last Update Date",
-            #     "column_type": "date",
-            # },
         ],
         "DEPLOYMENT": [
-
             RCFilter(
                 column="result",
                 allowed_filters=[
@@ -91,14 +64,6 @@ def test_report(mocker):
                 column_type=ColumnTypes.STRING,
                 allowed_values=["Verify", "Used", "Licensable", "Restricted"]
             ),
-
-            # {
-            #     "column": "result",
-            #     "allowed_filters": ["equals", "contains", "in_list"],
-            #     "visible_name": "Result",
-            #     "column_type": "string",
-            #     "allowed_values": ["Verify", "Used", "Licensable", "Restricted"],
-            # },
         ]
     }
 

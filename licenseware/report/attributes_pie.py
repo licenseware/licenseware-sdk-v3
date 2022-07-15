@@ -1,52 +1,69 @@
-from dataclasses import dataclass
 from licenseware.utils.alter_string import get_altered_strings
 
 
 
-@dataclass
 class PieAttrs:
-    label_key: str
-    value_key: str
-    label_description: str = None
-    value_description: str = None
+    """
+    Usage:
+    ```py
+    
+    pie = (
+        PieAttrs()
+        .attr(
+            label_key="product_name", 
+            label_description="WebLogic Edition",
+            value_key="number_of_devices",
+            value_description="Number of Devices",
+        )
+        .attr(label_key="device_name", value_key="devices_numbers")
+    )
 
-    def __post_init__(self):
+    ```
+    PIE SAMPLE
 
-        if self.label_description is None:
-            altstr = get_altered_strings(self.label_key)
-            self.label_description = altstr.title
+    {
+        "series": [
+            {
+                "label_description": "WebLogic Edition", 
+                "label_key": "product_name"
+            },
+            {
+                "value_description": "Number of Devices",
+                "value_key": "number_of_devices",
+            },
+        ]
+    }
+    """
+    
+    metadata = {
+        "series": []
+    }
 
-        if self.value_description is None:
-            altstr = get_altered_strings(self.value_key)
-            self.value_description = altstr.title
+    def attr(self, *, label_key: str, value_key:str, value_description:str = None, label_description: str = None):
+
+        if label_description is None:
+            altstr = get_altered_strings(label_key)
+            label_description = altstr.title
+
+        if value_description is None:
+            altstr = get_altered_strings(value_key)
+            value_description = altstr.title
+
+        self.metadata["series"].extend([
+            {
+                "label_key": label_key,
+                "label_description": label_description, 
+            },
+            {
+                "value_key": value_key,
+                "value_description": value_description,
+            },
+        ])
+
+        return self
+        
 
 
-    def dict(self):
-        return {
-            "series": [
-                {
-                    "label_key": self.label_key,
-                    "label_description": self.label_description, 
-                },
-                {
-                    "value_key": self.value_key,
-                    "value_description": self.value_description,
-                },
-            ]
-        }
 
 
 
-"""
-PIE SAMPLE
-
-{
-    "series": [
-        {"label_description": "WebLogic Edition", "label_key": "product_name"},
-        {
-            "value_description": "Number of Devices",
-            "value_key": "number_of_devices",
-        },
-    ]
-}
-"""

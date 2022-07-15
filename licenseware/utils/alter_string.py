@@ -17,7 +17,7 @@ class AlteredStrVersions:
 
 def get_altered_strings(s:str):
 
-    strli = s.strip().replace("-", "|").replace("_", "|").split("|")
+    strli = s.strip().replace("-", "|").replace("_", "|").replace(".", "|").split("|")
     str_title = " ".join([v.capitalize() for v in strli]) # odb-service => Odb Service
     str_title_joined = "".join([v.capitalize() for v in strli]) # odb-service => OdbService
     str_dash = "-".join([v.lower() for v in strli]) # odb-service => odb-service
