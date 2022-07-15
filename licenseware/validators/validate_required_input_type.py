@@ -19,7 +19,7 @@ def validate_required_input_type(filepath: str, required_input_type: Union[str, 
     elif isinstance(required_input_type, (list, tuple, set,)):
         required_input_types = required_input_type
     else:
-        raise ValueError("Only `string` and `iterables`(list, tuple, set) are acepted for `required_input_type` parameter") # pragma: no cover
+        raise ValueError("Only `string` and `iterables`(list, tuple, set) are acepted for `required_input_type` parameter")
 
     reqitypes = []
     for rtype in required_input_types:

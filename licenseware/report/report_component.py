@@ -15,7 +15,7 @@ class NewReportComponent:
     attributes: AttributesType
     style_attributes: StyleAttrs
     get_component_data_handler: Callable[[Any], Union[list, dict]]
-    order: int = 0
+    order: int = None
     filters: Tuple[str] = None
     config: Any = None
 
@@ -49,8 +49,8 @@ class NewReportComponent:
                 "public_url": self.public_url,
                 "snapshot_url": self.snapshot_url,
                 "order": self.order,
-                "style_attributes": self.style_attributes,
-                "attributes": self.attributes,
+                "style_attributes": self.style_attributes.metadata,
+                "attributes": self.attributes.metadata,
                 "title": self.title,
                 "component_type": self.component_type,
                 "filters": self.filters

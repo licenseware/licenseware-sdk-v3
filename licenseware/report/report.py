@@ -1,5 +1,5 @@
 import requests
-from typing import List, Any, Tuple
+from typing import List, Any, Tuple, Dict
 from dataclasses import dataclass
 from licenseware.utils.logger import log
 from licenseware.constants.states import States
@@ -35,6 +35,12 @@ def _update_filters(filters):
 
 
 
+def _parse_report_components(report_components: Dict[str, NewReportComponent]):
+    return [comp.metadata["data"][0] for _, comp in report_components.items()]
+
+
+
+
 @dataclass
 class NewReport:
     name: str
@@ -55,7 +61,7 @@ class NewReport:
         assert hasattr(self.config, "get_machine_token")
 
         self.app_id= self.config.APP_ID
-        self.report_components = {}
+        self.report_components: Dict[str, NewReportComponent] = dict()
         self.url = f'/reports/{self.report_id}' 
         self.public_url = f'/reports/{self.report_id}/public' 
         self.snapshot_url = f'/reports/{self.report_id}/snapshot' 
@@ -69,8 +75,12 @@ class NewReport:
         """ Attach component to this report """
         if component.component_id in self.report_components.keys():
             raise ValueError(f"Report component '{component.component_id}' is already registered")
+
+        if component.order is None:
+            component.order = len(self.report_components.keys()) + 1
+
         self.report_components[component.component_id] = component
-    
+
 
     @property
     def metadata(self):
@@ -88,7 +98,7 @@ class NewReport:
                     "snapshot_url": self.snapshot_url,
                     "preview_image_url": self.preview_image_url,
                     "preview_image_dark_url": self.preview_image_dark_url,
-                    "report_components": self.report_components,
+                    "report_components": _parse_report_components(self.report_components),
                     "connected_apps": self.connected_apps,
                     "filters": self.filters
                 }
