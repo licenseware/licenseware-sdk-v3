@@ -199,3 +199,64 @@ This `rv_tools_uploader` instance will make available the following needed metho
 - `metadata` - property which contains all the needed information to register a new uploader to discovery/registry-service;
 - `register` - method which will send uploader's metadata to discovery/registry-service;
 
+
+
+
+# Reports
+
+After the `Uploader` validates the files, the files are sent to processing and processed what remains is to provide useful insights by aggregating saved data resulted after processing in small digestable chunks of data.
+A report can contain one or more report components. 
+Each report component has a corespondent front-end component which `knows` how to render it's data.
+
+
+Start by importing the report contructors
+
+```py
+from config import config
+from licenseware import (
+    NewReport, 
+    NewReportComponent,
+    RCFilter,
+    ColumnTypes,
+    Filters,
+    StyleAttrs,
+    SummaryAttrs,
+    BarHorizontalAttrs,
+    Icons
+)
+
+```
+
+Declare a new report
+
+```py
+
+
+report_global_filters = [
+    RCFilter(
+        column="result",
+        allowed_filters=[
+            Filters.EQUALS, 
+            Filters.CONTAINS, 
+            Filters.IN_LIST,
+        ],
+        column_type=ColumnTypes.STRING,
+        allowed_values=["Verify", "Used", "Licensable", "Restricted"]
+    ),
+    # etc
+]
+
+fmw_deployment_report = NewReport(
+    name="Oracle Fusion Middleware Deployment",
+    report_id="fmw_deployment_report",
+    description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.", 
+    filters=report_global_filters,
+    config=config
+)
+
+```
+
+This report instance provides the following objects for use:
+- `attach` - method which will be used to attach instances of `NewReportComponent`;
+- `register` - method which will be used to make a post request with this report data;
+- `metadata` - property which contains the json payload for registry service
