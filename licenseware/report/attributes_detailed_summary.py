@@ -85,12 +85,12 @@ class DetailedSummaryAttrs:
 
     """
         
-    component_type = RCTypes.DETAILED_SUMMARY
-    
-    _metadata = {
-        "header_columns": [],
-        "detail_columns": []
-    }
+    def __init__(self):
+        self.component_type = RCTypes.DETAILED_SUMMARY
+        self._metadata = {
+            "header_columns": [],
+            "detail_columns": []
+        }
 
     @property
     def metadata(self):

@@ -36,9 +36,9 @@ class TableAttrs:
     }
     """
     
-    component_type = RCTypes.TABLE
-    
-    metadata = {"columns": []}
+    def __init__(self):
+        self.component_type = RCTypes.TABLE        
+        self.metadata = {"columns": []}
 
     def attr(self, *, prop: str, name: str = None, type:str = ColumnTypes.STRING):
 

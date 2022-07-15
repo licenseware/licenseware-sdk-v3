@@ -46,12 +46,12 @@ class StackedBarVerticalAttrs:
 
     """
 
-    component_type = RCTypes.STACKED_BAR_VERTICAL
-        
-    _metadata = { "series": {
-        "xaxis": [],
-        "yaxis": []
-    }}
+    def __init__(self):
+        self.component_type = RCTypes.STACKED_BAR_VERTICAL  
+        self._metadata = { "series": {
+            "xaxis": [],
+            "yaxis": []
+        }}
 
     @property
     def metadata(self):

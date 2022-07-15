@@ -54,9 +54,10 @@ class DetailedSummaryV2Attrs:
     
 
     """
-        
-    component_type = RCTypes.DETAILED_SUMMARY_V2
-    metadata = { "series": [] }
+    
+    def __init__(self):
+        self.component_type = RCTypes.DETAILED_SUMMARY_V2
+        self.metadata = { "series": [] }
 
     def attr(self, *, value_key:str, value_description:str = None, type:str = None, currency:str = None):
 

@@ -35,12 +35,12 @@ class StackedAreaAttrs:
 
     """
     
-    component_type = RCTypes.STACKED_AREA
-
-    _metadata = { "series": {
-        "xaxis": [],
-        "yaxis": []
-    }}
+    def __init__(self):
+        self.component_type = RCTypes.STACKED_AREA
+        self._metadata = { "series": {
+            "xaxis": [],
+            "yaxis": []
+        }}
 
     @property
     def metadata(self):

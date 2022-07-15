@@ -36,11 +36,11 @@ class PieAttrs:
     }
     """
 
-    component_type = RCTypes.PIE
-    
-    metadata = {
-        "series": []
-    }
+    def __init__(self):
+        self.component_type = RCTypes.PIE    
+        self.metadata = {
+            "series": []
+        }
 
     def attr(self, *, label_key: str, value_key:str, value_description:str = None, label_description: str = None):
 

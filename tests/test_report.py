@@ -8,7 +8,7 @@ from licenseware import (
     RCFilter,
     ColumnTypes,
     Filters,
-    RCTypes,
+    StyleAttrs,
     SummaryAttrs,
     Icons
 )
@@ -165,12 +165,18 @@ def test_report(mocker):
         .attr(value_key="unknown_types")
     )
 
+    styles = (
+        StyleAttrs()
+        .width_one_third
+        .set("height", "full")
+    )
+
     # Declaring the report component
     fmw_summary_component = NewReportComponent(
         title="Summary", 
         component_id="fmw_summary", 
         attributes=summary,
-        style_attributes={},
+        style_attributes=styles,
         get_component_data_handler=get_fmw_summary_component_data,
         config=config
     )

@@ -41,12 +41,13 @@ class RelationshipGraphAttrs:
 
     """
 
-    component_type = RCTypes.RELATIONSHIP_GRAPH
-    
-    _metadata = {
-        "series": [],
-        "categories": []
-    }
+    def __init__(self):
+        self.component_type = RCTypes.RELATIONSHIP_GRAPH        
+        self._metadata = {
+            "series": [],
+            "categories": []
+        }
+
 
     @property
     def metadata(self):

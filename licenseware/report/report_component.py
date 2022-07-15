@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from licenseware.constants.states import States
 from licenseware.utils.logger import log
 from .attributes_type import AttributesType
+from .style_attributes import StyleAttrs
 
 
 
@@ -12,7 +13,7 @@ class NewReportComponent:
     title: str
     component_id: str 
     attributes: AttributesType
-    style_attributes: dict
+    style_attributes: StyleAttrs
     get_component_data_handler: Callable[[Any], Union[list, dict]]
     order: int = 0
     filters: Tuple[str] = None
@@ -26,7 +27,7 @@ class NewReportComponent:
         assert hasattr(self.config, "REGISTER_REPORT_COMPONENT_URL")
         assert hasattr(self.config, "get_machine_token")
 
-        self.app_id= self.config.APP_ID
+        self.app_id = self.config.APP_ID
         self.component_type = self.attributes.component_type
         self.url = f'/report-components/{self.component_id}'
         self.public_url = f'/report-components/{self.component_id}/public'

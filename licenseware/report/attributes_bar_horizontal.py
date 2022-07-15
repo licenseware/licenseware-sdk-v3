@@ -33,11 +33,11 @@ class BarHorizontalAttrs:
 
     """
 
-    component_type = RCTypes.BAR_HORIZONTAL
-    
-    metadata = {
-        "series": []
-    }
+    def __init__(self):
+        self.component_type = RCTypes.BAR_HORIZONTAL
+        self.metadata = {
+            "series": []
+        }
 
     def attr(self, *, xaxis_key:str, yaxis_key:str, xaxis_description:str = None, yaxis_description:str = None):
 

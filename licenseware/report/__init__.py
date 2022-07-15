@@ -13,3 +13,4 @@ from .attributes_bar_horizontal import BarHorizontalAttrs
 from .attributes_stacked_area import StackedAreaAttrs
 from .column_types import ColumnTypes
 from .report_component_types import RCTypes
+from .style_attributes import StyleAttrs

@@ -22,12 +22,12 @@ class DataNarrativeAttrs:
     }
 
     """
-    
-    component_type = RCTypes.DATA_NARRATIVE
-    
-    metadata = {
-        "series": {}
-    }
+
+    def __init__(self):
+        self.component_type = RCTypes.DATA_NARRATIVE
+        self.metadata = {
+            "series": {}
+        }
 
     def attr(self, *, value_key:str):
 

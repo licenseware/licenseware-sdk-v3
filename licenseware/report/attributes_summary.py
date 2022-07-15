@@ -45,8 +45,9 @@ class SummaryAttrs:
 
     """
 
-    component_type = RCTypes.SUMMARY
-    metadata = {"series": []}
+    def __init__(self):
+        self.component_type = RCTypes.SUMMARY
+        self.metadata = {"series": []}
 
     def attr(self, *, value_key: str, value_description: str = None, icon:str = None):
 
