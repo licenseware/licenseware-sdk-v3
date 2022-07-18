@@ -1,10 +1,12 @@
 import requests
-from typing import Callable, Union, Any, Tuple
+from typing import Callable, Union, Any
 from dataclasses import dataclass
 from licenseware.constants.states import States
 from licenseware.utils.logger import log
 from .attributes_type import AttributesType
 from .style_attributes import StyleAttrs
+from .report_filter import ReportFilter
+
 
 
 
@@ -16,7 +18,7 @@ class NewReportComponent:
     style_attributes: StyleAttrs
     get_component_data_handler: Callable[[Any], Union[list, dict]]
     order: int = None
-    filters: Tuple[str] = None
+    filters: ReportFilter = None
     config: Any = None
 
 
@@ -53,7 +55,7 @@ class NewReportComponent:
                 "attributes": self.attributes.metadata,
                 "title": self.title,
                 "component_type": self.component_type,
-                "filters": self.filters
+                "filters": self.filters.metadata if self.filters is not None else None
             }]
         }
 

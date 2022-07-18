@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from licenseware.utils.logger import log
 from licenseware.constants.states import States
 from .report_component import NewReportComponent
-from .report_component_filter import RCFilter
+from .report_filter import ReportFilter
 
 
 def _update_connected_apps(connected_apps, config):
@@ -16,23 +16,6 @@ def _update_connected_apps(connected_apps, config):
         connected_apps.append(config.APP_ID)
 
     return connected_apps
-
-
-def _update_filters(filters):
-
-    if filters is not None:
-        parsed_filters = []
-        for filter in filters:
-            if isinstance(filter, dict):
-                parsed_filters.append(filter)
-            elif isinstance(filter, RCFilter):
-                parsed_filters.append(filter.dict())
-            else:
-                raise ValueError("Only `dict` and `RCFilter` types are allowed")
-        filters = parsed_filters
-
-    return filters
-
 
 
 def _parse_report_components(report_components: Dict[str, NewReportComponent]):
@@ -50,7 +33,7 @@ class NewReport:
     preview_image_dark: str = None
     connected_apps: Tuple[str] = None
     flags: Tuple[str] = None
-    filters: List[str] = None
+    filters: ReportFilter = None
     config: Any = None
 
     def __post_init__(self):
@@ -68,8 +51,7 @@ class NewReport:
         self.preview_image_url = f'/reports/{self.report_id}/preview_image' 
         self.preview_image_dark_url = f'/reports/{self.report_id}/preview_image_dark' 
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
-        self.filters = _update_filters(self.filters)
-        
+
 
     def attach(self, component: NewReportComponent):
         """ Attach component to this report """
@@ -100,7 +82,7 @@ class NewReport:
                     "preview_image_dark_url": self.preview_image_dark_url,
                     "report_components": _parse_report_components(self.report_components),
                     "connected_apps": self.connected_apps,
-                    "filters": self.filters
+                    "filters": self.filters.metadata if self.filters is not None else None
                 }
             ]
         }

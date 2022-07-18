@@ -1,4 +1,4 @@
-from .report_component_types import RCTypes
+from licenseware.constants.report_component_types import RCTypes
 
 
 
