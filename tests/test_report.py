@@ -5,23 +5,19 @@ from dataclasses import dataclass
 from licenseware import (
     NewReport, 
     NewReportComponent,
-    RCFilter,
-    ColumnTypes,
-    Filters,
+    ReportFilter,
     StyleAttrs,
     SummaryAttrs,
     BarHorizontalAttrs,
     Icons
 )
 
-from licenseware.report.report import _update_connected_apps, _update_filters, _parse_report_components
+from licenseware.report.report import _update_connected_apps, _parse_report_components
 
 
 # pytest -s -v tests/test_report.py
 
 t = unittest.TestCase()
-
-
 
 
 # pytest -s -v tests/test_report.py::test_parse_report_components
@@ -106,45 +102,6 @@ def test_update_connected_apps():
 
 
 
-# pytest -s -v tests/test_report.py::test_update_filters
-def test_update_filters():
-
-    filters = [
-        {
-            "column": "result",
-            "allowed_filters": ["equals", "contains", "in_list"],
-            "visible_name": "Result",
-            "column_type": "string",
-            "allowed_values": ["Verify", "Used", "Licensable", "Restricted"],
-        },
-        RCFilter(
-            column="result",
-            allowed_filters=[
-                Filters.EQUALS, 
-                Filters.CONTAINS, 
-                Filters.IN_LIST,
-            ],
-            column_type=ColumnTypes.STRING,
-            allowed_values=["Verify", "Used", "Licensable", "Restricted"]
-        )
-    ]
-
-    updated_filters = _update_filters(filters)
-
-    # print(updated_filters)
-    assert isinstance(updated_filters, list)
-    for fltr in updated_filters:
-        assert isinstance(fltr, dict)
-
-
-    filters = [
-        ["fail"]
-    ]
-
-    with t.assertRaises(ValueError):
-        _update_filters(filters)
-
-
 
 # pytest -s -v tests/test_report.py::test_report_creation
 def test_report_creation(mocker):
@@ -172,34 +129,32 @@ def test_report_creation(mocker):
     config = Config()
 
 
-    FMW_FILTERS = {
-        "BASE": [
-            RCFilter(
-                column="updated_at",
-                allowed_filters=[
-                    Filters.EQUALS, 
-                    Filters.GREATER_THAN, 
-                    Filters.GREATER_THAN_OR_EQUAL_TO,
-                    Filters.LESS_THAN,
-                    Filters.LESS_THAN_OR_EQUAL_TO,
-                ],
-                column_type=ColumnTypes.DATE,
-                visible_name="Last Update Date"
-            ),
-        ],
-        "DEPLOYMENT": [
-            RCFilter(
-                column="result",
-                allowed_filters=[
-                    Filters.EQUALS, 
-                    Filters.CONTAINS, 
-                    Filters.IN_LIST,
-                ],
-                column_type=ColumnTypes.STRING,
-                allowed_values=["Verify", "Used", "Licensable", "Restricted"]
-            ),
-        ]
-    }
+    FMW_FILTERS = (
+        ReportFilter()
+        .add(
+            column="result",
+            allowed_filters=[
+                ReportFilter.FILTER.EQUALS, 
+                ReportFilter.FILTER.CONTAINS, 
+                ReportFilter.FILTER.IN_LIST
+            ],
+            # column_type=ReportFilter.TYPE.STRING, # string type is the default
+            allowed_values=["Verify", "Used", "Licensable", "Restricted"],
+            # visible_name="Result" # Optional
+        )
+        .add(
+            column="total_number_of_cores",
+            allowed_filters=[
+                ReportFilter.FILTER.EQUALS, 
+                ReportFilter.FILTER.GREATER_THAN, 
+                ReportFilter.FILTER.GREATER_OR_EQUAL_TO,
+                ReportFilter.FILTER.LESS_THAN,
+                ReportFilter.FILTER.LESS_OR_EQUAL_TO
+            ],
+            column_type=ReportFilter.TYPE.STRING,
+            allowed_values=["Verify", "Used", "Licensable", "Restricted"],
+        )
+    )
 
 
     # Declaring the report
@@ -207,7 +162,7 @@ def test_report_creation(mocker):
         name="Oracle Fusion Middleware Deployment",
         report_id="fmw_deployment_report",
         description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.", 
-        filters=[*FMW_FILTERS["BASE"], *FMW_FILTERS["DEPLOYMENT"]],
+        filters=FMW_FILTERS,
         config=config
     )
 

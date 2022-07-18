@@ -1,6 +1,6 @@
 from licenseware.utils.alter_string import get_altered_strings
-from .column_types import ColumnTypes
-from .report_component_types import RCTypes
+from licenseware.constants.column_types import ColumnTypes
+from licenseware.constants.report_component_types import RCTypes
 
 
 class TableAttrs:

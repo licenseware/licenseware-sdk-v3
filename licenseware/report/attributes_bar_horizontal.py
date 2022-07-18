@@ -1,5 +1,5 @@
 from licenseware.utils.alter_string import get_altered_strings
-from .report_component_types import RCTypes
+from licenseware.constants.report_component_types import RCTypes
 
 
 class BarHorizontalAttrs:
