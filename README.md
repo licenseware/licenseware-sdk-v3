@@ -207,56 +207,152 @@ This `rv_tools_uploader` instance will make available the following needed metho
 After the `Uploader` validates the files, the files are sent to processing and processed what remains is to provide useful insights by aggregating saved data resulted after processing in small digestable chunks of data.
 A report can contain one or more report components. 
 Each report component has a corespondent front-end component which `knows` how to render it's data.
+The same principles apply as with `Uploaders`.
 
 
-Start by importing the report contructors
+- Start by importing the report contructors
 
 ```py
 from config import config
 from licenseware import (
     NewReport, 
     NewReportComponent,
-    RCFilter,
-    ColumnTypes,
-    Filters,
+    ReportFilter,
     StyleAttrs,
     SummaryAttrs,
     BarHorizontalAttrs,
     Icons
 )
-
 ```
 
-Declare a new report
+- Declare a new report
+
+Below we contruct report filters. This step can be done after you have defined all report components.
 
 ```py
 
+FMW_FILTERS = (
+        ReportFilter()
+        .add(
+            column="result",
+            allowed_filters=[
+                ReportFilter.FILTER.EQUALS, 
+                ReportFilter.FILTER.CONTAINS, 
+                ReportFilter.FILTER.IN_LIST
+            ],
+            # column_type=ReportFilter.TYPE.STRING, # string type is the default
+            allowed_values=["Verify", "Used", "Licensable", "Restricted"],
+            # visible_name="Result" # Optional
+        )
+        .add(
+            column="total_number_of_cores",
+            allowed_filters=[
+                ReportFilter.FILTER.EQUALS, 
+                ReportFilter.FILTER.GREATER_THAN, 
+                ReportFilter.FILTER.GREATER_OR_EQUAL_TO,
+                ReportFilter.FILTER.LESS_THAN,
+                ReportFilter.FILTER.LESS_OR_EQUAL_TO
+            ],
+            column_type=ReportFilter.TYPE.STRING,
+            allowed_values=["Verify", "Used", "Licensable", "Restricted"],
+        )
+    )
 
-report_global_filters = [
-    RCFilter(
-        column="result",
-        allowed_filters=[
-            Filters.EQUALS, 
-            Filters.CONTAINS, 
-            Filters.IN_LIST,
-        ],
-        column_type=ColumnTypes.STRING,
-        allowed_values=["Verify", "Used", "Licensable", "Restricted"]
-    ),
-    # etc
-]
+```
+
+FMW_FILTERS will be an instance of `ReportFilter` which will make available the list of filters on `metadata` object.
+
+
+- Declaring the report
+
+Using the `NewReport` class we fill the below parameters (filters can be filled later after you have defined all report components). 
+
+```py
 
 fmw_deployment_report = NewReport(
     name="Oracle Fusion Middleware Deployment",
     report_id="fmw_deployment_report",
     description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.", 
-    filters=report_global_filters,
+    filters=FMW_FILTERS,
     config=config
 )
 
 ```
+On this instance of the new report we will `attach` all the needed report components. 
 
 This report instance provides the following objects for use:
 - `attach` - method which will be used to attach instances of `NewReportComponent`;
 - `register` - method which will be used to make a post request with this report data;
-- `metadata` - property which contains the json payload for registry service
+- `metadata` - property which contains the json payload for registry service;
+
+
+- Declaring a new report component
+
+A report can contain one or more report components. Here we declare a `summary` report component type.
+
+
+- Declaring report component attributes
+
+```py
+
+summary = (
+    SummaryAttrs()
+    .attr(
+        value_key="missing_parent_details", 
+        value_description="Missing parent details",
+        icon=Icons.FEATURES
+    )
+    .attr(value_key="unknown_types")
+)
+
+```
+This way we inform front-end that it needs to use the Summary UI component and it needs to fill the component data as described in `SummaryAttrs`.
+
+
+- Declaring report component style attributes
+
+```py
+styles = (
+    StyleAttrs()
+    .width_one_third
+    .set("height", "full")
+)
+```
+Here we specify additional information to front-end about report component looks.
+
+
+Next, we need to create a function which based on the parameters received will return component data from database. 
+
+```py
+
+def get_fmw_summary_component_data(*args, **kwargs):
+    return "data from database"
+
+```
+    
+- Declaring the report component
+
+
+```py
+fmw_summary_component = NewReportComponent(
+    title="Summary", 
+    component_id="fmw_summary", 
+    attributes=summary,
+    style_attributes=styles,
+    get_component_data_handler=get_fmw_summary_component_data,
+    config=config
+)
+```
+
+Now that we have declared report component attributes, style attributes and the `get_component_data_handler` function we are ready to attach it to the report created up.
+
+
+- Attaching a report component to a report
+```py 
+
+fmw_deployment_report.attach(fmw_summary_component)
+
+```
+
+
+
