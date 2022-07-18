@@ -54,9 +54,9 @@ class NewReport:
 
 
     def attach(self, component: NewReportComponent):
-        """ Attach component to this report """
+        
         if component.component_id in self.report_components.keys():
-            raise ValueError(f"Report component '{component.component_id}' is already registered")
+            raise ValueError(f"Report component '{component.component_id}' is already attached")
 
         if component.order is None:
             component.order = len(self.report_components.keys()) + 1

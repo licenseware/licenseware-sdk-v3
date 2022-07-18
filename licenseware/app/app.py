@@ -1,8 +1,10 @@
 import requests
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Tuple, Dict
 from dataclasses import dataclass
 from licenseware.constants.states import States
 from licenseware.utils.logger import log
+from licenseware.uploader.uploader import NewUploader
+from licenseware.report.report import NewReport, NewReportComponent
 
 
 
@@ -30,6 +32,10 @@ class NewApp:
         assert hasattr(self.config, "REGISTER_APP_URL")
         assert hasattr(self.config, "get_machine_token")
 
+        self.uploaders: Dict[str, NewUploader] = dict() 
+        self.reports: Dict[str, NewReport] = dict()
+        self.report_components: Dict[str, NewReportComponent] = dict()
+        
         self.refresh_registration_url = "/refresh_registration"
         self.app_activation_url = "/activate_app"
         self.editable_tables_url = "/editable_tables"
@@ -37,6 +43,33 @@ class NewApp:
         self.tenant_registration_url = "/register_tenant"
         self.terms_and_conditions_url = "/terms_and_conditions"
         self.features_url = "/features"
+        
+
+    def attach_uploader(self, uploader: NewUploader):
+
+        if uploader.uploader_id in self.uploaders.keys():
+            raise ValueError(f"Uploader '{uploader.uploader_id}' is already attached")
+
+        self.uploaders[uploader.uploader_id] = uploader
+
+
+    def attach_report(self, report: NewReport):
+
+        if report.report_id in self.reports.keys():
+            raise ValueError(f"Report '{report.report_id}' is already attached")
+
+        self.reports[report.report_id] = report
+
+
+    def attach_report_component(self, report_component: NewReportComponent):
+
+        if report_component.component_id in self.report_components.keys():
+            raise ValueError(f"Report component '{report_component.component_id}' is already attached")
+
+        if report_component.order is None:
+            report_component.order = len(self.report_components.keys()) + 1
+
+        self.report_components[report_component.component_id] = report_component
 
 
     @property
