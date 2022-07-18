@@ -27,7 +27,7 @@ class NewApp:
         assert self.config is not None
         if hasattr(self.config, "APP_ID") and self.app_id is None:
             self.app_id = self.config.APP_ID
-        assert hasattr(self.config, "REGISTER_REPORT_URL")
+        assert hasattr(self.config, "REGISTER_APP_URL")
         assert hasattr(self.config, "get_machine_token")
 
         self.refresh_registration_url = "/refresh_registration"
@@ -73,7 +73,7 @@ class NewApp:
     def register(self):
 
         response = requests.post( # pragma: no cover
-            url=self.config.REGISTER_REPORT_URL, 
+            url=self.config.REGISTER_APP_URL, 
             json=self.metadata, 
             headers={"Authorization": self.config.get_machine_token()}
         )
@@ -81,11 +81,11 @@ class NewApp:
         if response.status_code == 200: # pragma: no cover
             return {
                     "status": States.SUCCESS,
-                    "message": f"Report '{self.report_id}' register successfully",
+                    "message": f"App '{self.app_id}' register successfully",
                     "content": self.metadata
                 }, 200
 
-        nokmsg = f"Could not register report '{self.report_id}'" # pragma: no cover
+        nokmsg = f"Could not register app '{self.app_id}'" # pragma: no cover
         log.error(nokmsg) # pragma: no cover
         return {"status": States.FAILED, "message": nokmsg, "content": self.metadata}, 400 # pragma: no cover
 
