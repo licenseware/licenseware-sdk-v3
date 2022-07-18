@@ -9,9 +9,9 @@
 - activate virtualenv: `source ./bin/activate`;
 - install dependencies: `pip3 install -r requirements.txt`;
 - running tests: `make run-tests`;
-- install lestest wheel: `make install`;
-- uninstall lestest: `make uninstall`;
-- build lestest wheel: `make build`;
+- install licenseware: `make install`;
+- uninstall licenseware: `make uninstall`;
+- build licenseware wheel: `make build`;
 
 
 # Uploaders
