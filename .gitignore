@@ -1,6 +1,6 @@
 # Custom
 bin
-test_files
+# test_files
 *.log
 
 # Byte-compiled / optimized / DLL files

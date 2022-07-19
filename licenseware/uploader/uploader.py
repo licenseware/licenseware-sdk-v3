@@ -7,6 +7,7 @@ from licenseware.uploader.encryption_parameters import UploaderEncryptionParamet
 from licenseware.uploader.defaults import default_filenames_validation_handler, default_filecontents_validation_handler
 from licenseware.uiresponses import FileValidationResponse
 from licenseware.utils.logger import log
+from .apispecs_file_upload import ApiSpecsFileUpload
 
 
 @dataclass
@@ -32,10 +33,10 @@ class NewUploader:
         
         self.app_id= self.config.APP_ID
         self.status = States.IDLE
-        self.upload_validation_url = f"/{self.uploader_id}/validation"
-        self.upload_url = f"/{self.uploader_id}/files"
-        self.quota_validation_url = f"/{self.uploader_id}/quota"
-        self.status_check_url = f"/{self.uploader_id}/status" 
+        self.upload_validation_url = f"/uploads/{self.uploader_id}/validation"
+        self.upload_url = f"/uploads/{self.uploader_id}/files"
+        self.quota_validation_url = f"/uploads/{self.uploader_id}/quota"
+        self.status_check_url = f"/uploads/{self.uploader_id}/status" 
 
 
     def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:

@@ -22,8 +22,3 @@ uninstall:
 	pip3 uninstall -y licenseware
 
 
-run-fastapi:
-	python3 fastapi_main.py
-
-run-flaskapi:
-	python3 flaskapi_main.py

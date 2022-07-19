@@ -20,7 +20,7 @@ VERSION = "3.0.0"
 setup(
     name="licenseware",
     version=VERSION,
-    description="Generate boilerplate unittests from given package.",
+    description="Licenseware SDK which contains common functionality used in all apps",
     url="https://licenseware.io/",
     author="Licenseware",
     author_email="contact@licenseware.io",
@@ -33,7 +33,7 @@ setup(
     package_data={"": ["*"]},
     # entry_points={
     #     "console_scripts": [
-    #         "lestest=lestest.cli:cli_entrypoint",
+    #         "lestest=licenseware.cli:cli_entrypoint",
     #     ],
     # },
 )
