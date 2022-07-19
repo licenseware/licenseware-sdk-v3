@@ -32,10 +32,10 @@ class NewUploader:
         
         self.app_id= self.config.APP_ID
         self.status = States.IDLE
-        self.upload_validation_url = f"/{self.uploader_id}/validation"
-        self.upload_url = f"/{self.uploader_id}/files"
-        self.quota_validation_url = f"/{self.uploader_id}/quota"
-        self.status_check_url = f"/{self.uploader_id}/status" 
+        self.upload_validation_url = f"/uploads/{self.uploader_id}/validation"
+        self.upload_url = f"/uploads/{self.uploader_id}/files"
+        self.quota_validation_url = f"/uploads/{self.uploader_id}/quota"
+        self.status_check_url = f"/uploads/{self.uploader_id}/status" 
 
 
     def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:
