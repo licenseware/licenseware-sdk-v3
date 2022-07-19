@@ -17,10 +17,10 @@ def test_adding_routes_to_api_spec():
 
     FileUploadApiSpecs = ApiSpec(
         title="File Upload", 
-        description="Validate filenames, upload files and check quota or status"
+        description="Validate filenames, upload files and check quota or status",
     )
 
-    filename_validation_specs = (
+    (
         FileUploadApiSpecs
         .route("/uploads/{uploader_id}/validation")
         .path_param(name="uploader_id")
@@ -34,17 +34,17 @@ def test_adding_routes_to_api_spec():
 
     # print(filename_validation_specs.metadata.routes)
 
-    assert len(filename_validation_specs.metadata.routes) == 1
-    assert len(filename_validation_specs.metadata.routes[0].path_params) == 1
-    assert filename_validation_specs.metadata.routes[0].route == "/uploads/{uploader_id}/validation"
-    assert filename_validation_specs.metadata.routes[0].path_params[0].name == "uploader_id"
+    assert len(FileUploadApiSpecs.routes) == 1
+    assert len(FileUploadApiSpecs.routes[0].path_params) == 1
+    assert FileUploadApiSpecs.routes[0].route == "/uploads/{uploader_id}/validation"
+    assert FileUploadApiSpecs.routes[0].path_params[0].name == "uploader_id"
 
 
     @dataclass
     class Files:
         files: List[bytes]
 
-    fileupload_specs = (
+    (
         FileUploadApiSpecs
         .route("/uploads/{uploader_id}/files")
         .path_param(name="uploader_id")
@@ -53,12 +53,24 @@ def test_adding_routes_to_api_spec():
 
     # print(fileupload_specs.metadata.routes)
 
-    assert len(fileupload_specs.metadata.routes) == 2
-    assert fileupload_specs.metadata.routes[1].route == "/uploads/{uploader_id}/files"
-    assert filename_validation_specs.metadata.routes[1].path_params[0].name == "uploader_id"
+    assert len(FileUploadApiSpecs.routes) == 2
+    assert FileUploadApiSpecs.routes[1].route == "/uploads/{uploader_id}/files"
+    assert FileUploadApiSpecs.routes[1].path_params[0].name == "uploader_id"
 
 
+# pytest -s -v tests/test_api_spec.py::test_adding_route_prefix
+def test_adding_route_prefix():
     
+    FileUploadApiSpecs = ApiSpec(
+        title="File Upload", 
+        description="Validate filenames, upload files and check quota or status",
+        prefix="/uploads"
+    )
+
+    FileUploadApiSpecs.route("/test")
+
+    FileUploadApiSpecs.routes[0].route == "/uploads/test"
+
 
 
 

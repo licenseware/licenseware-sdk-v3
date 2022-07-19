@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Union
 from licenseware import States
-from licenseware.uiresponses.file_validation_response import FileValidationResponse, ValidationResponse
+from licenseware.uiresponses.uploader_responses import FileValidationResponse, ValidationResponse
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.validators import validate_text_contains_any, validate_required_input_type
 

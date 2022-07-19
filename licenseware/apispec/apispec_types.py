@@ -32,10 +32,3 @@ class RouteType:
     request_files: type = None
     responses: List[ResponseType] = field(default_factory=list)
 
-
-@dataclass
-class ApiSpecType:
-    title: str
-    description: str
-    routes: List[RouteType]
-    

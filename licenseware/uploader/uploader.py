@@ -7,6 +7,7 @@ from licenseware.uploader.encryption_parameters import UploaderEncryptionParamet
 from licenseware.uploader.defaults import default_filenames_validation_handler, default_filecontents_validation_handler
 from licenseware.uiresponses import FileValidationResponse
 from licenseware.utils.logger import log
+from .apispecs_file_upload import ApiSpecsFileUpload
 
 
 @dataclass
