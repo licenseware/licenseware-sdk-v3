@@ -11,10 +11,16 @@ from .apispec_types import (
 
 class ApiSpec:
 
-    def __init__(self, title:str, description:str = None, prefix:str = None):
+    def __init__(
+        self, title:str = None, 
+        description:str = None, 
+        prefix:str = None, 
+        responses: List[ResponseType] = None
+    ):
         self.title = title
         self.description = description
         self.prefix = prefix
+        self.responses = responses or []
         self.routes: List[RouteType] = None
         self._current_route:str = None
         self._state: Dict[RouteName, RouteType] = dict()
@@ -48,6 +54,7 @@ class ApiSpec:
         self._current_route = route
         self._state[route].route = route
         self._state[route].handler = handler
+        self._state[route].responses.extend(self.responses)
         self._update_routes()
         return self
 

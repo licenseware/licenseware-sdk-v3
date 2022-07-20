@@ -45,13 +45,13 @@ class NewUploader:
         assert hasattr(self.config, "REGISTER_UPLOADER_URL")
         assert hasattr(self.config, "get_machine_token")
         
-        self.app_id= self.config.APP_ID
+        self.app_id = self.config.APP_ID
         self.status = States.IDLE
-        self.upload_validation_url = f"/uploads/{self.uploader_id}/validation"
-        self.upload_url = f"/uploads/{self.uploader_id}/files"
-        self.quota_validation_url = f"/uploads/{self.uploader_id}/quota"
-        self.status_check_url = f"/uploads/{self.uploader_id}/status" 
-        self.apispecs = UploaderApiSpecs
+        self.upload_validation_url = f"/{self.app_id}/uploads/{self.uploader_id}/validation"
+        self.upload_url = f"/{self.app_id}/uploads/{self.uploader_id}/files"
+        self.quota_validation_url = f"/{self.app_id}/uploads/{self.uploader_id}/quota"
+        self.status_check_url = f"/{self.app_id}/uploads/{self.uploader_id}/status" 
+        self.apispecs = UploaderApiSpecs(self.app_id)
 
 
     def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:
@@ -72,7 +72,7 @@ class NewUploader:
             return default_check_quota_handler(validation_response)
         return self.check_quota_handler(validation_response) 
         
-
+    # TODO
     def check_status(self, uploader_id:str):
         if self.check_status_handler is None: 
             return default_check_status_handler(uploader_id)
@@ -92,12 +92,12 @@ class NewUploader:
                 "flags": self.flags,
                 "status": self.status,
                 "icon": self.icon,
+                "validation_parameters": self.validation_parameters.dict(),
+                "encryption_parameters": self.encryption_parameters.dict(),
                 "upload_url": self.upload_url,
                 "upload_validation_url": self.upload_validation_url,
                 "quota_validation_url": self.quota_validation_url,
                 "status_check_url": self.status_check_url,
-                "validation_parameters": self.validation_parameters.dict(),
-                "encryption_parameters": self.encryption_parameters.dict()
             }]
         }
 

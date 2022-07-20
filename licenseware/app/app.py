@@ -5,7 +5,8 @@ from licenseware.constants.states import States
 from licenseware.utils.logger import log
 from licenseware.uploader.uploader import NewUploader
 from licenseware.report.report import NewReport, NewReportComponent
-
+from .route_handlers import NewAppRouteHandlers
+from .app_apispecs import AppApiSpecs
 
 
 @dataclass
@@ -35,16 +36,10 @@ class NewApp:
         self.uploaders: Dict[str, NewUploader] = dict() 
         self.reports: Dict[str, NewReport] = dict()
         self.report_components: Dict[str, NewReportComponent] = dict()
+        self.routes = NewAppRouteHandlers(self.app_id)
+        self.apispecs = AppApiSpecs(self.routes)
         
-        self.refresh_registration_url = "/refresh_registration"
-        self.app_activation_url = "/activate_app"
-        self.editable_tables_url = "/editable_tables"
-        self.history_report_url = "/reports/history_report"
-        self.tenant_registration_url = "/register_tenant"
-        self.terms_and_conditions_url = "/terms_and_conditions"
-        self.features_url = "/features"
-        
-
+    
     def attach_uploader(self, uploader: NewUploader):
 
         if uploader.uploader_id in self.uploaders.keys():
@@ -86,16 +81,10 @@ class NewApp:
                     "tenants_with_public_reports": self.get_tenants_with_public_reports_handler(),
                     "flags": self.flags,
                     "icon": self.icon,
-                    "features_url": self.features_url,
                     "features": self.get_tenant_features_handler(),
-                    "refresh_registration_url": self.refresh_registration_url,
-                    "app_activation_url": self.app_activation_url,
-                    "editable_tables_url": self.editable_tables_url,
-                    "history_report_url": self.history_report_url,
-                    "tenant_registration_url": self.tenant_registration_url,
-                    "terms_and_conditions_url": self.terms_and_conditions_url,
                     "app_meta": self.app_meta,
-                    "integration_details": self.integration_details
+                    "integration_details": self.integration_details,
+                    **self.routes.urls
                 }
             ]
         }

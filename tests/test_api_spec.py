@@ -2,13 +2,41 @@ import pytest
 import unittest
 from typing import List
 from dataclasses import dataclass
-from licenseware import ApiSpec
+from licenseware import ApiSpec, ResponseType
 
 
 # pytest -s -v tests/test_api_spec.py
 
 
 t = unittest.TestCase()
+
+
+
+# pytest -s -v tests/test_api_spec.py::test_adding_default_responses
+def test_adding_default_responses():
+
+
+    FileUploadApiSpecs = ApiSpec(
+        title="File Upload", 
+        description="Validate filenames, upload files and check quota or status",
+        responses=[
+            ResponseType(method="GET", response="Missing Tenant or Authorization information", status_code=403),
+            ResponseType(method="POST", response="Missing Tenant or Authorization information", status_code=403),
+            ResponseType(method="PUT", response="Missing Tenant or Authorization information", status_code=403),
+            ResponseType(method="DELETE", response="Missing Tenant or Authorization information", status_code=403),
+        ]
+    )
+
+    FileUploadApiSpecs.route("/test", handler="testhandler")
+    FileUploadApiSpecs.response(method="POST", response="Some data", status_code=200)
+
+    assert len(FileUploadApiSpecs.routes[0].responses) == 5
+
+    assert FileUploadApiSpecs.routes[0].responses[0].method == "GET"
+    assert FileUploadApiSpecs.routes[0].responses[0].response == "Missing Tenant or Authorization information"
+    assert FileUploadApiSpecs.routes[0].responses[0].status_code == 403
+
+
 
 
 # pytest -s -v tests/test_api_spec.py::test_adding_routes_to_api_spec
