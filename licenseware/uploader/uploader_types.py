@@ -1,5 +1,8 @@
-from typing import Tuple, List
+from typing import Tuple, List, NewType
 from dataclasses import dataclass, asdict
+
+
+UploaderId = NewType("UploaderId", str)
 
 
 @dataclass
@@ -48,5 +51,14 @@ class UploaderQuotaResponse:
     monthly_quota_consumed:int
     quota_reset_date:str
 
+    def dict(self):
+        return asdict(self) # pragma: no cover
+
+
+
+@dataclass
+class UploaderStatusResponse:
+    status: str  
+    
     def dict(self):
         return asdict(self) # pragma: no cover
