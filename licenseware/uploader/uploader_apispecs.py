@@ -1,5 +1,5 @@
 from licenseware.apispec import ApiSpec
-from licenseware.uiresponses import (
+from .uploader_types import (
     FilenameValidationPayload, 
     FileValidationResponse,
     FilesUploadPayload,
@@ -7,7 +7,7 @@ from licenseware.uiresponses import (
 )
 
 
-ApiSpecsFileUpload = (
+UploaderApiSpecs = (
 
     ApiSpec(
         title="File Upload", 
@@ -16,7 +16,7 @@ ApiSpecsFileUpload = (
     )
 
     # File names validation
-    .route("/{uploader_id}/validation")
+    .route("/{uploader_id}/validation", handler="validate_filenames")
     .path_param("uploader_id")
     .request_body(FilenameValidationPayload)
     .response(method="POST", response=FileValidationResponse, status_code=200)
@@ -24,7 +24,7 @@ ApiSpecsFileUpload = (
 
 
     # File content validation and upload
-    .route("/{uploader_id}/files")
+    .route("/{uploader_id}/files", handler="validate_filecontents")
     .path_param("uploader_id")
     .request_form(FilesUploadPayload)
     .query_param("clear_data", description="Boolean parameter, warning, will clear existing data. Accepts `true`/`false` values.")
@@ -34,14 +34,14 @@ ApiSpecsFileUpload = (
 
 
     # Uploader quota
-    .route("/{uploader_id}/quota")
+    .route("/{uploader_id}/quota", handler="check_quota")
     .path_param("uploader_id")
     .response(method="GET", response=UploaderQuotaResponse, status_code=200)
     .response(method="GET", response=UploaderQuotaResponse, status_code=402)
 
 
     # Uploader status
-    .route("/{uploader_id}/status")
+    .route("/{uploader_id}/status", handler="check_status")
     .path_param("uploader_id")
     .response(method="GET", response=UploaderQuotaResponse, status_code=200)
     .response(method="GET", response=UploaderQuotaResponse, status_code=402)

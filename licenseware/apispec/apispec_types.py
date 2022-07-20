@@ -23,6 +23,7 @@ class ResponseType:
 @dataclass
 class RouteType:
     route: str = None
+    handler: str = None
     path_params: List[ParamType] = field(default_factory=list)
     query_params: List[ParamType] = field(default_factory=list)
     header_params: List[ParamType] = field(default_factory=list)

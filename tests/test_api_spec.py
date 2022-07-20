@@ -22,7 +22,7 @@ def test_adding_routes_to_api_spec():
 
     (
         FileUploadApiSpecs
-        .route("/uploads/{uploader_id}/validation")
+        .route("/uploads/{uploader_id}/validation", handler="function_name")
         .path_param(name="uploader_id")
         .request_body({
             "filenames": [
@@ -46,7 +46,7 @@ def test_adding_routes_to_api_spec():
 
     (
         FileUploadApiSpecs
-        .route("/uploads/{uploader_id}/files")
+        .route("/uploads/{uploader_id}/files", handler="function_name")
         .path_param(name="uploader_id")
         .request_files(Files)
     )
@@ -67,7 +67,7 @@ def test_adding_route_prefix():
         prefix="/uploads"
     )
 
-    FileUploadApiSpecs.route("/test")
+    FileUploadApiSpecs.route("/test", handler="function_name")
 
     FileUploadApiSpecs.routes[0].route == "/uploads/test"
 
@@ -80,15 +80,15 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
         )
 
 
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .path_param("some_param")
             .path_param("some_param")
         )
@@ -97,7 +97,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .header_param("some_param")
             .header_param("some_param")
         )
@@ -106,7 +106,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .query_param("some_param")
             .query_param("some_param")
         )
@@ -115,7 +115,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .cookie_param("some_param")
             .cookie_param("some_param")
         )
@@ -123,7 +123,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .request_body(bytes)
             .request_body(bytes)
         )
@@ -132,7 +132,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .request_form(bytes)
             .request_form(bytes)
         )
@@ -141,7 +141,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .request_files(bytes)
             .request_files(bytes)
         )
@@ -150,7 +150,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files")
+            .route("/uploads/{uploader_id}/files", handler="function_name")
             .response(method="GET", response="Some response", status_code=200)
             .response(method="GET", response="Some response", status_code=200)
         )

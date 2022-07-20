@@ -28,7 +28,11 @@ class ApiSpec:
         self.routes = list(self._routes.values())
 
 
-    def route(self, route:str):
+    def route(self, route:str, *, handler:str):
+        """
+            route - route/path/enpoint
+            handler - function which will handle this route
+        """
         assert route.startswith("/")
 
         if self.prefix is not None: 
@@ -43,6 +47,7 @@ class ApiSpec:
 
         self._current_route = route
         self._state[route].route = route
+        self._state[route].handler = handler
         self._update_routes()
         return self
 

@@ -4,10 +4,22 @@ from typing import Callable, Tuple, List, Any, Union
 from licenseware.constants.states import States
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
-from licenseware.uploader.defaults import default_filenames_validation_handler, default_filecontents_validation_handler
-from licenseware.uiresponses import FileValidationResponse
+from .uploader_types import (
+    FileValidationResponse, 
+    UploaderQuotaResponse, 
+    UploaderStatusResponse,
+    UploaderId
+)
+
 from licenseware.utils.logger import log
-from .apispecs_file_upload import ApiSpecsFileUpload
+from .uploader_apispecs import UploaderApiSpecs
+from licenseware.uploader.defaults import (
+    default_filenames_validation_handler, 
+    default_filecontents_validation_handler,
+    default_check_quota_handler,
+    default_check_status_handler,
+)
+
 
 
 @dataclass
@@ -22,6 +34,8 @@ class NewUploader:
     icon: str = None
     filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileValidationResponse] = None
     filecontents_validation_handler: Callable[[Union[List[str], List[bytes]], UploaderValidationParameters], FileValidationResponse] = None
+    check_quota_handler: Callable[[Union[List[str], List[bytes]]], UploaderQuotaResponse] = None
+    check_status_handler: Callable[[UploaderId], UploaderStatusResponse] = None
     config: Any = None
 
     def __post_init__(self):
@@ -37,22 +51,33 @@ class NewUploader:
         self.upload_url = f"/uploads/{self.uploader_id}/files"
         self.quota_validation_url = f"/uploads/{self.uploader_id}/quota"
         self.status_check_url = f"/uploads/{self.uploader_id}/status" 
+        self.apispecs = UploaderApiSpecs
 
 
     def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:
-
         if self.filenames_validation_handler is None:
             return default_filenames_validation_handler(filenames, self.validation_parameters)
-
-        return self.filenames_validation_handler(filenames, self.validation_parameters) # pragma: no cover
+        return self.filenames_validation_handler(filenames, self.validation_parameters) 
 
 
     def validate_filecontents(self, files: list) -> FileValidationResponse:
-
-        if self.filecontents_validation_handler is None: # pragma: no cover
+        if self.filecontents_validation_handler is None: 
             return default_filecontents_validation_handler(files, self.validation_parameters)
+        return self.filecontents_validation_handler(files, self.validation_parameters) 
 
-        return self.filenames_validation_handler(files, self.validation_parameters) # pragma: no cover
+
+    # TODO
+    def check_quota(self, validation_response: FileValidationResponse):
+        if self.check_quota_handler is None: 
+            return default_check_quota_handler(validation_response)
+        return self.check_quota_handler(validation_response) 
+        
+
+    def check_status(self, uploader_id:str):
+        if self.check_status_handler is None: 
+            return default_check_status_handler(uploader_id)
+        return self.check_status_handler(uploader_id) 
+
 
     @property
     def metadata(self):

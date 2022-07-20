@@ -3,7 +3,7 @@ from typing import List, Union, IO
 from licenseware import States
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.file_upload_handler import FileUploadHandler
-from licenseware.uiresponses import FileValidationResponse, ValidationResponse
+from licenseware.uploader.uploader_types import FileValidationResponse, ValidationResponse
 from .helpers import get_filenames_response, get_failed_validations, get_error_message
 
 
