@@ -1,4 +1,5 @@
 from typing import List
+from urllib.parse import urlencode
 from dataclasses import dataclass, asdict
 from licenseware.report.style_attributes import StyleAttrs
 from licenseware.utils.alter_string import get_altered_strings
@@ -48,9 +49,8 @@ class DataTable:
         type: ColumnTypes = None,
         editable: bool = True,
         visible: bool = True,
-        hashable: bool = False,
+        hashable: bool = True,
         required: bool = False,
-        entities_url: str = None,
         distinct_key:str = None,
         foreign_key:str = None,
     ):
@@ -59,10 +59,19 @@ class DataTable:
             raise ValueError(f"Column '{prop}' is already added")
         self._added_props.add(prop)
 
+
+        if prop in {"tenant_id", "_id", "updated_at"}:
+            editable = False
+            visible = False
+            hashable = False
+            required = True
+
+
         if name is None:
             altstr = get_altered_strings(prop)
             name = altstr.title
         
+
         if type is None:
             if values is not None:
                 type = ColumnTypes.ENUM
@@ -70,6 +79,17 @@ class DataTable:
                 type = ColumnTypes.ENTITY
             else:
                 type = ColumnTypes.STRING
+
+        entities_url = None
+        if distinct_key is not None or foreign_key is not None:
+            query_params = {'_id': '{entity_id}'}
+            if distinct_key is not None:
+                query_params.update({"distinct_key": distinct_key})
+            if foreign_key is not None:
+                query_params.update({"foreign_key": foreign_key})
+
+            entities_url = f"{self.path}?{urlencode(query_params)}"
+
 
         assert isinstance(type, ColumnTypes)
 

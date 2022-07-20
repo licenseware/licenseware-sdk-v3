@@ -354,5 +354,59 @@ fmw_deployment_report.attach(fmw_summary_component)
 
 ```
 
+# Datatable
 
+We have `uploaders` which handle files uploaded and sent to procesing, `reports` which take the data processed and show it to the user in a insightful way we also can provide a way for the user to manipulate/update the data processed using `datatable`.
+
+```py
+
+from licenseware import DataTable, ColumnTypes
+
+devices = DataTable(
+    title="Devices", 
+    component_id="device_table",
+    compound_indexes = [["tenant_id", "name"], ["tenant_id", "name", "device_type"]],
+    simple_indexes = [
+        "_id",
+        "tenant_id",
+        "name",
+        "is_parent_to",
+        "cpu_model",
+    ]
+)
+
+devices.column("_id", editable=False, visible=False)
+devices.column("tenant_id", editable=False, visible=False)
+devices.column("name", required=True)
+devices.column("is_parent_to", distinct_key="name", foreign_key="name")
+devices.column("capped", required=True, type=ColumnTypes.BOOL)
+devices.column(
+    "device_type", 
+    required=True, 
+    values=["Virtual", "Pool", "Domain", "Physical", "Cluster", "Unknown"]
+)
+devices.column(
+    "operating_system_type", 
+    values=["Solaris", "ESX", "Linux", "AIX", "HP-UX", "Windows", "Other"]
+)
+devices.column("total_number_of_processors", type=ColumnTypes.NUMBER)
+devices.column("updated_at", editable=False, type=ColumnTypes.DATE)
+devices.column("raw_data", editable=False, type=ColumnTypes.JSON)
+
+```
+
+Up we declare the table component metadata for `component_id="device_table"`. 
+This is very similar to report attributes (ex: `BarHorizontalAttrs`).
+Method `column` appends columns to table component. 
+Method `column` has the following parameters, most of them with sensible defaults:
+- prop: str - this is required, place the name of the field here;
+- name: str = None - if not filed, value will be computed from prop;
+- values: list = None - provide a list of values, a dropdown will appear in frontend;
+- type: ColumnTypes = None - if values is filled type will be automatically set to enum, if distinct_key and foreign_key are filled type will be set automatically to entity, otherwise a default type string will be set. Make sure to specify type for the other types not covered automatically if needed; 
+- editable: bool = True - by default all fields are editable (the user can change the field data). If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to False.
+- visible: bool = True - by default all fields are visible to the user. Same defaults apply as for editable.
+- hashable: bool = False - by default all fields are hashable. Same defaults apply as for editable.
+- required: bool = False - by default all fields not required. If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to True.
+- distinct_key:str = None - here place the name of the field from which you want a list of unique items;
+- foreign_key:str = None  - here place the name of the foreign key field;
 
