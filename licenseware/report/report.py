@@ -43,13 +43,13 @@ class NewReport:
         assert hasattr(self.config, "REGISTER_REPORT_URL")
         assert hasattr(self.config, "get_machine_token")
 
-        self.app_id= self.config.APP_ID
+        self.app_id = self.config.APP_ID
         self.report_components: Dict[str, NewReportComponent] = dict()
-        self.url = f'/reports/{self.report_id}' 
-        self.public_url = f'/reports/{self.report_id}/public' 
-        self.snapshot_url = f'/reports/{self.report_id}/snapshot' 
-        self.preview_image_url = f'/reports/{self.report_id}/preview_image' 
-        self.preview_image_dark_url = f'/reports/{self.report_id}/preview_image_dark' 
+        self.url = f'/{self.app_id}/reports/{self.report_id}' 
+        self.public_url = f'/{self.app_id}/reports/{self.report_id}/public' 
+        self.snapshot_url = f'/{self.app_id}/reports/{self.report_id}/snapshot' 
+        self.preview_image_url = f'/{self.app_id}/reports/{self.report_id}/preview_image' 
+        self.preview_image_dark_url = f'/{self.app_id}/reports/{self.report_id}/preview_image_dark' 
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
 
 
