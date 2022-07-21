@@ -1,18 +1,19 @@
 import logging
 
 import settings
-from app.api import routers
 from settings import config
+from app.api import routers
 
 
 def get_db(env):
-    from app.dependencies.db import memory, mongo, redis
-
-    return {
-        settings.Environment.TEST: memory.InMemory,
-        settings.Environment.DEV: redis.Redis,
-        settings.Environment.PROD: mongo.Mongo,
-    }[env]
+    from app.dependencies.db import memory#, mongo, redis
+    mongo, redis = None, None
+    return memory.InMemory
+    # {
+    #     settings.Environment.TEST: memory.InMemory,
+    #     settings.Environment.DEV: redis.Redis,
+    #     settings.Environment.PROD: mongo.Mongo,
+    # }[env]
 
 
 WebApp = config.webapp_framework.WebApp
@@ -22,7 +23,8 @@ logger = logging.getLogger()
 logger.setLevel(config.LOG_LEVEL.value)
 
 
-app.state.db = get_db(config.ENV)(**config.db_config)
+# app.state.db = get_db(config.ENV)(**config.db_config)
+app.state.db = get_db(config.ENV)()
 logger.info("Starting with environment: %s", config.ENV)
 
 if __name__ == "__main__":

@@ -433,4 +433,3 @@ Method `column` has the following parameters, most of them with sensible default
 - required: bool = False - by default all fields not required. If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to True.
 - distinct_key:str = None - here place the name of the field from which you want a list of unique items;
 - foreign_key:str = None  - here place the name of the foreign key field;
-
