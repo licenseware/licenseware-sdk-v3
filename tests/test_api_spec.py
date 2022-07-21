@@ -27,14 +27,16 @@ def test_adding_default_responses():
         ]
     )
 
-    FileUploadApiSpecs.route("/test", handler="testhandler")
-    FileUploadApiSpecs.response(method="POST", response="Some data", status_code=200)
+    FileUploadApiSpecs.route(method="POST", route="/test", handler="testhandler")
+    FileUploadApiSpecs.response(response="Some data", status_code=200)
 
     assert len(FileUploadApiSpecs.routes[0].responses) == 5
 
     assert FileUploadApiSpecs.routes[0].responses[0].method == "GET"
     assert FileUploadApiSpecs.routes[0].responses[0].response == "Missing Tenant or Authorization information"
     assert FileUploadApiSpecs.routes[0].responses[0].status_code == 403
+
+    print(FileUploadApiSpecs.routes)
 
 
 
@@ -50,14 +52,14 @@ def test_adding_routes_to_api_spec():
 
     (
         FileUploadApiSpecs
-        .route("/uploads/{uploader_id}/validation", handler="function_name")
+        .route(method="GET", route="/uploads/{uploader_id}/validation", handler="function_name")
         .path_param(name="uploader_id")
         .request_body({
             "filenames": [
                 "string"
             ]
         })
-        .response(method="GET", response="Some response", status_code=200)
+        .response(response="Some response", status_code=200)
     )
 
     # print(filename_validation_specs.metadata.routes)
@@ -74,7 +76,7 @@ def test_adding_routes_to_api_spec():
 
     (
         FileUploadApiSpecs
-        .route("/uploads/{uploader_id}/files", handler="function_name")
+        .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
         .path_param(name="uploader_id")
         .request_files(Files)
     )
@@ -95,7 +97,7 @@ def test_adding_route_prefix():
         prefix="/uploads"
     )
 
-    FileUploadApiSpecs.route("/test", handler="function_name")
+    FileUploadApiSpecs.route(method="GET", route="/test", handler="function_name")
 
     FileUploadApiSpecs.routes[0].route == "/uploads/test"
 
@@ -108,15 +110,15 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
         )
 
 
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
             .path_param("some_param")
             .path_param("some_param")
         )
@@ -125,7 +127,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
             .header_param("some_param")
             .header_param("some_param")
         )
@@ -134,7 +136,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
             .query_param("some_param")
             .query_param("some_param")
         )
@@ -143,7 +145,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
             .cookie_param("some_param")
             .cookie_param("some_param")
         )
@@ -151,7 +153,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="POST", route="/uploads/{uploader_id}/files", handler="function_name")
             .request_body(bytes)
             .request_body(bytes)
         )
@@ -160,7 +162,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="POST", route="/uploads/{uploader_id}/files", handler="function_name")
             .request_form(bytes)
             .request_form(bytes)
         )
@@ -169,7 +171,7 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
+            .route(method="POST", route="/uploads/{uploader_id}/files", handler="function_name")
             .request_files(bytes)
             .request_files(bytes)
         )
@@ -178,9 +180,9 @@ def test_fail_overwrite_params():
     with t.assertRaises(ValueError):
         (
             ApiSpec(title="SomeTitle")
-            .route("/uploads/{uploader_id}/files", handler="function_name")
-            .response(method="GET", response="Some response", status_code=200)
-            .response(method="GET", response="Some response", status_code=200)
+            .route(method="GET", route="/uploads/{uploader_id}/files", handler="function_name")
+            .response(response="Some response", status_code=200)
+            .response(response="Some response", status_code=200)
         )
 
 

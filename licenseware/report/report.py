@@ -1,10 +1,12 @@
 import requests
-from typing import List, Any, Tuple, Dict
+from typing import Any, Tuple, Dict
 from dataclasses import dataclass
 from licenseware.utils.logger import log
 from licenseware.constants.states import States
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
+from .report_apispecs import ReportApiSpecs
+from licenseware.utils.alter_string import get_altered_strings
 
 
 def _update_connected_apps(connected_apps, config):
@@ -44,13 +46,18 @@ class NewReport:
         assert hasattr(self.config, "get_machine_token")
 
         self.app_id = self.config.APP_ID
+
+        appid = get_altered_strings(self.app_id).dash
+        reportid = get_altered_strings(self.report_id).dash
+
         self.report_components: Dict[str, NewReportComponent] = dict()
-        self.url = f'/{self.app_id}/reports/{self.report_id}' 
-        self.public_url = f'/{self.app_id}/reports/{self.report_id}/public' 
-        self.snapshot_url = f'/{self.app_id}/reports/{self.report_id}/snapshot' 
-        self.preview_image_url = f'/{self.app_id}/reports/{self.report_id}/preview_image' 
-        self.preview_image_dark_url = f'/{self.app_id}/reports/{self.report_id}/preview_image_dark' 
+        self.url = f'/{appid}/reports/{reportid}' 
+        self.public_url = f'/{appid}/reports/{reportid}/public' 
+        self.snapshot_url = f'/{appid}/reports/{reportid}/snapshot' 
+        self.preview_image_url = f'/{appid}/reports/{reportid}/preview_image' 
+        self.preview_image_dark_url = f'/{appid}/reports/{reportid}/preview_image_dark' 
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
+        self.apispecs = ReportApiSpecs(appid)
 
 
     def attach(self, component: NewReportComponent):

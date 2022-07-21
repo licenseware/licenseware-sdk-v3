@@ -22,6 +22,7 @@ class ResponseType:
 
 @dataclass
 class RouteType:
+    method: str = None
     route: str = None
     handler: str = None
     path_params: List[ParamType] = field(default_factory=list)

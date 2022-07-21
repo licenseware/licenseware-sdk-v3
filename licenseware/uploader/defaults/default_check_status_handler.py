@@ -1,4 +1,4 @@
-from licenseware.uploader.uploader_types import UploaderId
+from licenseware.constants.uploader_types import UploaderId
 
 
 

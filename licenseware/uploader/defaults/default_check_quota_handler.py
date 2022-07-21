@@ -1,4 +1,4 @@
-from licenseware.uploader.uploader_types import FileValidationResponse
+from licenseware.constants.uploader_types import FileValidationResponse
 
 
 
