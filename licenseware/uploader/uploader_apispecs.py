@@ -1,5 +1,6 @@
-from licenseware.apispec import ApiSpec, ResponseType
-from .uploader_types import (
+from licenseware.apispec import ApiSpec
+from licenseware.constants.apispec_types import ResponseType
+from licenseware.constants.uploader_types import (
     FilenameValidationPayload, 
     FileValidationResponse,
     FilesUploadPayload,
@@ -37,35 +38,35 @@ class UploaderApiSpecs:
         )
 
         # File names validation
-        .route("/{uploader_id}/validation", handler="validate_filenames")
+        .route(method="POST", route="/{uploader_id}/validation", handler="validate_filenames")
         .path_param("uploader_id")
         .request_body(FilenameValidationPayload)
-        .response(method="POST", response=FileValidationResponse, status_code=200)
-        .response(method="POST", response=UploaderQuotaResponse, status_code=402)
+        .response(response=FileValidationResponse, status_code=200)
+        .response(response=UploaderQuotaResponse, status_code=402)
 
 
         # File content validation and upload
-        .route("/{uploader_id}/files", handler="validate_filecontents")
+        .route(method="POST", route="/{uploader_id}/files", handler="validate_filecontents")
         .path_param("uploader_id")
         .request_form(FilesUploadPayload)
         .query_param("clear_data", description="Boolean parameter, warning, will clear existing data. Accepts `true`/`false` values.")
         .query_param("event_id", description="The uuid4 string received on filenames validation")
-        .response(method="POST", response=FileValidationResponse, status_code=200)
-        .response(method="POST", response=UploaderQuotaResponse, status_code=402)
+        .response(response=FileValidationResponse, status_code=200)
+        .response(response=UploaderQuotaResponse, status_code=402)
 
 
         # Uploader quota
-        .route("/{uploader_id}/quota", handler="check_quota")
+        .route(method="GET", route="/{uploader_id}/quota", handler="check_quota")
         .path_param("uploader_id")
-        .response(method="GET", response=UploaderQuotaResponse, status_code=200)
-        .response(method="GET", response=UploaderQuotaResponse, status_code=402)
+        .response(response=UploaderQuotaResponse, status_code=200)
+        .response(response=UploaderQuotaResponse, status_code=402)
 
 
         # Uploader status
-        .route("/{uploader_id}/status", handler="check_status")
+        .route(method="GET", route="/{uploader_id}/status", handler="check_status")
         .path_param("uploader_id")
-        .response(method="GET", response=UploaderQuotaResponse, status_code=200)
-        .response(method="GET", response=UploaderQuotaResponse, status_code=402)
+        .response(response=UploaderQuotaResponse, status_code=200)
+        .response(response=UploaderQuotaResponse, status_code=402)
 
     )
 

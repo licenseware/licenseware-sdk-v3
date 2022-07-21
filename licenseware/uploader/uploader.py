@@ -1,24 +1,26 @@
 import requests
-from dataclasses import dataclass
 from typing import Callable, Tuple, List, Any, Union
-from licenseware.constants.states import States
-from licenseware.uploader.validation_parameters import UploaderValidationParameters
+from dataclasses import dataclass
+from licenseware.utils.logger import log
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
-from .uploader_types import (
+from licenseware.uploader.validation_parameters import UploaderValidationParameters
+from licenseware.utils.alter_string import get_altered_strings
+from licenseware.constants.states import States
+from licenseware.constants.uploader_types import (
     FileValidationResponse, 
     UploaderQuotaResponse, 
     UploaderStatusResponse,
     UploaderId
 )
-
-from licenseware.utils.logger import log
-from .uploader_apispecs import UploaderApiSpecs
 from licenseware.uploader.defaults import (
     default_filenames_validation_handler, 
     default_filecontents_validation_handler,
     default_check_quota_handler,
     default_check_status_handler,
 )
+
+from .uploader_apispecs import UploaderApiSpecs
+
 
 
 
@@ -46,12 +48,16 @@ class NewUploader:
         assert hasattr(self.config, "get_machine_token")
         
         self.app_id = self.config.APP_ID
+
+        appid = get_altered_strings(self.app_id).dash
+        reportid = get_altered_strings(self.uploader_id).dash
+
         self.status = States.IDLE
-        self.upload_validation_url = f"/{self.app_id}/uploads/{self.uploader_id}/validation"
-        self.upload_url = f"/{self.app_id}/uploads/{self.uploader_id}/files"
-        self.quota_validation_url = f"/{self.app_id}/uploads/{self.uploader_id}/quota"
-        self.status_check_url = f"/{self.app_id}/uploads/{self.uploader_id}/status" 
-        self.apispecs = UploaderApiSpecs(self.app_id)
+        self.upload_validation_url = f"/{appid}/uploads/{reportid}/validation"
+        self.upload_url = f"/{appid}/uploads/{reportid}/files"
+        self.quota_validation_url = f"/{appid}/uploads/{reportid}/quota"
+        self.status_check_url = f"/{appid}/uploads/{reportid}/status" 
+        self.apispecs = UploaderApiSpecs(appid)
 
 
     def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:

@@ -2,11 +2,12 @@ import requests
 from typing import Callable, Union, Any
 from dataclasses import dataclass
 from licenseware.constants.states import States
+from licenseware.constants.attributes_type import AttributesType
 from licenseware.utils.logger import log
-from .attributes_type import AttributesType
+from licenseware.utils.alter_string import get_altered_strings
 from .style_attributes import StyleAttrs
 from .report_filter import ReportFilter
-
+from .report_component_apispecs import ReportComponentApiSpecs
 
 
 
@@ -30,10 +31,15 @@ class NewReportComponent:
         assert hasattr(self.config, "get_machine_token")
 
         self.app_id = self.config.APP_ID
+
+        appid = get_altered_strings(self.app_id).dash
+        compid = get_altered_strings(self.component_id).dash
+
         self.component_type = self.attributes.component_type
-        self.url = f'/report-components/{self.component_id}'
-        self.public_url = f'/report-components/{self.component_id}/public'
-        self.snapshot_url = f'/report-components/{self.component_id}/snapshot'
+        self.url = f'/{appid}/report-components/{compid}'
+        self.public_url = f'/{appid}/report-components/{compid}/public'
+        self.snapshot_url = f'/{appid}/report-components/{compid}/snapshot'
+        self.apispecs = ReportComponentApiSpecs(appid)
 
 
     def get_component_data(self, *args, **kwargs):
