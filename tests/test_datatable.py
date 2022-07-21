@@ -1,6 +1,6 @@
 import pytest
 import unittest
-from licenseware import DataTable, ColumnTypes
+from licenseware import DataTable, ColumnTypes, CrudHandler
 
 
 # pytest -s -v tests/test_datatable.py
@@ -11,9 +11,34 @@ t = unittest.TestCase()
 # pytest -s -v tests/test_datatable.py::test_datatable_overwrite_prop
 def test_datatable_overwrite_prop():
 
+    class CrudDeviceTable(CrudHandler):
+
+        def __init__(self, someinitparams):
+            self.someinitparams = someinitparams
+
+        def get(self, params):
+            return params + self.someinitparams
+
+        def post(self, payload):
+            return payload + self.someinitparams
+
+        def put(self, payload):
+            return payload + self.someinitparams
+
+        def delete(self, payload):
+            return payload + self.someinitparams
+
+
+    cdt = CrudDeviceTable("initval")
+
+    res = cdt.get("queryparamsprobably")
+    assert "initval" in res 
+
+
     with t.assertRaises(ValueError):
         devices = DataTable(
             title="Devices", 
+            crud_handler=CrudDeviceTable("initval"),
             component_id="device_table"
         )
         devices.column("col")
@@ -23,9 +48,26 @@ def test_datatable_overwrite_prop():
 # pytest -s -v tests/test_datatable.py::test_datatable
 def test_datatable():
 
+
+    class CrudDeviceTable(CrudHandler):
+
+        def get(self, params):
+            return params
+
+        def post(self, payload):
+            return payload
+
+        def put(self, payload):
+            return payload
+
+        def delete(self, payload):
+            return payload
+
+
     devices = DataTable(
         title="Devices", 
         component_id="device_table",
+        crud_handler=CrudDeviceTable,
         compound_indexes = [["tenant_id", "name"], ["tenant_id", "name", "device_type"]],
         simple_indexes = [
             "_id",

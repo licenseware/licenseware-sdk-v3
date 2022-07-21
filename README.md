@@ -356,15 +356,36 @@ fmw_deployment_report.attach(fmw_summary_component)
 
 # Datatable
 
-We have `uploaders` which handle files uploaded and sent to procesing, `reports` which take the data processed and show it to the user in a insightful way we also can provide a way for the user to manipulate/update the data processed using `datatable`.
+We have `uploaders` which handle files uploaded and sent to procesing, `reports` which take the data processed and show it to the user in a insightful way we also can provide a way for the user to manipulate/update the data processed using `datatable`. With Datatable we can provide `excel like` features on the web.
+
 
 ```py
 
-from licenseware import DataTable, ColumnTypes
+from licenseware import DataTable, ColumnTypes, CrudHandler
+
+
+class CrudDeviceTable(CrudHandler): 
+
+    # you can provide some init values if you want
+
+    def get(self, params):
+        return params
+
+    def post(self, payload):
+        return payload
+
+    def put(self, payload):
+        return payload
+
+    def delete(self, payload):
+        return payload
+
+
 
 devices = DataTable(
     title="Devices", 
     component_id="device_table",
+    crud_handler=CrudDeviceTable, # class or instance which inherits from CrudHandler abstract class
     compound_indexes = [["tenant_id", "name"], ["tenant_id", "name", "device_type"]],
     simple_indexes = [
         "_id",
@@ -394,6 +415,9 @@ devices.column("updated_at", editable=False, type=ColumnTypes.DATE)
 devices.column("raw_data", editable=False, type=ColumnTypes.JSON)
 
 ```
+
+Class `CrudDeviceTable` is responsible for interacting with the database and providing the data required.
+Since the way data is structured can vary from case to case it's up to you to provide the logic. 
 
 Up we declare the table component metadata for `component_id="device_table"`. 
 This is very similar to report attributes (ex: `BarHorizontalAttrs`).
