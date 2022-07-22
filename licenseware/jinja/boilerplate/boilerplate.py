@@ -8,6 +8,7 @@ from .create_gitignore_file import create_gitignore_file
 from .create_dockerfile_file import create_dockerfile_file
 from .create_dockerignore_file import create_dockerignore_file
 from .create_precommitconfigyaml_file import create_precommitconfigyaml_file
+from .create_env_file import create_env_file
 from .create_envdocker_file import create_envdocker_file
 from .create_app_initpy_file import create_app_initpy_file
 from .create_app_api_initpy_file import create_app_api_initpy_file
@@ -23,6 +24,9 @@ from .create_app_dependencies_db_memorypy_file import create_app_dependencies_db
 from .create_app_dependencies_web_fastapi_driverpy_file import create_app_dependencies_web_fastapi_driverpy_file
 from .create_app_dependencies_types_typespy_file import create_app_dependencies_types_typespy_file
 from .create_app_schema_itemspy_file import create_app_schema_itemspy_file
+
+
+
 
 
 class Boilerplate:
@@ -45,6 +49,7 @@ class Boilerplate:
             create_dockerfile_file(**options),
             create_dockerignore_file(**options),
             create_precommitconfigyaml_file(**options),
+            create_env_file(**options),
             create_envdocker_file(**options),
             create_app_initpy_file(**options),
             create_app_api_initpy_file(**options),
