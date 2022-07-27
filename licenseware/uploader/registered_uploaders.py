@@ -11,24 +11,31 @@ class RegisteredUploaders:
         self.uploader_enum = Enum('UploaderEnum', {u.uploader_id:u.uploader_id for u in self.uploaders})
         self.uploader_dispacher: Dict[str, NewUploader] = {u.uploader_id:u for u in uploaders}
 
-    def _get_current_uploader(self, uploader_id):
+    def _get_current_uploader(self, uploader_id: Enum):
         uploader_id = str(uploader_id).replace("UploaderEnum.", "")
         return self.uploader_dispacher[uploader_id]
 
-    def validate_filenames(self, uploader_id, filenames):
+    def validate_filenames_flow(self, tenant: str, authorization: str, uploader_id: Enum, filenames: dict):
         uploader = self._get_current_uploader(uploader_id)
-        return uploader.filenames_validation_handler(filenames, uploader.validation_parameters)
+        validation_response = uploader.filenames_validation_handler(filenames, uploader.validation_parameters)
+        # quota_response = uploader.check_quota_handler(tenant, authorization, validation_response=validation_response)
+        # if quota_response is not None:
+        #     return quota_response
+        return validation_response
 
-    def validate_filecontents(self, uploader_id, files, clear_data, event_id):
+    def validate_filecontents_flow(self, tenant: str, authorization: str, uploader_id: Enum, files: List[bytes], clear_data: bool, event_id :str):
         uploader = self._get_current_uploader(uploader_id)
-        return uploader.filecontents_validation_handler(files, uploader.validation_parameters)
+        validation_response = uploader.filecontents_validation_handler(files, uploader.validation_parameters)
+        # quota_response = uploader.check_quota_handler(tenant, authorization, validation_response=validation_response)
+        # if quota_response is not None:
+        #     return quota_response
+        return validation_response
 
-    def check_quota(self, uploader_id):
+    def check_quota(self, tenant: str, authorization: str, uploader_id: Enum):
         uploader = self._get_current_uploader(uploader_id)
-        return uploader.check_quota_handler()
+        return uploader.check_quota_handler(tenant, authorization)
 
-    def check_status(self, uploader_id):
+    def check_status(self, tenant: str, authorization: str, uploader_id: Enum):
         uploader = self._get_current_uploader(uploader_id)
-        return uploader.check_quota_handler()
-
+        return uploader.check_status_handler(tenant, authorization)
 

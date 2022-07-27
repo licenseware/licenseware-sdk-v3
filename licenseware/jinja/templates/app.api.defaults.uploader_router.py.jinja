@@ -1,15 +1,21 @@
 from typing import List
 from settings import config
 from pydantic import BaseModel
-
-from app.dependencies.web import WebRouter, UploadFile
 from app.uploaders import registered_uploaders
+from app.dependencies.web import (
+    WebRouter, 
+    UploadFile, 
+    Header, 
+    Depends,
+    authorized_user
+)
 
 
 
 router = WebRouter(
     tags=["Uploaders"],
-    prefix=f"/{config.APP_ID}/uploads"
+    prefix=f"/{config.APP_ID}/uploads",
+    dependencies=[Depends(authorized_user)]
 )
 
 
@@ -45,31 +51,50 @@ responses = {
 }
 
 
-@router.post("/{uploader_id}/validation", responses=responses)
+@router.post(
+    path="/{uploader_id}/validation", 
+    responses=responses
+)
 def validate_file_names(
-    uploader_id: registered_uploaders.uploader_enum, filenames: FilenameValidationPayload
+    uploader_id: registered_uploaders.uploader_enum,
+    filenames: FilenameValidationPayload,
+    tenant: str = Header(),
+    authjwt: str = Header(),
 ):
     """ Validating the list of filenames provided """
-    return registered_uploaders.validate_filenames(uploader_id, filenames)
+    return registered_uploaders.validate_filenames_flow(tenant, authjwt, uploader_id, filenames.dict())
 
 
 
 @router.post("/{uploader_id}/files", responses=responses)
 def validate_file_contents(
-    uploader_id: registered_uploaders.uploader_enum, files: List[UploadFile], clear_data: bool = False, event_id:str = None
+    files: List[UploadFile], 
+    uploader_id: registered_uploaders.uploader_enum,
+    tenant: str = Header(),
+    authjwt: str = Header(),
+    clear_data: bool = False, 
+    event_id:str = None
 ):
     """ Validating the list of files provided """
-    return registered_uploaders.validate_filecontents(uploader_id, files, clear_data, event_id)
-
+    return registered_uploaders.validate_filecontents_flow(tenant, authjwt, uploader_id, files, clear_data, event_id)
 
 
 @router.get("/{uploader_id}/quota", response_model=UploaderQuotaResponse, status_code=200)
-def check_uploader_quota(uploader_id: registered_uploaders.uploader_enum):
+def check_uploader_quota(
+    uploader_id: registered_uploaders.uploader_enum,
+    tenant: str = Header(),
+    authjwt: str = Header(),
+    ):
     """ Check current uploader quota """
-    return registered_uploaders.check_quota(uploader_id)
+    
+    return registered_uploaders.check_quota(tenant, authjwt, uploader_id)
 
 
 @router.get("/{uploader_id}/status", response_model=UploaderStatusResponse, status_code=200)
-def check_uploader_status(uploader_id: registered_uploaders.uploader_enum):
+def check_uploader_status(
+    uploader_id: registered_uploaders.uploader_enum,
+    tenant: str = Header(),
+    authjwt: str = Header(),
+    ):
     """ Check current uploader status """
-    return registered_uploaders.check_status(uploader_id)
+    return registered_uploaders.check_status(tenant, authjwt, uploader_id)
