@@ -62,6 +62,7 @@ def test_file_handler_flask_file_storage_input():
             content_type="application/*",
         )
 
+
     # flaskfilestorage.filename
     f = FileUploadHandler(flaskfilestorage)
 

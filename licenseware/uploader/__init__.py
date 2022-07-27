@@ -1,4 +1,4 @@
 from .uploader import NewUploader
 from .encryption_parameters import UploaderEncryptionParameters
 from .validation_parameters import UploaderValidationParameters
-from .uploader_apispecs import UploaderApiSpecs
+from .registered_uploaders import RegisteredUploaders

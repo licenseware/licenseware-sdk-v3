@@ -59,7 +59,7 @@ def test_new_uploader(mocker):
         config=config
     )
 
-    response = rv_tools_uploader.validate_filenames(filenames)
+    response = rv_tools_uploader.filenames_validation_handler(filenames, rv_tools_validation_parameters)
 
     for resp in response.validation:
         if resp.filename == "notok.csv":
@@ -70,7 +70,7 @@ def test_new_uploader(mocker):
 
     fp = "./test_files/RVTools.xlsx"
     files = [fp]
-    response = rv_tools_uploader.validate_filecontents(files)
+    response = rv_tools_uploader.filecontents_validation_handler(files, rv_tools_validation_parameters)
 
     for resp in response.validation:
         if resp.filename == "notok.csv":
@@ -150,7 +150,7 @@ def test_new_uploader_custom_handlers(mocker):
         config=config
     )
 
-    response = rv_tools_uploader.validate_filenames(filenames)
+    response = rv_tools_uploader.filenames_validation_handler(filenames, rv_tools_validation_parameters)
 
     for resp in response.validation:
         if resp.filename == "notok.csv":
@@ -161,7 +161,7 @@ def test_new_uploader_custom_handlers(mocker):
 
     fp = "./test_files/RVTools.xlsx"
     files = [fp]
-    response = rv_tools_uploader.validate_filecontents(files)
+    response = rv_tools_uploader.filecontents_validation_handler(files, rv_tools_validation_parameters)
 
     for resp in response.validation:
         if resp.filename == "notok.csv":

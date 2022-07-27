@@ -1,5 +1,5 @@
 import uuid
-from typing import List, Union, IO
+from typing import List, Union
 from licenseware import States
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.file_upload_handler import FileUploadHandler

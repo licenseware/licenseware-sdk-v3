@@ -14,3 +14,4 @@ from .filter_item_type import FilterItemType
 from .style_attributes_type import StyleAttrsType
 from .uploader_types import *
 from .apispec_types import *
+from .tenant_types import *

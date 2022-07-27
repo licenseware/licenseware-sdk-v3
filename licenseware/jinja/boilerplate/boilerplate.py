@@ -14,7 +14,7 @@ from .create_app_initpy_file import create_app_initpy_file
 from .create_app_api_initpy_file import create_app_api_initpy_file
 from .create_app_dependencies_initpy_file import create_app_dependencies_initpy_file
 from .create_app_schema_initpy_file import create_app_schema_initpy_file
-from .create_app_workers_initpy_file import create_app_workers_initpy_file
+from .create_app_uploaders_initpy_file import create_app_uploaders_initpy_file
 from .create_app_dependencies_db_initpy_file import create_app_dependencies_db_initpy_file
 from .create_app_dependencies_types_initpy_file import create_app_dependencies_types_initpy_file
 from .create_app_dependencies_web_initpy_file import create_app_dependencies_web_initpy_file
@@ -24,7 +24,13 @@ from .create_app_dependencies_db_memorypy_file import create_app_dependencies_db
 from .create_app_dependencies_web_fastapi_driverpy_file import create_app_dependencies_web_fastapi_driverpy_file
 from .create_app_dependencies_types_typespy_file import create_app_dependencies_types_typespy_file
 from .create_app_schema_itemspy_file import create_app_schema_itemspy_file
-
+from .create_app_api_defaults_initpy_file import create_app_api_defaults_initpy_file
+from .create_app_api_defaults_uploader_router_file import create_app_api_defaults_uploader_router_file
+from .create_app_dependencies_workers_basepy_file import create_app_dependencies_workers_basepy_file
+from .create_app_dependencies_workers_celery_workerpy_file import create_app_dependencies_workers_celery_workerpy_file
+from .create_app_dependencies_workers_get_workerpy_file import create_app_dependencies_workers_get_workerpy_file
+from .create_app_dependencies_factory_instancespy_file import create_app_dependencies_factory_instancespy_file
+from .create_app_services_initpy_file import create_app_services_initpy_file
 
 
 
@@ -52,16 +58,23 @@ class Boilerplate:
             create_env_file(**options),
             create_envdocker_file(**options),
             create_app_initpy_file(**options),
+            create_app_api_defaults_initpy_file(**options),
+            create_app_api_defaults_uploader_router_file(**options),
             create_app_api_initpy_file(**options),
             create_app_schema_initpy_file(**options),
             create_app_schema_itemspy_file(**options),
-            create_app_workers_initpy_file(**options),
+            create_app_services_initpy_file(**options),
+            create_app_uploaders_initpy_file(**options),
             create_app_dependencies_initpy_file(**options),
+            create_app_dependencies_factory_instancespy_file(**options),
             create_app_dependencies_db_initpy_file(**options),
             create_app_dependencies_types_initpy_file(**options),
             create_app_dependencies_types_typespy_file(**options),
             create_app_dependencies_web_initpy_file(**options),
             create_app_dependencies_workers_initpy_file(**options),
+            create_app_dependencies_workers_basepy_file(**options),
+            create_app_dependencies_workers_celery_workerpy_file(**options),
+            create_app_dependencies_workers_get_workerpy_file(**options),
             create_app_dependencies_db_basepy_file(**options),
             create_app_dependencies_db_memorypy_file(**options),
             create_app_dependencies_web_fastapi_driverpy_file(**options),

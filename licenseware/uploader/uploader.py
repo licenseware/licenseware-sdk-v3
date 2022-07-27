@@ -19,9 +19,6 @@ from licenseware.uploader.defaults import (
     default_check_status_handler,
 )
 
-from .uploader_apispecs import UploaderApiSpecs
-
-
 
 
 @dataclass
@@ -34,10 +31,10 @@ class NewUploader:
     encryption_parameters: UploaderEncryptionParameters = None
     flags: Tuple[str] = None
     icon: str = None
-    filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileValidationResponse] = None
-    filecontents_validation_handler: Callable[[Union[List[str], List[bytes]], UploaderValidationParameters], FileValidationResponse] = None
-    check_quota_handler: Callable[[Union[List[str], List[bytes]]], UploaderQuotaResponse] = None
-    check_status_handler: Callable[[UploaderId], UploaderStatusResponse] = None
+    filenames_validation_handler: Callable[[List[str], UploaderValidationParameters], FileValidationResponse] = default_filenames_validation_handler
+    filecontents_validation_handler: Callable[[Union[List[str], List[bytes]], UploaderValidationParameters], FileValidationResponse] = default_filecontents_validation_handler
+    check_quota_handler: Callable[[Union[List[str], List[bytes]]], UploaderQuotaResponse] = default_check_quota_handler
+    check_status_handler: Callable[[UploaderId], UploaderStatusResponse] = default_check_status_handler
     config: Any = None
 
     def __post_init__(self):
@@ -57,32 +54,6 @@ class NewUploader:
         self.upload_url = f"/{appid}/uploads/{reportid}/files"
         self.quota_validation_url = f"/{appid}/uploads/{reportid}/quota"
         self.status_check_url = f"/{appid}/uploads/{reportid}/status" 
-        self.apispecs = UploaderApiSpecs(appid)
-
-
-    def validate_filenames(self, filenames: List[str]) -> FileValidationResponse:
-        if self.filenames_validation_handler is None:
-            return default_filenames_validation_handler(filenames, self.validation_parameters)
-        return self.filenames_validation_handler(filenames, self.validation_parameters) 
-
-
-    def validate_filecontents(self, files: list) -> FileValidationResponse:
-        if self.filecontents_validation_handler is None: 
-            return default_filecontents_validation_handler(files, self.validation_parameters)
-        return self.filecontents_validation_handler(files, self.validation_parameters) 
-
-
-    # TODO
-    def check_quota(self, validation_response: FileValidationResponse):
-        if self.check_quota_handler is None: 
-            return default_check_quota_handler(validation_response)
-        return self.check_quota_handler(validation_response) 
-        
-    # TODO
-    def check_status(self, uploader_id:str):
-        if self.check_status_handler is None: 
-            return default_check_status_handler(uploader_id)
-        return self.check_status_handler(uploader_id) 
 
 
     @property

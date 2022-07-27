@@ -7,7 +7,6 @@ from licenseware.utils.logger import log
 from licenseware.utils.alter_string import get_altered_strings
 from .style_attributes import StyleAttrs
 from .report_filter import ReportFilter
-from .report_component_apispecs import ReportComponentApiSpecs
 
 
 
@@ -39,7 +38,6 @@ class NewReportComponent:
         self.url = f'/{appid}/report-components/{compid}'
         self.public_url = f'/{appid}/report-components/{compid}/public'
         self.snapshot_url = f'/{appid}/report-components/{compid}/snapshot'
-        self.apispecs = ReportComponentApiSpecs(appid)
 
 
     def get_component_data(self, *args, **kwargs):
