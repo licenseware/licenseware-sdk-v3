@@ -1,8 +1,11 @@
 import logging
-
 import settings
 from settings import config
 from app.api import routers
+from app.dependencies.web import WebApp
+from app.uploaders import uploaders
+from licenseware import NewApp, Flags
+
 
 
 def get_db(env):
@@ -16,22 +19,40 @@ def get_db(env):
     # }[env]
 
 
-WebApp = config.webapp_framework.WebApp
-app = WebApp()
-[app.include_router(router) for router in routers]
+
+app = NewApp(
+    name="Oracle Middleware Manager",
+    description="""OMWM Automate the analysis and determination of Oracle Middleware usage.""",
+    flags=[Flags.BETA],
+    config=config
+)
+
+[app.attach_uploader(u) for u in uploaders]
+
+
+
+webapp = WebApp(
+    title=app.name,
+    description=app.description
+)
+
+[webapp.include_router(router) for router in routers]
+
+webapp.state.db = get_db(config.ENV)()
+
+
+
+
 logger = logging.getLogger()
 logger.setLevel(config.LOG_LEVEL.value)
-
-
-# app.state.db = get_db(config.ENV)(**config.db_config)
-app.state.db = get_db(config.ENV)()
 logger.info("Starting with environment: %s", config.ENV)
+
 
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        "main:app",
+        "main:webapp",
         host="0.0.0.0",
         port=config.PORT,
         reload=config.ENV == settings.Environment.DEV,

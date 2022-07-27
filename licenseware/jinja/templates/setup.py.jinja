@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+from settings import config
 
 
 def get_requirements():
@@ -7,8 +8,8 @@ def get_requirements():
 
 
 setup(
-    name="sample-clean-architecture",
-    version="0.1.0",
+    name=config.APP_ID,
+    version="0.0.1",
     install_requires=get_requirements(),
     packages=find_packages("."),
 )

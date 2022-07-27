@@ -1,6 +1,5 @@
-import importlib
-
 from app.dependencies.types import BaseSettings, StrEnum
+
 
 
 class LogLevel(StrEnum):
@@ -28,6 +27,9 @@ class WebAppFramework(StrEnum):
 
 
 class Config(BaseSettings):
+    APP_ID: str = "app"
+    REGISTER_APP_URL: str
+    REGISTER_UPLOADER_URL: str
     ENV: Environment = Environment.DEV
     LOG_LEVEL: LogLevel = LogLevel.INFO
     PORT: int = 8000
@@ -82,17 +84,15 @@ class Config(BaseSettings):
             },
         }[self.ENV]
 
-    @property
-    def webapp_framework(self):
-        library = {
-            WebAppFramework.FASTAPI: "fastapi",
-            WebAppFramework.FLASK: "flask",
-        }[self.WEBAPP_FRAMEWORK]
-        return importlib.import_module(f"app.dependencies.web.{library}_driver")
+
+    def get_machine_token(self):
+        return "machine token"
 
     class Config:
         env_file = ".env"
         case_sensitive = True
+        
 
 
 config = Config()
+

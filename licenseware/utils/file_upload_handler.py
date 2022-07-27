@@ -1,6 +1,7 @@
 import os
 import io
 import shutil
+import tempfile
 from typing import Union, IO
 
 
@@ -29,8 +30,15 @@ class FileUploadHandler(io.BufferedIOBase):
             attrs = ['close', 'read', 'seek', 'tell', 'write']
             
             for name, val in vars(self.fileorbuffer).items():
-                if isinstance(val, io.BytesIO) and all(hasattr(val, attr) for attr in attrs) and self.buffer is None:
-                    self.buffer = val
+                if (
+                    isinstance(val, (tempfile.SpooledTemporaryFile, io.BytesIO, )) 
+                    and 
+                    all(hasattr(val, attr) for attr in attrs) 
+                    and 
+                    self.buffer is None
+                ):
+                        self.buffer = val
+                
                 if name in ["filename", "name"] and self.filename is None:
                     self.filename = val
                     

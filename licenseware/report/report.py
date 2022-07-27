@@ -5,8 +5,8 @@ from licenseware.utils.logger import log
 from licenseware.constants.states import States
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
-from .report_apispecs import ReportApiSpecs
 from licenseware.utils.alter_string import get_altered_strings
+
 
 
 def _update_connected_apps(connected_apps, config):
@@ -57,7 +57,6 @@ class NewReport:
         self.preview_image_url = f'/{appid}/reports/{reportid}/preview_image' 
         self.preview_image_dark_url = f'/{appid}/reports/{reportid}/preview_image_dark' 
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
-        self.apispecs = ReportApiSpecs(appid)
 
 
     def attach(self, component: NewReportComponent):

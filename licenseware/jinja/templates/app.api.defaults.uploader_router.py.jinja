@@ -1,0 +1,75 @@
+from typing import List
+from settings import config
+from pydantic import BaseModel
+
+from app.dependencies.web import WebRouter, UploadFile
+from app.uploaders import registered_uploaders
+
+
+
+router = WebRouter(
+    tags=["Uploaders"],
+    prefix=f"/{config.APP_ID}/uploads"
+)
+
+
+class FilenameValidationPayload(BaseModel):
+    filenames: List[str] 
+
+class ValidationResponse(BaseModel):
+    status: str
+    filename: str
+    message: str
+
+class FileValidationResponse(BaseModel):
+    status: str
+    message: str
+    validation: List[ValidationResponse]
+    event_id: str
+
+class UploaderQuotaResponse(BaseModel):
+    status:str
+    message:str
+    monthly_quota:int
+    monthly_quota_consumed:int
+    quota_reset_date:str
+
+
+class UploaderStatusResponse(BaseModel):
+    status:str
+
+
+responses = {
+    200: {"model": FileValidationResponse},
+    402: {"model": UploaderQuotaResponse}
+}
+
+
+@router.post("/{uploader_id}/validation", responses=responses)
+def validate_file_names(
+    uploader_id: registered_uploaders.uploader_enum, filenames: FilenameValidationPayload
+):
+    """ Validating the list of filenames provided """
+    return registered_uploaders.validate_filenames(uploader_id, filenames)
+
+
+
+@router.post("/{uploader_id}/files", responses=responses)
+def validate_file_contents(
+    uploader_id: registered_uploaders.uploader_enum, files: List[UploadFile], clear_data: bool = False, event_id:str = None
+):
+    """ Validating the list of files provided """
+    return registered_uploaders.validate_filecontents(uploader_id, files, clear_data, event_id)
+
+
+
+@router.get("/{uploader_id}/quota", response_model=UploaderQuotaResponse, status_code=200)
+def check_uploader_quota(uploader_id: registered_uploaders.uploader_enum):
+    """ Check current uploader quota """
+    return registered_uploaders.check_quota(uploader_id)
+
+
+@router.get("/{uploader_id}/status", response_model=UploaderStatusResponse, status_code=200)
+def check_uploader_status(uploader_id: registered_uploaders.uploader_enum):
+    """ Check current uploader status """
+    return registered_uploaders.check_status(uploader_id)

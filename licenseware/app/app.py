@@ -1,23 +1,18 @@
 import requests
-from typing import Any, Callable, Tuple, Dict
+from typing import Any, Tuple, Dict
 from dataclasses import dataclass
 from licenseware.constants.states import States
 from licenseware.utils.logger import log
 from licenseware.uploader.uploader import NewUploader
 from licenseware.report.report import NewReport, NewReportComponent
-from .route_handlers import NewAppRouteHandlers
-from .app_apispecs import AppApiSpecs
+from licenseware import tenant as t
+
 
 
 @dataclass
 class NewApp:
     name:str
     description:str
-    get_tenants_with_app_activated_handler: Callable
-    get_tenants_with_data_available_handler: Callable
-    get_tenants_with_public_reports_handler: Callable
-    get_tenant_features_handler: Callable
-    app_id:str = None
     flags: Tuple[str] = None
     icon:str = None
     app_meta: dict = None
@@ -28,16 +23,14 @@ class NewApp:
     def __post_init__(self):
 
         assert self.config is not None
-        if hasattr(self.config, "APP_ID") and self.app_id is None:
-            self.app_id = self.config.APP_ID
+        assert hasattr(self.config, "APP_ID")
         assert hasattr(self.config, "REGISTER_APP_URL")
         assert hasattr(self.config, "get_machine_token")
 
+        self.app_id = self.config.APP_ID
         self.uploaders: Dict[str, NewUploader] = dict() 
         self.reports: Dict[str, NewReport] = dict()
         self.report_components: Dict[str, NewReportComponent] = dict()
-        self.routes = NewAppRouteHandlers(self.app_id)
-        self.apispecs = AppApiSpecs(self.routes)
         
     
     def attach_uploader(self, uploader: NewUploader):
@@ -73,18 +66,17 @@ class NewApp:
         metadata_payload = {
             "data": [
                 {
-                    "app_id": self.app_id,
                     "name": self.name,
-                    "description": self.description,
-                    "tenants_with_app_activated": self.get_tenants_with_app_activated_handler(),
-                    "tenants_with_data_available": self.get_tenants_with_data_available_handler(),
-                    "tenants_with_public_reports": self.get_tenants_with_public_reports_handler(),
-                    "flags": self.flags,
                     "icon": self.icon,
-                    "features": self.get_tenant_features_handler(),
+                    "flags": self.flags,
+                    "app_id": self.app_id,
                     "app_meta": self.app_meta,
+                    "description": self.description,
                     "integration_details": self.integration_details,
-                    **self.routes.urls
+                    "tenants_with_app_activated": t.get_tenants_with_app_activated(),
+                    "tenants_with_data_available": t.get_tenants_with_data_available(),
+                    "tenants_with_public_reports": t.get_tenants_with_public_reports(),
+                    "features": t.get_tenant_features(),
                 }
             ]
         }
