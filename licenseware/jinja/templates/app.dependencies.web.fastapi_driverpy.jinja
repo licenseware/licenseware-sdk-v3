@@ -1,6 +1,19 @@
+from licenseware import log
 from fastapi import FastAPI as WebApp
 from fastapi import APIRouter as WebRouter
 from fastapi import Request as WebRequest
 from fastapi import HTTPException as WebHTTPException
-from fastapi import Depends
-from fastapi import UploadFile
+from fastapi import (
+    Depends, 
+    UploadFile, 
+    Header
+)
+
+
+
+def authorized_user(tenant: str = Header(), authjwt: str = Header()):
+    if tenant is None or authjwt is None:
+        log.warning("Invalid User Credentials")
+        raise WebHTTPException(status_code=403, detail="Missing `tenant` or `authjwt` from headers")
+    
+    log.success("Valid User Credentials")
