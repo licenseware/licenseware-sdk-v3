@@ -139,15 +139,6 @@ def test_report_creation(mocker):
         )
     )
 
-    # Declaring the report
-    fmw_deployment_report = NewReport(
-        name="Oracle Fusion Middleware Deployment",
-        report_id="fmw_deployment_report",
-        description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.",
-        filters=FMW_FILTERS,
-        config=config,
-    )
-
     # Function responsible for getting report component data
     def get_fmw_summary_component_data(*args, **kwargs):
         return "mock_component_data"
@@ -176,20 +167,6 @@ def test_report_creation(mocker):
         config=config,
     )
 
-    # Attaching a report component to a report
-    fmw_deployment_report.attach(fmw_summary_component)
-    with t.assertRaises(ValueError):
-        fmw_deployment_report.attach(fmw_summary_component)
-
-    assert fmw_summary_component.get_component_data() == "mock_component_data"
-    assert "data" in fmw_summary_component.metadata
-
-    d = fmw_deployment_report.metadata["data"][0]
-    firstfilter = d["filters"][0]["allowed_filters"][0]
-    assert isinstance(firstfilter, str)
-
-    assert fmw_summary_component.component_id in fmw_deployment_report.report_components
-
     # COMPONENT 2
     # Declaring some attributes
     bar_horizontal = BarHorizontalAttrs().attr(
@@ -208,7 +185,33 @@ def test_report_creation(mocker):
         config=config,
     )
 
-    fmw_deployment_report.attach(fmw_bar_horizontal_component)
+    report_components = [fmw_bar_horizontal_component, fmw_summary_component]
+
+    # Declaring the report
+    fmw_deployment_report = NewReport(
+        name="Oracle Fusion Middleware Deployment",
+        report_id="fmw_deployment_report",
+        description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.",
+        filters=FMW_FILTERS,
+        components=report_components,
+        config=config,
+    )
+
+    # Attaching a report component to a report
+    fmw_deployment_report.attach("fmw_summary")
+    with t.assertRaises(ValueError):
+        fmw_deployment_report.attach("fmw_summary")
+
+    assert fmw_summary_component.get_component_data() == "mock_component_data"
+    assert "data" in fmw_summary_component.metadata
+
+    d = fmw_deployment_report.metadata["data"][0]
+    firstfilter = d["filters"][0]["allowed_filters"][0]
+    assert isinstance(firstfilter, str)
+
+    assert fmw_summary_component.component_id in fmw_deployment_report.report_components
+
+    fmw_deployment_report.attach("bar_devices")
 
     assert len(fmw_deployment_report.report_components) == 2
 
