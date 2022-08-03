@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 
 import requests
 
+from licenseware import tenant as t
 from licenseware.constants.states import States
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
@@ -37,6 +38,7 @@ class NewReport:
     flags: List[str] = None
     filters: ReportFilter = None
     components: List[NewReportComponent] = None
+    registrable: bool = True
     config: Any = None
 
     def __post_init__(self):
@@ -50,6 +52,9 @@ class NewReport:
 
         appid = get_altered_strings(self.app_id).dash
         reportid = get_altered_strings(self.report_id).dash
+
+        if isinstance(self.filters, ReportFilter):
+            self.filters = self.filters.metadata
 
         self.report_components: Dict[str, NewReportComponent] = dict()
         self.url = f"/{appid}/reports/{reportid}"
@@ -68,7 +73,7 @@ class NewReport:
 
         raise ValueError(
             f"Component '{component_id}' not found on given report components"
-        )
+        )  # pragma no cover
 
     def attach(self, component_id: str):
 
@@ -102,9 +107,9 @@ class NewReport:
                         self.report_components
                     ),
                     "connected_apps": self.connected_apps,
-                    "filters": self.filters.metadata
-                    if self.filters is not None
-                    else None,
+                    "filters": self.filters,
+                    "registrable": self.registrable,
+                    "public_for_tenants": t.get_tenants_with_public_report(),
                 }
             ]
         }

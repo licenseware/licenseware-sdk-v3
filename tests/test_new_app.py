@@ -1,3 +1,4 @@
+import json
 import unittest
 from dataclasses import dataclass
 
@@ -26,6 +27,7 @@ class Config:
     REGISTER_REPORT_COMPONENT_URL = ""
     REGISTER_APP_URL = ""
     REGISTER_UPLOADER_URL = ""
+    REGISTER_ALL_URL = ""
 
     @staticmethod
     def get_machine_token():
@@ -52,13 +54,6 @@ def test_adding_objects():
 
     config = Config()
 
-    app = NewApp(
-        name="Oracle Middleware Manager",
-        description="""OMWM Automate the analysis and determination of Oracle Middleware usage.""",
-        flags=[Flags.BETA],
-        config=config,
-    )
-
     summary = (
         SummaryAttrs()
         .attr(
@@ -83,10 +78,6 @@ def test_adding_objects():
         config=config,
     )
 
-    app.attach_report_component(fmw_summary_component)
-
-    assert fmw_summary_component.component_id in app.report_components
-
     fmw_deployment_report = NewReport(
         name="Oracle Fusion Middleware Deployment",
         report_id="fmw_deployment_report",
@@ -94,10 +85,6 @@ def test_adding_objects():
         filters=[],
         config=config,
     )
-
-    app.attach_report(fmw_deployment_report)
-
-    assert fmw_deployment_report.report_id in app.reports
 
     rv_tools_uploader = NewUploader(
         name="RVTools",
@@ -107,6 +94,34 @@ def test_adding_objects():
         config=config,
     )
 
-    app.attach_uploader(rv_tools_uploader)
+    app = NewApp(
+        name="Oracle Middleware Manager",
+        description="""OMWM Automate the analysis and determination of Oracle Middleware usage.""",
+        flags=[Flags.BETA],
+        config=config,
+    )
 
-    assert rv_tools_uploader.uploader_id in app.uploaders
+    app.attach_uploaders([rv_tools_uploader])
+    app.attach_reports([fmw_deployment_report])
+    app.attach_components([fmw_summary_component])
+
+    assert rv_tools_uploader.uploader_id in app.attached_uploaders
+    assert fmw_deployment_report.report_id in app.attached_reports
+    assert fmw_summary_component.component_id in app.attached_components
+
+    with t.assertRaises(ValueError):
+        app.attach_uploaders([rv_tools_uploader])
+
+    with t.assertRaises(ValueError):
+        app.attach_reports([fmw_deployment_report])
+
+    with t.assertRaises(ValueError):
+        app.attach_components([fmw_summary_component])
+
+    assert isinstance(app.metadata, dict)
+    assert "data" in app.metadata
+
+    print(json.dumps(app.full_metadata, sort_keys=True, indent=4, default=str))
+
+    assert isinstance(app.full_metadata, dict)
+    assert "data" in app.full_metadata

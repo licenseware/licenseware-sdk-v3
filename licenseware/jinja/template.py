@@ -40,7 +40,7 @@ def create_jinja_template(
     """
 
     file_path = os.path.join(filepath, filename)
-    if os.path.exists(file_path):
+    if os.path.exists(file_path):  # pragma no cover
         log.info(f"Skipping `{file_path}`")
         return JinjaTemplate(file_path, None)
 

@@ -1,4 +1,3 @@
-import json
 import unittest
 from dataclasses import dataclass
 
@@ -215,8 +214,8 @@ def test_report_creation(mocker):
 
     assert len(fmw_deployment_report.report_components) == 2
 
-    print(
-        json.dumps(
-            fmw_deployment_report.metadata, sort_keys=True, indent=4, default=str
-        )
-    )
+    # print(
+    #     json.dumps(
+    #         fmw_deployment_report.metadata, sort_keys=True, indent=4, default=str
+    #     )
+    # )
