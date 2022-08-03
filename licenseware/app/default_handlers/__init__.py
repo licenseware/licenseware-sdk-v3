@@ -6,3 +6,4 @@ from .register_app import register_app
 from .get_history_report import get_history_report
 from .get_features import get_features
 from .get_integrations import get_integrations
+from .register_tenant import register_tenant
