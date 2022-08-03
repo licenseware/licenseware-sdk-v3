@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Union
 
-from licenseware import States
+from licenseware.constants.states import States
 from licenseware.constants.uploader_types import (
     FileValidationResponse,
     ValidationResponse,
