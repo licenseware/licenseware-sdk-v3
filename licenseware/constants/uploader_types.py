@@ -1,6 +1,5 @@
-from typing import Tuple, List, NewType
-from dataclasses import dataclass, asdict
-
+from dataclasses import asdict, dataclass
+from typing import List, NewType, Tuple
 
 UploaderId = NewType("UploaderId", str)
 
@@ -12,7 +11,7 @@ class ValidationResponse:
     message: str
 
     def dict(self):
-        return asdict(self) # pragma: no cover
+        return asdict(self)  # pragma: no cover
 
 
 @dataclass
@@ -23,42 +22,58 @@ class FileValidationResponse:
     event_id: str
 
     def dict(self):
-        return asdict(self) # pragma: no cover
-
+        return asdict(self)  # pragma: no cover
 
 
 @dataclass
 class FilenameValidationPayload:
-    filenames: List[str] 
-    
+    filenames: List[str]
+
     def dict(self):
-        return asdict(self) # pragma: no cover
+        return asdict(self)  # pragma: no cover
 
 
 @dataclass
 class FilesUploadPayload:
-    files: List[bytes] 
-    
+    files: List[bytes]
+
     def dict(self):
-        return asdict(self) # pragma: no cover
+        return asdict(self)  # pragma: no cover
 
 
 @dataclass
 class UploaderQuotaResponse:
-    status:str
-    message:str
-    monthly_quota:int
-    monthly_quota_consumed:int
-    quota_reset_date:str
+    status: str
+    message: str
+    monthly_quota: int
+    monthly_quota_consumed: int
+    quota_reset_date: str
 
     def dict(self):
-        return asdict(self) # pragma: no cover
+        return asdict(self)  # pragma: no cover
 
+
+@dataclass
+class QuotaType:
+    tenant_id: str
+    uploader_id: str
+    monthly_quota: int
+    monthly_quota_consumed: int
+    quota_reset_date: str
+
+    def dict(self):
+        return asdict(self)  # pragma: no cover
+
+
+@dataclass
+class QuotaPlan:
+    UNLIMITED: str = "UNLIMITED"
+    FREE: str = "FREE"
 
 
 @dataclass
 class UploaderStatusResponse:
-    status: str  
-    
+    status: str
+
     def dict(self):
-        return asdict(self) # pragma: no cover
+        return asdict(self)  # pragma: no cover

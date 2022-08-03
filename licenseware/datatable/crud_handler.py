@@ -1,9 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-
-class CrudHandler(metaclass=ABCMeta): # pragma no cover
-    
+class CrudHandler(metaclass=ABCMeta):  # pragma no cover
     @abstractmethod
     def get(self):
         pass

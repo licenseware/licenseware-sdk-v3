@@ -1,11 +1,13 @@
-import pytest
 import unittest
-from licenseware.validators import validate_min_rows_number
 
+import pytest
+
+from licenseware.validators import validate_min_rows_number
 
 # pytest -v -s tests/test_validate_min_rows_number.py
 
 t = unittest.TestCase()
+
 
 def test_validate_min_rows_number():
 
@@ -15,4 +17,3 @@ def test_validate_min_rows_number():
 
     with t.assertRaises(ValueError):
         validate_min_rows_number(min_rows=1, current_rows=0, raise_error=True)
-    

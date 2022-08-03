@@ -1,24 +1,24 @@
-import requests
-from typing import Any, Tuple, Dict
 from dataclasses import dataclass
-from licenseware.constants.states import States
-from licenseware.utils.logger import log
-from licenseware.uploader.uploader import NewUploader
-from licenseware.report.report import NewReport, NewReportComponent
-from licenseware import tenant as t
+from typing import Any, Dict, Tuple
 
+import requests
+
+from licenseware import tenant as t
+from licenseware.constants.states import States
+from licenseware.report.report import NewReport, NewReportComponent
+from licenseware.uploader.uploader import NewUploader
+from licenseware.utils.logger import log
 
 
 @dataclass
 class NewApp:
-    name:str
-    description:str
+    name: str
+    description: str
     flags: Tuple[str] = None
-    icon:str = None
+    icon: str = None
     app_meta: dict = None
     integration_details: Tuple[dict] = None
     config: Any = None
-
 
     def __post_init__(self):
 
@@ -28,18 +28,16 @@ class NewApp:
         assert hasattr(self.config, "get_machine_token")
 
         self.app_id = self.config.APP_ID
-        self.uploaders: Dict[str, NewUploader] = dict() 
+        self.uploaders: Dict[str, NewUploader] = dict()
         self.reports: Dict[str, NewReport] = dict()
         self.report_components: Dict[str, NewReportComponent] = dict()
-        
-    
+
     def attach_uploader(self, uploader: NewUploader):
 
         if uploader.uploader_id in self.uploaders.keys():
             raise ValueError(f"Uploader '{uploader.uploader_id}' is already attached")
 
         self.uploaders[uploader.uploader_id] = uploader
-
 
     def attach_report(self, report: NewReport):
 
@@ -48,17 +46,17 @@ class NewApp:
 
         self.reports[report.report_id] = report
 
-
     def attach_report_component(self, report_component: NewReportComponent):
 
         if report_component.component_id in self.report_components.keys():
-            raise ValueError(f"Report component '{report_component.component_id}' is already attached")
+            raise ValueError(
+                f"Report component '{report_component.component_id}' is already attached"
+            )
 
         if report_component.order is None:
             report_component.order = len(self.report_components.keys()) + 1
 
         self.report_components[report_component.component_id] = report_component
-
 
     @property
     def metadata(self):
@@ -80,27 +78,28 @@ class NewApp:
                 }
             ]
         }
-        
-        return metadata_payload
 
+        return metadata_payload
 
     def register(self):
 
-        response = requests.post( # pragma: no cover
-            url=self.config.REGISTER_APP_URL, 
-            json=self.metadata, 
-            headers={"Authorization": self.config.get_machine_token()}
+        response = requests.post(  # pragma: no cover
+            url=self.config.REGISTER_APP_URL,
+            json=self.metadata,
+            headers={"Authorization": self.config.get_machine_token()},
         )
 
-        if response.status_code == 200: # pragma: no cover
+        if response.status_code == 200:  # pragma: no cover
             return {
-                    "status": States.SUCCESS,
-                    "message": f"App '{self.app_id}' register successfully",
-                    "content": self.metadata
-                }, 200
+                "status": States.SUCCESS,
+                "message": f"App '{self.app_id}' register successfully",
+                "content": self.metadata,
+            }, 200
 
-        nokmsg = f"Could not register app '{self.app_id}'" # pragma: no cover
-        log.error(nokmsg) # pragma: no cover
-        return {"status": States.FAILED, "message": nokmsg, "content": self.metadata}, 400 # pragma: no cover
-
-    
+        nokmsg = f"Could not register app '{self.app_id}'"  # pragma: no cover
+        log.error(nokmsg)  # pragma: no cover
+        return {
+            "status": States.FAILED,
+            "message": nokmsg,
+            "content": self.metadata,
+        }, 400  # pragma: no cover

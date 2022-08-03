@@ -1,5 +1,5 @@
+from dataclasses import asdict, dataclass
 from typing import Tuple
-from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -20,6 +20,5 @@ class UploaderValidationParameters:
     regex_escape: bool = True
     ignored_by_uup: bool = False
 
-
     def dict(self):
-        return asdict(self) # pragma: no cover
+        return asdict(self)  # pragma: no cover

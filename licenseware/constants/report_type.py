@@ -1,5 +1,6 @@
-from typing import List
 from dataclasses import dataclass
+from typing import List
+
 from .report_component_type import ReportComponentType
 
 
@@ -11,9 +12,8 @@ class ReportType:
     description: str
     flags: List[str]
     report_components: List[ReportComponentType]
-    url:str
+    url: str
     public_url: str
     preview_image_url: str
     preview_image_dark_url: str
-    connected_apps: List[str]   
-
+    connected_apps: List[str]

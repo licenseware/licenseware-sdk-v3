@@ -1,6 +1,5 @@
+from dataclasses import asdict, dataclass
 from typing import Tuple
-from dataclasses import dataclass, asdict
-
 
 
 @dataclass
@@ -9,6 +8,5 @@ class UploaderEncryptionParameters:
     filecontent: Tuple[str] = None
     columns: Tuple[str] = None
 
-
     def dict(self):
-        return asdict(self) # pragma: no cover
+        return asdict(self)  # pragma: no cover

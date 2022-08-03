@@ -1,14 +1,13 @@
-from typing import List, Union, NewType
 from dataclasses import dataclass, field
-
+from typing import List, NewType, Union
 
 RouteName = NewType("RouteName", str)
 
 
 @dataclass
 class ParamType:
-    name:str
-    type:str
+    name: str
+    type: str
     required: bool
     description: str
 
@@ -16,7 +15,7 @@ class ParamType:
 @dataclass
 class ResponseType:
     method: str
-    response: Union[type, str, int, list, dict] 
+    response: Union[type, str, int, list, dict]
     status_code: int
 
 
@@ -33,4 +32,3 @@ class RouteType:
     request_form: type = None
     request_files: type = None
     responses: List[ResponseType] = field(default_factory=list)
-

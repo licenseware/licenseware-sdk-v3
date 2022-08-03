@@ -1,8 +1,8 @@
 from typing import List
-from licenseware.utils.alter_string import get_altered_strings
+
 from licenseware.constants.allowed_filters import AllowedFilters
 from licenseware.constants.column_types import ColumnTypes
-
+from licenseware.utils.alter_string import get_altered_strings
 
 
 class ReportFilter:
@@ -15,8 +15,8 @@ class ReportFilter:
         .add(
             column="result",
             allowed_filters=[
-                ReportFilter.FILTER.EQUALS, 
-                ReportFilter.FILTER.CONTAINS, 
+                ReportFilter.FILTER.EQUALS,
+                ReportFilter.FILTER.CONTAINS,
                 ReportFilter.FILTER.IN_LIST
             ],
             # column_type=ReportFilter.TYPE.STRING, # string type is the default
@@ -26,8 +26,8 @@ class ReportFilter:
         .add(
             column="total_number_of_cores",
             allowed_filters=[
-                ReportFilter.FILTER.EQUALS, 
-                ReportFilter.FILTER.GREATER_THAN, 
+                ReportFilter.FILTER.EQUALS,
+                ReportFilter.FILTER.GREATER_THAN,
                 ReportFilter.FILTER.GREATER_OR_EQUAL_TO,
                 ReportFilter.FILTER.LESS_THAN,
                 ReportFilter.FILTER.LESS_OR_EQUAL_TO
@@ -38,7 +38,7 @@ class ReportFilter:
     )
 
     ```
-    
+
     Filter sample
     {
         "column": "result",
@@ -55,7 +55,15 @@ class ReportFilter:
     def __init__(self):
         self.metadata = []
 
-    def add(self, *, column:str,  allowed_filters: List[str], column_type:str = None, allowed_values: List[str] = None, visible_name:str = None):
+    def add(
+        self,
+        *,
+        column: str,
+        allowed_filters: List[str],
+        column_type: str = None,
+        allowed_values: List[str] = None,
+        visible_name: str = None
+    ):
 
         if column_type is None:
             column_type = self.TYPE.STRING
@@ -64,14 +72,14 @@ class ReportFilter:
             strver = get_altered_strings(column)
             visible_name = strver.title
 
-        self.metadata.append({
-            "column": column,
-            "allowed_filters": allowed_filters,
-            "column_type": column_type,
-            "allowed_values": allowed_values,
-            "visible_name": visible_name,
-        })
+        self.metadata.append(
+            {
+                "column": column,
+                "allowed_filters": allowed_filters,
+                "column_type": column_type,
+                "allowed_values": allowed_values,
+                "visible_name": visible_name,
+            }
+        )
 
         return self
-
-

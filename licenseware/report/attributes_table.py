@@ -1,6 +1,6 @@
-from licenseware.utils.alter_string import get_altered_strings
 from licenseware.constants.column_types import ColumnTypes
 from licenseware.constants.report_component_types import RCTypes
+from licenseware.utils.alter_string import get_altered_strings
 
 
 class TableAttrs:
@@ -8,7 +8,7 @@ class TableAttrs:
     Usage:
 
     ```py
-    
+
     table = (
         TableAttrs()
         .attr(prop= "device_name")
@@ -23,8 +23,8 @@ class TableAttrs:
     {
         "columns": [
             {
-                "name": "Device Name", 
-                "prop": "device_name", 
+                "name": "Device Name",
+                "prop": "device_name",
                 "type": "string"
             },
             {
@@ -35,21 +35,23 @@ class TableAttrs:
         ]
     }
     """
-    
+
     def __init__(self):
-        self.component_type = RCTypes.TABLE        
+        self.component_type = RCTypes.TABLE
         self.metadata = {"columns": []}
 
-    def attr(self, *, prop: str, name: str = None, type:str = ColumnTypes.STRING):
+    def attr(self, *, prop: str, name: str = None, type: str = ColumnTypes.STRING):
 
         if name is None:
             altstr = get_altered_strings(prop)
             name = altstr.title
 
-        self.metadata["columns"].append({
-            "name": name, 
-            "prop": prop, 
-            "type": type,
-        })
+        self.metadata["columns"].append(
+            {
+                "name": name,
+                "prop": prop,
+                "type": type,
+            }
+        )
 
         return self

@@ -1,7 +1,6 @@
 from .base_types import BaseTypes
 
 
-
 class ColumnTypes(BaseTypes):
     STRING = "string"
     NUMBER = "number"
@@ -10,5 +9,3 @@ class ColumnTypes(BaseTypes):
     JSON = "json"
     ENUM = "enum"
     ENTITY = "entity"
-
-

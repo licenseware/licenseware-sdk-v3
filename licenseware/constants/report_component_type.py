@@ -1,8 +1,9 @@
-from typing import List
 from dataclasses import dataclass
-from .style_attributes_type import StyleAttrsType
+from typing import List
+
 from .attributes_type import AttributesType
 from .report_filter_type import ReportFilterType
+from .style_attributes_type import StyleAttrsType
 
 
 @dataclass
@@ -18,4 +19,3 @@ class ReportComponentType:
     attributes: AttributesType
     filters: List[ReportFilterType]
     type: str
-

@@ -1,11 +1,13 @@
 import pytest
+
 from licenseware.utils import get_altered_strings
 
 # pytest -s -v tests/test_altered_strings.py
 
+
 def test_altered_strings():
 
-    s = "columns_name" 
+    s = "columns_name"
 
     str_versions = get_altered_strings(s)
 
@@ -16,7 +18,3 @@ def test_altered_strings():
     assert str_versions.dash_upper == "COLUMNS-NAME"
     assert str_versions.underscore == "columns_name"
     assert str_versions.underscore_upper == "COLUMNS_NAME"
-    
-
-
-
