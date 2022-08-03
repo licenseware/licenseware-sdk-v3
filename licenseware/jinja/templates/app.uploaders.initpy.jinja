@@ -1,11 +1,10 @@
 from licenseware import RegisteredUploaders
-# Import here NewUploader instances and add them to uploaders list
+from .rv_tools.uploader import rv_tools_uploader # import here uploaders created
 
 
 uploaders = [
-
+    rv_tools_uploader
 ]
 
 
 registered_uploaders = RegisteredUploaders(uploaders)
-

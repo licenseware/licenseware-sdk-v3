@@ -1,6 +1,3 @@
-
-
-
 class StyleAttrs:
     """
     Usage:
@@ -11,14 +8,14 @@ class StyleAttrs:
         .width_one_third
         .set("height", "full")
     )
-    
+
     ```
     """
 
     def __init__(self):
         self.metadata = {}
 
-    def set(self, name:str, value:str):
+    def set(self, name: str, value: str):
         if name in self.metadata.keys():
             raise ValueError(f"Style '{name}' already set")
         self.metadata.update({name: value})
@@ -26,28 +23,28 @@ class StyleAttrs:
 
     @property
     def width_one_third(self):
-        if 'width' in self.metadata.keys():
+        if "width" in self.metadata.keys():
             raise ValueError("Style 'width' already set")
-        self.metadata.update({'width': '1/3'})
+        self.metadata.update({"width": "1/3"})
         return self
 
     @property
     def width_two_thirds(self):
-        if 'width' in self.metadata.keys(): # pragma no cover 
+        if "width" in self.metadata.keys():  # pragma no cover
             raise ValueError("Style 'width' already set")
-        self.metadata.update({'width': '2/3'})
+        self.metadata.update({"width": "2/3"})
         return self
 
     @property
     def width_full(self):
-        if 'width' in self.metadata.keys():
+        if "width" in self.metadata.keys():
             raise ValueError("Style 'width' already set")
-        self.metadata.update({'width': 'full'})
+        self.metadata.update({"width": "full"})
         return self
 
     @property
     def width_half(self):
-        if 'width' in self.metadata.keys():
+        if "width" in self.metadata.keys():
             raise ValueError("Style 'width' already set")
-        self.metadata.update({'width': '1/2'})
+        self.metadata.update({"width": "1/2"})
         return self

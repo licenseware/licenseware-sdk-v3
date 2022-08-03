@@ -1,12 +1,11 @@
 from licenseware.constants.report_component_types import RCTypes
 
 
-
 class DataNarrativeAttrs:
     """
     Usage:
     ```py
-    
+
     dn = (
         DataNarrativeAttrs()
         .attr(value_key="data")
@@ -25,24 +24,13 @@ class DataNarrativeAttrs:
 
     def __init__(self):
         self.component_type = RCTypes.DATA_NARRATIVE
-        self.metadata = {
-            "series": {}
-        }
+        self.metadata = {"series": {}}
 
-    def attr(self, *, value_key:str):
+    def attr(self, *, value_key: str):
 
         if len(self.metadata["series"]) > 0:
-            raise ValueError("Only one `value_key` can be set") # pragma no cover
+            raise ValueError("Only one `value_key` can be set")  # pragma no cover
 
-        self.metadata["series"].update({
-            "value_key": value_key
-        })
+        self.metadata["series"].update({"value_key": value_key})
 
         return self
-
-        
-
-
-
-
-

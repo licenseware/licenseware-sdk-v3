@@ -1,10 +1,11 @@
-import pytest
 import io
 import os
 import shutil
+
 import pandas as pd
-from werkzeug.datastructures import FileStorage
+import pytest
 from fastapi import UploadFile
+from werkzeug.datastructures import FileStorage
 
 from licenseware import FileUploadHandler
 
@@ -23,7 +24,6 @@ def test_file_handler_objects():
 
     assert isinstance(f.readlines(1), list)
     assert isinstance(f.readline(1), bytes)
-
 
 
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_string_input
@@ -53,7 +53,7 @@ def test_file_handler_flask_file_storage_input():
 
     csvfp = "./test_files/lms_detail.csv"
 
-    with open(csvfp, 'rb') as f:
+    with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
 
         flaskfilestorage = FileStorage(
@@ -61,7 +61,6 @@ def test_file_handler_flask_file_storage_input():
             filename=os.path.basename(csvfp),
             content_type="application/*",
         )
-
 
     # flaskfilestorage.filename
     f = FileUploadHandler(flaskfilestorage)
@@ -85,14 +84,12 @@ def test_file_handler_flask_file_storage_input():
     shutil.rmtree(os.path.dirname(save_path))
 
 
-
-
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_fastapi_uploadfile_input
 def test_file_handler_fastapi_uploadfile_input():
 
     csvfp = "./test_files/lms_detail.csv"
 
-    with open(csvfp, 'rb') as f:
+    with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
 
         fastapiuploadfile = UploadFile(
@@ -122,13 +119,12 @@ def test_file_handler_fastapi_uploadfile_input():
     shutil.rmtree(os.path.dirname(save_path))
 
 
-
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_flask_filestorage_input_seek_2_params
 def test_file_handler_flask_filestorage_input_seek_2_params():
 
     csvfp = "./test_files/RVTools.xlsx"
 
-    with open(csvfp, 'rb') as f:
+    with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
 
         flaskfilestorage = FileStorage(
@@ -143,8 +139,7 @@ def test_file_handler_flask_filestorage_input_seek_2_params():
 
     sheets = pd.ExcelFile(f).sheet_names
 
-    assert 'tabvInfo' in sheets
-
+    assert "tabvInfo" in sheets
 
 
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_fastapi_uploadfile_input_seek_2_params
@@ -152,7 +147,7 @@ def test_file_handler_fastapi_uploadfile_input_seek_2_params():
 
     csvfp = "./test_files/RVTools.xlsx"
 
-    with open(csvfp, 'rb') as f:
+    with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
 
         fastapiuploadfile = UploadFile(
@@ -161,14 +156,10 @@ def test_file_handler_fastapi_uploadfile_input_seek_2_params():
             content_type="application/*",
         )
 
-
     f = FileUploadHandler(fastapiuploadfile)
-    
+
     assert f.filename == "RVTools.xlsx"
 
     sheets = pd.ExcelFile(f).sheet_names
 
-    assert 'tabvInfo' in sheets
-
-
-    
+    assert "tabvInfo" in sheets

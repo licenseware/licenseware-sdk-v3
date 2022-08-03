@@ -1,1 +1,1 @@
-from .repository import MongoRepo, SQLRepo, JSONDirectoryRepo
+from .repository import JSONDirectoryRepo, MongoRepo, SQLRepo

@@ -1,5 +1,5 @@
-from licenseware.utils.alter_string import get_altered_strings
 from licenseware.constants.report_component_types import RCTypes
+from licenseware.utils.alter_string import get_altered_strings
 
 
 class DetailedSummaryAttrs:
@@ -7,12 +7,12 @@ class DetailedSummaryAttrs:
     Usage:
 
     ```py
-    
+
     detailed_summary = (
         DetailedSummaryAttrs()
         .attr_header(
-            label_key="operating_system", 
-            value_key="number_of_devices", 
+            label_key="operating_system",
+            value_key="number_of_devices",
             icon=Icons.SERVERS
         )
         .attr_detail(
@@ -56,7 +56,7 @@ class DetailedSummaryAttrs:
     [
         {
             "operating_system": "Other",
-            "number_of_devices": 2, 
+            "number_of_devices": 2,
             "devices_by_type": [
                 {
                     "operating_system": "Other",
@@ -84,13 +84,10 @@ class DetailedSummaryAttrs:
     ]
 
     """
-        
+
     def __init__(self):
         self.component_type = RCTypes.DETAILED_SUMMARY
-        self._metadata = {
-            "header_columns": [],
-            "detail_columns": []
-        }
+        self._metadata = {"header_columns": [], "detail_columns": []}
 
     @property
     def metadata(self):
@@ -98,8 +95,15 @@ class DetailedSummaryAttrs:
         assert len(self._metadata["detail_columns"]) > 0
         return self._metadata
 
-
-    def attr_header(self, *, label_key:str, value_key:str, label_description:str = None, value_description:str = None, icon:str = None):
+    def attr_header(
+        self,
+        *,
+        label_key: str,
+        value_key: str,
+        label_description: str = None,
+        value_description: str = None,
+        icon: str = None
+    ):
 
         if label_description is None:
             altstr = get_altered_strings(label_key)
@@ -109,44 +113,52 @@ class DetailedSummaryAttrs:
             altstr = get_altered_strings(value_key)
             value_description = altstr.title
 
-
-        self._metadata["header_columns"].extend([
-            {
-                "label_key": label_key,
-                "label_description": label_description,
-                "icon": icon,
-            },
-            {
-                "value_key": value_key,
-                "value_description": value_description,
-            },
-        ])
+        self._metadata["header_columns"].extend(
+            [
+                {
+                    "label_key": label_key,
+                    "label_description": label_description,
+                    "icon": icon,
+                },
+                {
+                    "value_key": value_key,
+                    "value_description": value_description,
+                },
+            ]
+        )
 
         return self
 
+    def attr_detail(
+        self,
+        *,
+        label_key: str,
+        value_key: str,
+        label_description: str = None,
+        value_description: str = None,
+        icon: str = None
+    ):
 
-    
-    def attr_detail(self, *, label_key:str, value_key:str, label_description:str = None, value_description:str = None, icon:str = None):
-
-        if label_description is None: # pragma no cover
+        if label_description is None:  # pragma no cover
             altstr = get_altered_strings(label_key)
             label_description = altstr.title
 
-        if value_description is None: # pragma no cover
+        if value_description is None:  # pragma no cover
             altstr = get_altered_strings(value_key)
             value_description = altstr.title
 
-
-        self._metadata["detail_columns"].extend([
-            {
-                "label_key": label_key,
-                "label_description": label_description,
-                "icon": icon,
-            },
-            {
-                "value_key": value_key,
-                "value_description": value_description,
-            },
-        ])
+        self._metadata["detail_columns"].extend(
+            [
+                {
+                    "label_key": label_key,
+                    "label_description": label_description,
+                    "icon": icon,
+                },
+                {
+                    "value_key": value_key,
+                    "value_description": value_description,
+                },
+            ]
+        )
 
         return self

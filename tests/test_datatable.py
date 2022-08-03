@@ -1,7 +1,8 @@
-import pytest
 import unittest
-from licenseware import DataTable, ColumnTypes, CrudHandler
 
+import pytest
+
+from licenseware import ColumnTypes, CrudHandler, DataTable
 
 # pytest -s -v tests/test_datatable.py
 
@@ -10,9 +11,7 @@ t = unittest.TestCase()
 
 # pytest -s -v tests/test_datatable.py::test_datatable_overwrite_prop
 def test_datatable_overwrite_prop():
-
     class CrudDeviceTable(CrudHandler):
-
         def __init__(self, someinitparams):
             self.someinitparams = someinitparams
 
@@ -28,18 +27,16 @@ def test_datatable_overwrite_prop():
         def delete(self, payload):
             return payload + self.someinitparams
 
-
     cdt = CrudDeviceTable("initval")
 
     res = cdt.get("queryparamsprobably")
-    assert "initval" in res 
-
+    assert "initval" in res
 
     with t.assertRaises(ValueError):
         devices = DataTable(
-            title="Devices", 
+            title="Devices",
             crud_handler=CrudDeviceTable("initval"),
-            component_id="device_table"
+            component_id="device_table",
         )
         devices.column("col")
         devices.column("col")
@@ -47,10 +44,7 @@ def test_datatable_overwrite_prop():
 
 # pytest -s -v tests/test_datatable.py::test_datatable
 def test_datatable():
-
-
     class CrudDeviceTable(CrudHandler):
-
         def get(self, params):
             return params
 
@@ -63,13 +57,12 @@ def test_datatable():
         def delete(self, payload):
             return payload
 
-
     devices = DataTable(
-        title="Devices", 
+        title="Devices",
         component_id="device_table",
         crud_handler=CrudDeviceTable,
-        compound_indexes = [["tenant_id", "name"], ["tenant_id", "name", "device_type"]],
-        simple_indexes = [
+        compound_indexes=[["tenant_id", "name"], ["tenant_id", "name", "device_type"]],
+        simple_indexes=[
             "_id",
             "tenant_id",
             "name",
@@ -80,7 +73,7 @@ def test_datatable():
             "device_type",
             "virtualization_type",
             "cpu_model",
-        ]
+        ],
     )
 
     devices.column("_id", editable=False, visible=False)
@@ -92,18 +85,27 @@ def test_datatable():
     devices.column("is_dr_with", distinct_key="name", foreign_key="name")
     devices.column("capped", required=True, type=ColumnTypes.BOOL)
     devices.column(
-        "device_type", 
-        required=True, 
-        values=["Virtual", "Pool", "Domain", "Physical", "Cluster", "Unknown"]
+        "device_type",
+        required=True,
+        values=["Virtual", "Pool", "Domain", "Physical", "Cluster", "Unknown"],
     )
     devices.column(
-        "virtualization_type", 
-        required=True, 
-        values=["Solaris", "VMWare", "OracleVM", "AIX", "HP-UX", "Hyper-V", "Physical", "Other"]
+        "virtualization_type",
+        required=True,
+        values=[
+            "Solaris",
+            "VMWare",
+            "OracleVM",
+            "AIX",
+            "HP-UX",
+            "Hyper-V",
+            "Physical",
+            "Other",
+        ],
     )
     devices.column(
-        "operating_system_type", 
-        values=["Solaris", "ESX", "Linux", "AIX", "HP-UX", "Windows", "Other"]
+        "operating_system_type",
+        values=["Solaris", "ESX", "Linux", "AIX", "HP-UX", "Windows", "Other"],
     )
     devices.column("operating_system_caption")
     devices.column("cpu_model")
@@ -117,7 +119,6 @@ def test_datatable():
     devices.column("raw_data", editable=False, type=ColumnTypes.JSON)
     devices.column("source")
     devices.column("source_system_id")
-
 
     assert devices.title == "Devices"
     assert len(devices.columns) == 23
@@ -133,9 +134,7 @@ def test_datatable():
     devices_dict = devices.dict()
     assert isinstance(devices_dict, dict)
     assert "columns" in devices_dict.keys()
-    assert len(devices_dict['columns']) == 23
-
-
+    assert len(devices_dict["columns"]) == 23
 
 
 """

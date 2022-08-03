@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 # https://packaging.python.org/guides/distributing-packages-using-setuptools/?highlight=setup.py#setup-py
 # Distribute py wheels

@@ -1,14 +1,13 @@
-import pytest
 from dataclasses import is_dataclass
-from licenseware import customdataclass
 
+import pytest
+
+from licenseware import customdataclass
 
 # pytest -s -v tests/test_custom_dataclass.py
 
 
 def test_custom_dataclass():
-
- 
     @customdataclass
     class SomeCls:
         name: str
@@ -19,10 +18,9 @@ def test_custom_dataclass():
     assert instance.name == "Test"
 
     # TODO failed tests
-    
+
     # data = SomeCls.dict()
 
     # assert isinstance(data, dict)
     # assert "name" in data
     # assert data["name"] == "Test"
-    

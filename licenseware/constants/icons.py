@@ -8,5 +8,3 @@ class Icons(BaseTypes):
     DATABASE_ROUNDED = "DatabaseIconRounded"
     DEVICE = "DeviceIcon"
     FILE = "FileIcon"
-    
-    

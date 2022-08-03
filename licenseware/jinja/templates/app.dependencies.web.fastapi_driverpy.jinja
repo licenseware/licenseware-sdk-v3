@@ -11,9 +11,12 @@ from fastapi import (
 
 
 
-def authorized_user(tenant: str = Header(), authjwt: str = Header()):
-    if tenant is None or authjwt is None:
+def authorized_user(
+    tenant_id: str = Header(convert_underscores=False), 
+    auth_jwt: str = Header(convert_underscores=False)
+):
+    if tenant_id is None or auth_jwt is None:
         log.warning("Invalid User Credentials")
-        raise WebHTTPException(status_code=403, detail="Missing `tenant` or `authjwt` from headers")
+        raise WebHTTPException(status_code=403, detail="Missing `tenant_id` or `auth_jwt` from headers")
     
     log.success("Valid User Credentials")

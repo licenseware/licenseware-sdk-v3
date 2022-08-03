@@ -12,4 +12,3 @@ class RCTypes(BaseTypes):
     RELATIONSHIP_GRAPH = "relationship_graph"
     BAR_HORIZONTAL = "bar_horizontal"
     STACKED_AREA = "stacked_area"
-    
