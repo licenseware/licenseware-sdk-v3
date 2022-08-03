@@ -12,7 +12,7 @@ def validate_text_contains_all(
     Raise exception if contents of the text file don't contain all items in text_contains_all list
     """
 
-    if not text_contains_all:
+    if not text_contains_all:  # pragma no cover
         return True
 
     matches_count = 0

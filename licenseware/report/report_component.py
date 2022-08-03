@@ -46,7 +46,7 @@ class NewReportComponent:
     @property
     def metadata(self):
 
-        metadata_payload = {  # pragma no cover
+        metadata_payload = {
             "data": [
                 {
                     "app_id": self.app_id,
@@ -58,7 +58,7 @@ class NewReportComponent:
                     "style_attributes": self.style_attributes.metadata,
                     "attributes": self.attributes.metadata,
                     "title": self.title,
-                    "component_type": self.component_type,
+                    "type": self.component_type,
                     "filters": self.filters.metadata
                     if self.filters is not None
                     else None,
@@ -68,27 +68,25 @@ class NewReportComponent:
 
         return metadata_payload
 
-    def register(self):
+    def register(self):  # pragma: no cover
 
-        response = requests.post(  # pragma: no cover
+        response = requests.post(
             url=self.config.REGISTER_REPORT_COMPONENT_URL,
             json=self.metadata,
             headers={"Authorization": self.config.get_machine_token()},
         )
 
-        if response.status_code == 200:  # pragma: no cover
+        if response.status_code == 200:
             return {
                 "status": States.SUCCESS,
                 "message": f"Report component '{self.component_id}' register successfully",
                 "content": self.metadata,
             }, 200
 
-        nokmsg = (
-            f"Could not register component '{self.component_id}'"  # pragma: no cover
-        )
-        log.error(nokmsg)  # pragma: no cover
+        nokmsg = f"Could not register component '{self.component_id}'"
+        log.error(nokmsg)
         return {
             "status": States.FAILED,
             "message": nokmsg,
             "content": self.metadata,
-        }, 400  # pragma: no cover
+        }, 400

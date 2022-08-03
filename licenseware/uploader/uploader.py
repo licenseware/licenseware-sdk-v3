@@ -56,19 +56,30 @@ class NewUploader:
 
         self.app_id = self.config.APP_ID
 
+        self.validation_parameters = (
+            self.validation_parameters.dict()
+            if self.validation_parameters is not None
+            else None
+        )
+        self.encryption_parameters = (
+            self.encryption_parameters.dict()
+            if self.encryption_parameters is not None
+            else None
+        )
+
         appid = get_altered_strings(self.app_id).dash
-        reportid = get_altered_strings(self.uploader_id).dash
+        uploaderid = get_altered_strings(self.uploader_id).dash
 
         self.status = States.IDLE
-        self.upload_validation_url = f"/{appid}/uploads/{reportid}/validation"
-        self.upload_url = f"/{appid}/uploads/{reportid}/files"
-        self.quota_validation_url = f"/{appid}/uploads/{reportid}/quota"
-        self.status_check_url = f"/{appid}/uploads/{reportid}/status"
+        self.upload_validation_url = f"/{appid}/uploads/{uploaderid}/validation"
+        self.upload_url = f"/{appid}/uploads/{uploaderid}/files"
+        self.quota_validation_url = f"/{appid}/uploads/{uploaderid}/quota"
+        self.status_check_url = f"/{appid}/uploads/{uploaderid}/status"
 
     @property
     def metadata(self):
 
-        metadata_payload = {  # pragma: no cover
+        metadata_payload = {
             "data": [
                 {
                     "app_id": self.app_id,
@@ -79,8 +90,8 @@ class NewUploader:
                     "flags": self.flags,
                     "status": self.status,
                     "icon": self.icon,
-                    "validation_parameters": self.validation_parameters.dict(),
-                    "encryption_parameters": self.encryption_parameters.dict(),
+                    "validation_parameters": self.validation_parameters,
+                    "encryption_parameters": self.encryption_parameters,
                     "upload_url": self.upload_url,
                     "upload_validation_url": self.upload_validation_url,
                     "quota_validation_url": self.quota_validation_url,
@@ -89,27 +100,27 @@ class NewUploader:
             ]
         }
 
-        return metadata_payload  # pragma: no cover
+        return metadata_payload
 
-    def register(self):
+    def register(self):  # pragma no cover
 
-        response = requests.post(  # pragma: no cover
+        response = requests.post(
             url=self.config.REGISTER_UPLOADER_URL,
             json=self.metadata,
             headers={"Authorization": self.config.get_machine_token()},
         )
 
-        if response.status_code == 200:  # pragma: no cover
+        if response.status_code == 200:
             return {
                 "status": States.SUCCESS,
                 "message": f"Uploader '{self.uploader_id}' register successfully",
                 "content": self.metadata,
             }, 200
 
-        nokmsg = f"Could not register uploader '{self.uploader_id}'"  # pragma: no cover
-        log.error(nokmsg)  # pragma: no cover
+        nokmsg = f"Could not register uploader '{self.uploader_id}'"
+        log.error(nokmsg)
         return {
             "status": States.FAILED,
             "message": nokmsg,
             "content": self.metadata,
-        }, 400  # pragma: no cover
+        }, 400

@@ -12,7 +12,7 @@ def validate_text_contains_any(
     Raise exception if contents of the text file don't contain at least one item in text_contains_any list
     """
 
-    if not text_contains_any:
+    if not text_contains_any:  # pragma no cover
         return True
 
     for txt_to_find in text_contains_any:
