@@ -2,7 +2,7 @@ import unittest
 
 import pytest
 
-from licenseware.validators import validate_min_rows_number
+from licenseware.uploader.default_handlers.validators import validate_min_rows_number
 
 # pytest -v -s tests/test_validate_min_rows_number.py
 

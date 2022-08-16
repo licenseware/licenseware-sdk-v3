@@ -3,12 +3,13 @@ from typing import Any, List
 
 import requests
 
-from licenseware import tenant as t
 from licenseware.constants.states import States
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
+
+from . import default_handlers
 
 
 @dataclass
@@ -90,9 +91,9 @@ class NewApp:
                     "icon": self.icon,
                     "app_meta": self.app_meta,
                     "integration_details": self.integration_details,
-                    "features": t.get_tenant_features(),
-                    "tenants_with_app_activated": t.get_tenants_with_app_activated(),
-                    "tenants_with_data_available": t.get_tenants_with_data_available(),
+                    "features": default_handlers.get_tenant_features(),
+                    "tenants_with_app_activated": default_handlers.get_tenants_with_app_activated(),
+                    "tenants_with_data_available": default_handlers.get_tenants_with_data_available(),
                     "refresh_registration_url": self.refresh_registration_url,
                     "app_activation_url": self.app_activation_url,
                     "editable_tables_url": self.editable_tables_url,

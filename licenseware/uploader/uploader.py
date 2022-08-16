@@ -10,7 +10,7 @@ from licenseware.constants.uploader_types import (
     UploaderQuotaResponse,
     UploaderStatusResponse,
 )
-from licenseware.uploader.defaults import (
+from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
     default_check_status_handler,
     default_filecontents_validation_handler,

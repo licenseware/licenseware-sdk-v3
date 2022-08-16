@@ -4,7 +4,7 @@ from typing import List, Union
 
 import pandas as pd
 
-from licenseware import validators as v
+from . import validators as v
 from licenseware.constants.states import States
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.file_upload_handler import FileUploadHandler

@@ -3,11 +3,11 @@ from typing import Any, Dict, List
 
 import requests
 
-from licenseware import tenant as t
 from licenseware.constants.states import States
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
 
+from . import default_handlers
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
 
@@ -109,7 +109,7 @@ class NewReport:
                     "connected_apps": self.connected_apps,
                     "filters": self.filters,
                     "registrable": self.registrable,
-                    "public_for_tenants": t.get_tenants_with_public_report(),
+                    "public_for_tenants": default_handlers.get_tenants_with_public_reports(),
                 }
             ]
         }
