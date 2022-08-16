@@ -1,4 +1,5 @@
 import uuid
+from copy import deepcopy
 from typing import List, Union
 
 from licenseware.constants.states import States
@@ -20,7 +21,9 @@ def default_filecontents_validation_handler(
     if not isinstance(validation_parameters, UploaderValidationParameters):
         validation_parameters = UploaderValidationParameters(**validation_parameters)
 
-    filename_validation_response = get_filenames_response(files, validation_parameters)
+    filename_validation_response = get_filenames_response(
+        deepcopy(files), validation_parameters
+    )
     if filename_validation_response is not None:
         return filename_validation_response  # pragma: no cover
 

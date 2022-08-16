@@ -15,12 +15,10 @@ from .default_filenames_validation_handler import default_filenames_validation_h
 def reset_stream(f):
     @wraps(f)
     def decorator(*args, **kwargs):
-        stream = isinstance(args[0], FileUploadHandler)
-        if stream:
-            args[0].reset()
+        file: FileUploadHandler = args[0]
+        file.reset()
         response = f(*args, **kwargs)
-        if stream:
-            args[0].reset()
+        file.reset()
         return response
 
     return decorator
