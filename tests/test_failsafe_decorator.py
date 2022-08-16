@@ -1,7 +1,8 @@
-import pytest
 import unittest
-from licenseware import failsafe
 
+import pytest
+
+from licenseware import failsafe
 
 t = unittest.TestCase()
 
