@@ -6,7 +6,7 @@ from werkzeug.datastructures import FileStorage
 
 from licenseware import FileUploadHandler
 from licenseware.uploader import UploaderValidationParameters
-from licenseware.uploader.defaults import (
+from licenseware.uploader.default_handlers import (
     default_filecontents_validation_handler,
     helpers,
 )

@@ -4,6 +4,5 @@ from licenseware.datatable import *
 from licenseware.jinja import *
 from licenseware.report import *
 from licenseware.repository import *
-from licenseware.tenant import *
 from licenseware.uploader import *
 from licenseware.utils import *

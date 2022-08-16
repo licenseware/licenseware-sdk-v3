@@ -201,7 +201,7 @@ def test_report_creation(mocker):
     with t.assertRaises(ValueError):
         fmw_deployment_report.attach("fmw_summary")
 
-    assert fmw_summary_component.get_component_data() == "mock_component_data"
+    assert fmw_summary_component.get_component_data_handler() == "mock_component_data"
     assert "data" in fmw_summary_component.metadata
 
     d = fmw_deployment_report.metadata["data"][0]

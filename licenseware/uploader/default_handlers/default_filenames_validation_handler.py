@@ -7,7 +7,7 @@ from licenseware.constants.uploader_types import (
     ValidationResponse,
 )
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
-from licenseware.validators import (
+from licenseware.uploader.default_handlers.validators import (
     validate_required_input_type,
     validate_text_contains_any,
 )

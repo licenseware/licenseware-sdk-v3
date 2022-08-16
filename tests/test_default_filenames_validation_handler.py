@@ -2,7 +2,7 @@ import pytest
 
 from licenseware import FileTypes
 from licenseware.uploader import UploaderValidationParameters
-from licenseware.uploader.defaults import default_filenames_validation_handler
+from licenseware.uploader.default_handlers import default_filenames_validation_handler
 
 # pytest -s -v tests/test_default_filenames_validation_handler.py
 

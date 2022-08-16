@@ -2,7 +2,7 @@ import unittest
 
 import pytest
 
-from licenseware.validators.validate_required_items import (
+from licenseware.uploader.default_handlers.validators.validate_required_items import (
     _handle_response,
     validate_required_items,
 )

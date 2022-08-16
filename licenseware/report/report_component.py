@@ -30,6 +30,9 @@ class NewReportComponent:
         assert hasattr(self.config, "REGISTER_REPORT_COMPONENT_URL")
         assert hasattr(self.config, "get_machine_token")
 
+        if isinstance(self.filters, ReportFilter):
+            self.filters = self.filters.metadata
+
         self.app_id = self.config.APP_ID
 
         appid = get_altered_strings(self.app_id).dash
@@ -39,9 +42,6 @@ class NewReportComponent:
         self.url = f"/{appid}/report-components/{compid}"
         self.public_url = f"/{appid}/report-components/{compid}/public"
         self.snapshot_url = f"/{appid}/report-components/{compid}/snapshot"
-
-    def get_component_data(self, *args, **kwargs):
-        return self.get_component_data_handler(*args, **kwargs)
 
     @property
     def metadata(self):
@@ -59,9 +59,7 @@ class NewReportComponent:
                     "attributes": self.attributes.metadata,
                     "title": self.title,
                     "type": self.component_type,
-                    "filters": self.filters.metadata
-                    if self.filters is not None
-                    else None,
+                    "filters": self.filters,
                 }
             ]
         }
