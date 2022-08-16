@@ -6,11 +6,11 @@ from licenseware.constants.uploader_types import (
     FileValidationResponse,
     ValidationResponse,
 )
-from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.uploader.default_handlers.validators import (
     validate_required_input_type,
     validate_text_contains_any,
 )
+from licenseware.uploader.validation_parameters import UploaderValidationParameters
 
 
 def _get_error_message(
@@ -33,6 +33,9 @@ def default_filenames_validation_handler(
 ) -> FileValidationResponse:
 
     validation_response = []
+
+    if not isinstance(validation_parameters, UploaderValidationParameters):
+        validation_parameters = UploaderValidationParameters(**validation_parameters)
 
     if validation_parameters.ignore_filenames:
         filenames_ignored = [  # pragma: no cover
