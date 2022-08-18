@@ -43,8 +43,8 @@ def test_file_handler_string_input():
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
     save_path = "./test_files/testdir"
-    f.save(save_path)
-    assert os.path.exists(save_path)
+    saved_file_path = f.save(save_path)
+    assert os.path.exists(saved_file_path)
     shutil.rmtree(save_path)
 
 
