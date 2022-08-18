@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Union
+from typing import Any, Callable, NewType, Union
 
 import requests
 
@@ -10,8 +10,6 @@ from licenseware.utils.logger import log
 
 from .report_filter import ReportFilter
 from .style_attributes import StyleAttrs
-
-from typing import NewType
 
 TenantId = NewType("tenant_id", str)
 Authorization = NewType("authorization", str)

@@ -42,10 +42,10 @@ def test_file_handler_string_input():
     dfcsv = pd.read_csv(f.buffer)
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
-    save_path = "./test_files/testdir/testfile.csv"
+    save_path = "./test_files/testdir"
     f.save(save_path)
     assert os.path.exists(save_path)
-    shutil.rmtree(os.path.dirname(save_path))
+    shutil.rmtree(save_path)
 
 
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_flask_file_storage_input
