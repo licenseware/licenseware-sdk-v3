@@ -65,13 +65,16 @@ class FileUploadHandler(io.BufferedIOBase):
         if not os.path.exists(dst):
             os.makedirs(dst)
 
-        dstbytes = open(os.path.join(dst, self.filename), "wb")
+        save_path = os.path.join(dst, self.filename)
+        dstbytes = open(save_path, "wb")
         self.reset()
         try:
             shutil.copyfileobj(self, dstbytes, buffer_size)
         finally:
             dstbytes.close()
             self.close()
+
+        return save_path
 
     # Except `reset` and `save` methods the rest just proxy request to buffer class
     # Tried different ways to avoid this with:
