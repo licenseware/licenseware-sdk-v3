@@ -35,13 +35,13 @@ class NewReportComponent:
 
         self.app_id = self.config.APP_ID
 
-        appid = get_altered_strings(self.app_id).dash
+        ns = get_altered_strings(self.app_id).dash
         compid = get_altered_strings(self.component_id).dash
 
         self.component_type = self.attributes.component_type
-        self.url = f"/{appid}/report-components/{compid}"
-        self.public_url = f"/{appid}/report-components/{compid}/public"
-        self.snapshot_url = f"/{appid}/report-components/{compid}/snapshot"
+        self.url = f"/{ns}/report-components/{compid}"
+        self.public_url = f"/{ns}/report-components/{compid}/public"
+        self.snapshot_url = f"/{ns}/report-components/{compid}/snapshot"
 
     @property
     def metadata(self):

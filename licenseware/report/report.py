@@ -48,16 +48,16 @@ class NewReport:
 
         self.app_id = self.config.APP_ID
 
-        appid = get_altered_strings(self.app_id).dash
+        ns = get_altered_strings(self.app_id).dash
         reportid = get_altered_strings(self.report_id).dash
 
         if isinstance(self.filters, ReportFilter):
             self.filters = self.filters.metadata
 
         self.report_components: Dict[str, NewReportComponent] = dict()
-        self.url = f"/{appid}/reports/{reportid}"
-        self.public_url = f"/{appid}/reports/{reportid}/public"
-        self.snapshot_url = f"/{appid}/reports/{reportid}/snapshot"
+        self.url = f"/{ns}/reports/{reportid}"
+        self.public_url = f"/{ns}/reports/{reportid}/public"
+        self.snapshot_url = f"/{ns}/reports/{reportid}/snapshot"
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
 
     def _get_component_by_id(self, component_id: str):

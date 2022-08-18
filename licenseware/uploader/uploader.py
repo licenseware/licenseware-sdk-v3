@@ -67,14 +67,14 @@ class NewUploader:
             else None
         )
 
-        appid = get_altered_strings(self.app_id).dash
+        ns = get_altered_strings(self.app_id).dash
         uploaderid = get_altered_strings(self.uploader_id).dash
 
         self.status = States.IDLE
-        self.upload_validation_url = f"/{appid}/uploads/{uploaderid}/validation"
-        self.upload_url = f"/{appid}/uploads/{uploaderid}/files"
-        self.quota_validation_url = f"/{appid}/uploads/{uploaderid}/quota"
-        self.status_check_url = f"/{appid}/uploads/{uploaderid}/status"
+        self.upload_validation_url = f"/{ns}/uploads/{uploaderid}/validation"
+        self.upload_url = f"/{ns}/uploads/{uploaderid}/files"
+        self.quota_validation_url = f"/{ns}/uploads/{uploaderid}/quota"
+        self.status_check_url = f"/{ns}/uploads/{uploaderid}/status"
 
     @property
     def metadata(self):
