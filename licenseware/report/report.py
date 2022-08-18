@@ -32,8 +32,6 @@ class NewReport:
     name: str
     description: str
     report_id: str
-    preview_image: str = None
-    preview_image_dark: str = None
     connected_apps: List[str] = None
     flags: List[str] = None
     filters: ReportFilter = None
@@ -60,8 +58,6 @@ class NewReport:
         self.url = f"/{appid}/reports/{reportid}"
         self.public_url = f"/{appid}/reports/{reportid}/public"
         self.snapshot_url = f"/{appid}/reports/{reportid}/snapshot"
-        self.preview_image_url = f"/{appid}/reports/{reportid}/preview_image"
-        self.preview_image_dark_url = f"/{appid}/reports/{reportid}/preview_image_dark"
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
 
     def _get_component_by_id(self, component_id: str):
@@ -101,8 +97,6 @@ class NewReport:
                     "url": self.url,
                     "public_url": self.public_url,
                     "snapshot_url": self.snapshot_url,
-                    "preview_image_url": self.preview_image_url,
-                    "preview_image_dark_url": self.preview_image_dark_url,
                     "report_components": _parse_report_components(
                         self.report_components
                     ),

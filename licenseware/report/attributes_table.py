@@ -40,7 +40,7 @@ class TableAttrs:
         self.component_type = RCTypes.TABLE
         self.metadata = {"columns": []}
 
-    def attr(self, *, prop: str, name: str = None, type: str = ColumnTypes.STRING):
+    def attr(self, prop: str, *, name: str = None, type: str = ColumnTypes.STRING):
 
         if name is None:
             altstr = get_altered_strings(prop)

@@ -22,9 +22,7 @@ def test_report_filter():
                 ReportFilter.FILTER.CONTAINS,
                 ReportFilter.FILTER.IN_LIST,
             ],
-            # column_type=ReportFilter.TYPE.STRING, # string type is the default
             allowed_values=["Verify", "Used", "Licensable", "Restricted"],
-            # visible_name="Result" # Optional
         )
         .add(
             column="total_number_of_cores",
@@ -38,29 +36,73 @@ def test_report_filter():
             column_type=ReportFilter.TYPE.STRING,
             allowed_values=["Verify", "Used", "Licensable", "Restricted"],
         )
+        .add(
+            column="total_number_of_cores_intel",
+            allowed_values=["Verify", "Used", "Licensable", "Restricted"],
+        )
     )
 
     # print(filters.metadata)
 
     assert isinstance(filters.metadata, list)
-    assert len(filters.metadata) == 2
+    assert len(filters.metadata) == 3
 
-    for f in filters.metadata:
-        assert f["column"] in ["result", "total_number_of_cores"]
-        if f["column"] == "result":
-            assert f["visible_name"] == "Result"
-        if f["column"] == "total_number_of_cores":
-            assert f["visible_name"] == "Total Number Of Cores"
+    assert filters.metadata == [
+        {
+            "column": "result",
+            "allowed_filters": ["equals", "contains", "in_list"],
+            "column_type": "enum",
+            "allowed_values": ["Verify", "Used", "Licensable", "Restricted"],
+            "visible_name": "Result",
+        },
+        {
+            "column": "total_number_of_cores",
+            "allowed_filters": [
+                "equals",
+                "greater_than",
+                "greater_or_equal_to",
+                "less_than",
+                "less_or_equal_to",
+            ],
+            "column_type": "string",
+            "allowed_values": ["Verify", "Used", "Licensable", "Restricted"],
+            "visible_name": "Total Number Of Cores",
+        },
+        {
+            "column": "total_number_of_cores_intel",
+            "allowed_filters": ["equals", "contains", "in_list"],
+            "column_type": "enum",
+            "allowed_values": ["Verify", "Used", "Licensable", "Restricted"],
+            "visible_name": "Total Number Of Cores Intel",
+        },
+    ]
 
-    # {
-    #     "column": "total_number_of_cores",
-    #     "allowed_filters": [
-    #         "equals",
-    #         "greater_than",
-    #         "greater_or_equal_to",
-    #         "less_than",
-    #         "less_or_equal_to",
-    #     ],
-    #     "visible_name": "Total Number of Cores",
-    #     "column_type": "number",
-    # },
+
+# pytest -v -s tests/test_report_filter.py::test_report_filter_utils
+def test_report_filter_utils():
+
+    allowed_filters = ReportFilter()._determine_allowed_filters(
+        ReportFilter.TYPE.STRING
+    )
+
+    assert allowed_filters == [ReportFilter.FILTER.EQUALS, ReportFilter.FILTER.CONTAINS]
+
+    allowed_filters = ReportFilter()._determine_allowed_filters(
+        ReportFilter.TYPE.NUMBER
+    )
+
+    assert allowed_filters == [
+        ReportFilter.FILTER.EQUALS,
+        ReportFilter.FILTER.GREATER_THAN,
+        ReportFilter.FILTER.GREATER_OR_EQUAL_TO,
+        ReportFilter.FILTER.LESS_THAN,
+        ReportFilter.FILTER.LESS_OR_EQUAL_TO,
+    ]
+
+    column_type = ReportFilter()._determine_column_type("column", ["allowed_values"])
+
+    assert column_type == ReportFilter.TYPE.ENUM
+
+    column_type = ReportFilter()._determine_column_type("number_of_devices", None)
+
+    assert column_type == ReportFilter.TYPE.NUMBER
