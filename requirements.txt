@@ -2,7 +2,7 @@ requests~=2.28
 loguru~=0.6
 openpyxl~=3.0
 pandas~=1.2
-redbird==0.5.1
+pymongo==4.2.0
 # Development
 pytest<7
 coverage<7

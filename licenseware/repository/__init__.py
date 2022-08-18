@@ -1,1 +1,2 @@
-from .repository import JSONDirectoryRepo, MongoRepo, SQLRepo
+from .mongo_repository.mongo_repository import MongoRepository
+from .repository_interface import RepositoryInterface
