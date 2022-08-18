@@ -11,6 +11,14 @@ from licenseware.utils.logger import log
 from .report_filter import ReportFilter
 from .style_attributes import StyleAttrs
 
+from typing import NewType
+
+TenantId = NewType("tenant_id", str)
+Authorization = NewType("authorization", str)
+Filters = NewType("filters", str)
+Limit = NewType("limit", int)
+Skip = NewType("skip", int)
+
 
 @dataclass
 class NewReportComponent:
@@ -18,7 +26,16 @@ class NewReportComponent:
     component_id: str
     attributes: AttributesType
     style_attributes: StyleAttrs
-    get_component_data_handler: Callable[[Any], Union[list, dict]]
+    get_component_data_handler: Callable[
+        [
+            TenantId,
+            Authorization,
+            Filters,
+            Limit,
+            Skip,
+        ],
+        Union[list, dict],
+    ]
     order: int = None
     filters: ReportFilter = None
     config: Any = None
@@ -35,13 +52,13 @@ class NewReportComponent:
 
         self.app_id = self.config.APP_ID
 
-        ns = get_altered_strings(self.app_id).dash
+        appid = get_altered_strings(self.app_id).dash
         compid = get_altered_strings(self.component_id).dash
 
         self.component_type = self.attributes.component_type
-        self.url = f"/{ns}/report-components/{compid}"
-        self.public_url = f"/{ns}/report-components/{compid}/public"
-        self.snapshot_url = f"/{ns}/report-components/{compid}/snapshot"
+        self.url = f"/{appid}/report-components/{compid}"
+        self.public_url = f"/{appid}/report-components/{compid}/public"
+        self.snapshot_url = f"/{appid}/report-components/{compid}/snapshot"
 
     @property
     def metadata(self):
