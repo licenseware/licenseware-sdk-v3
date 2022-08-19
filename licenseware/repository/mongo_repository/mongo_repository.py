@@ -53,7 +53,9 @@ class MongoRepository(RepositoryInterface):
             {**doc, **{"_id": utils.get_object_id_str(doc["_id"])}} for doc in cursor
         ]
 
-    def distinct(self, table_or_collection: str, field: str, filters: dict = None):
+    def distinct(
+        self, table_or_collection: str, field: str, filters: dict = None
+    ) -> List[str]:
         col: Collection = self.db[table_or_collection]
 
         if filters is not None:
@@ -63,7 +65,7 @@ class MongoRepository(RepositoryInterface):
         cursor = col.distinct(key=field, filter=filters)
         return cursor
 
-    def count(self, table_or_collection: str, filters: dict = None):
+    def count(self, table_or_collection: str, filters: dict = None) -> int:
         col: Collection = self.db[table_or_collection]
 
         if filters is None:
@@ -75,7 +77,7 @@ class MongoRepository(RepositoryInterface):
 
     def insert_one(
         self, table_or_collection: str, data_validator: Callable, data: dict
-    ):
+    ) -> dict:
         data_validator(data)
         col: Collection = self.db[table_or_collection]
         col.insert_one(data)
@@ -89,7 +91,7 @@ class MongoRepository(RepositoryInterface):
         data_validator: Callable,
         data: dict,
         overwrite: bool = False,
-    ):
+    ) -> dict:
         data_validator(data)
         col: Collection = self.db[table_or_collection]
         data["_id"] = utils.get_object_id(id)
@@ -104,7 +106,7 @@ class MongoRepository(RepositoryInterface):
         data_validator: Callable,
         data: List[dict],
         overwrite: bool = False,
-    ):
+    ) -> List[dict]:
         data_validator(data)
         col: Collection = self.db[table_or_collection]
         if overwrite:
