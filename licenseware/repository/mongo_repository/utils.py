@@ -15,3 +15,16 @@ def get_object_id(oid: str):
     if ObjectId().is_valid(oid):
         return ObjectId(oid)
     return oid
+
+
+def add_update_operators(data: dict, append: bool):
+
+    if isinstance(data, dict):
+        first_key = list(data.keys())[0]
+        if not first_key.startswith("$"):
+            data = {"$set": data}
+
+    if isinstance(data, list):
+        data = {"$set": data}
+
+    return data

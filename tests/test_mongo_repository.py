@@ -48,6 +48,34 @@ def test_get_object_id():
     assert isinstance(oid, int)
 
 
+# pytest -s -v tests/test_mongo_repository.py::test_add_update_operators
+def test_add_update_operators():
+
+    # TODO - by default $set operator is used,
+    # but a way to traverse the dict and create a update query may be possible
+
+    data = {
+        "field1": 1,
+        "some_list_int": [1, 2, 3],
+        "some_list_dict": [
+            {"simplefield1": 1},
+            {"simplefield2": 2},
+            {"simplefield3": 3},
+        ],
+        "some_list_dict_nested": [
+            {"nestedfield1": [{"nestedfield1": 5}]},
+            {"simplefield2": 2},
+            {"simplefield3": 3},
+        ],
+    }
+
+    update_query = utils.add_update_operators(data, append=False)
+
+    # print(update_query)
+
+    assert "$set" in update_query
+
+
 # pytest -s -v tests/test_mongo_repository.py::test_mongo_raw_connection
 def test_mongo_raw_connection(mongo_connection):
 
@@ -263,3 +291,51 @@ def test_mongo_repository_execute_query(mongo_connection):
 
     assert isinstance(results, list)
     assert len(results) > 0
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_update_one
+def test_mongo_repository_update_one(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    result = repo.update_one(
+        "TestCollection",
+        filters={"field_name": "some_data1"},
+        data={"field_name": "some_data_updated1"},
+        data_validator=None,
+    )
+
+    # print(result)
+    assert result["field_name"] == "some_data_updated1"
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_update_on_id
+def test_mongo_repository_update_on_id(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    result = repo.update_on_id(
+        "TestCollection",
+        id="some-id",
+        data={"field_name": "some_data1"},
+        data_validator=None,
+    )
+
+    print(result)
+    assert result["field_name"] == "some_data1"
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_update_many
+def test_mongo_repository_update_many(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    result = repo.update_many(
+        "TestCollection",
+        filters={"field_name": "some_data1"},
+        data=[{"field_name": "some_data_reupdated_1"}],
+        data_validator=None,
+    )
+
+    print(result)
+    # assert result["field_name"] == "some_data1"

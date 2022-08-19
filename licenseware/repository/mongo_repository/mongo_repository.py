@@ -13,36 +13,40 @@ class MongoRepository(RepositoryInterface):
 
     # RAW
 
-    def execute_query(self, table_or_collection: str, query: List[dict]):
-        col: Collection = self.db[table_or_collection]
-        cursor = col.aggregate(pipeline=query)
+    def execute_query(self, collection: str, query: List[dict]):
+        col: Collection = self.db[collection]
+        cursor = col.aggregate(pipeline=query, allowDiskUse=True)
         return [
             {**doc, **{"_id": utils.get_object_id_str(doc["_id"])}} for doc in cursor
         ]
 
     # finding data
 
-    def find_one(self, table_or_collection: str, filters: dict) -> dict:
-        col: Collection = self.db[table_or_collection]
+    def find_one(self, collection: str, filters: dict) -> dict:
+        col: Collection = self.db[collection]
         data = col.find_one(filters)
+        if data is None:
+            return []
         data["_id"] = utils.get_object_id_str(data["_id"])
         return data
 
-    def find_by_id(self, table_or_collection: str, id: str) -> dict:
-        col: Collection = self.db[table_or_collection]
+    def find_by_id(self, collection: str, id: str) -> dict:
+        col: Collection = self.db[collection]
         data = col.find_one({"_id": utils.get_object_id(id)})
+        if data is None:
+            return []
         data["_id"] = utils.get_object_id_str(data["_id"])
         return data
 
     def find_many(
         self,
-        table_or_collection: str,
+        collection: str,
         filters: dict,
         limit: int = 0,
         skip: int = 0,
         sort: List[Tuple[str, int]] = None,
     ) -> List[dict]:
-        col: Collection = self.db[table_or_collection]
+        col: Collection = self.db[collection]
 
         if "_id" in filters:
             filters["_id"] = utils.get_object_id(filters["_id"])
@@ -53,10 +57,8 @@ class MongoRepository(RepositoryInterface):
             {**doc, **{"_id": utils.get_object_id_str(doc["_id"])}} for doc in cursor
         ]
 
-    def distinct(
-        self, table_or_collection: str, field: str, filters: dict = None
-    ) -> List[str]:
-        col: Collection = self.db[table_or_collection]
+    def distinct(self, collection: str, field: str, filters: dict = None) -> List[str]:
+        col: Collection = self.db[collection]
 
         if filters is not None:
             if "_id" in filters:
@@ -65,8 +67,8 @@ class MongoRepository(RepositoryInterface):
         cursor = col.distinct(key=field, filter=filters)
         return cursor
 
-    def count(self, table_or_collection: str, filters: dict = None) -> int:
-        col: Collection = self.db[table_or_collection]
+    def count(self, collection: str, filters: dict = None) -> int:
+        col: Collection = self.db[collection]
 
         if filters is None:
             filters = {}
@@ -75,25 +77,25 @@ class MongoRepository(RepositoryInterface):
 
     # Inserting new data
 
-    def insert_one(
-        self, table_or_collection: str, data_validator: Callable, data: dict
-    ) -> dict:
-        data_validator(data)
-        col: Collection = self.db[table_or_collection]
+    def insert_one(self, collection: str, data_validator: Callable, data: dict) -> dict:
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
         col.insert_one(data)
         data["_id"] = utils.get_object_id_str(data["_id"])
         return data
 
     def insert_with_id(
         self,
-        table_or_collection: str,
+        collection: str,
         id: Union[str, int],
         data_validator: Callable,
         data: dict,
         overwrite: bool = False,
     ) -> dict:
-        data_validator(data)
-        col: Collection = self.db[table_or_collection]
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
         data["_id"] = utils.get_object_id(id)
         if overwrite:
             col.delete_one({"_id": data["_id"]})
@@ -102,13 +104,14 @@ class MongoRepository(RepositoryInterface):
 
     def insert_many(
         self,
-        table_or_collection: str,
+        collection: str,
         data_validator: Callable,
         data: List[dict],
         overwrite: bool = False,
     ) -> List[dict]:
-        data_validator(data)
-        col: Collection = self.db[table_or_collection]
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
         if overwrite:
             col.delete_many(
                 {"_id": {"$in": [utils.get_object_id(d["_id"]) for d in data]}}
@@ -121,35 +124,64 @@ class MongoRepository(RepositoryInterface):
 
     def update_one(
         self,
-        table_or_collection: str,
+        collection: str,
         filters: dict,
         data_validator: Callable,
         data: dict,
         append: bool = False,
+        upsert: bool = True,
     ) -> dict:
-        ...
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
+        col.update_one(
+            filter=filters,
+            update=utils.add_update_operators(data, append),
+            upsert=upsert,
+        )
+        return self.find_one(collection, data)
 
     def update_on_id(
         self,
-        table_or_collection: str,
-        id: Union[str, int],
+        collection: str,
+        id: dict,
         data_validator: Callable,
         data: dict,
+        append: bool = False,
+        upsert: bool = True,
     ):
-        ...
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
+        col.update_one(
+            filter={"_id": utils.get_object_id(id)},
+            update=utils.add_update_operators(data, append),
+            upsert=upsert,
+        )
+        return self.find_one(collection, data)
 
     def update_many(
         self,
-        table_or_collection: str,
+        collection: str,
         filters: dict,
         data_validator: Callable,
-        data: List[dict],
+        data: dict,
+        append: bool = False,
+        upsert: bool = True,
     ):
-        ...
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
+        col.update_many(
+            filter=filters,
+            update=utils.add_update_operators(data, append),
+            upsert=upsert,
+        )
+        return self.find_many(collection, data)
 
     def replace_one(
         self,
-        table_or_collection: str,
+        collection: str,
         filters: dict,
         data_validator: Callable,
         data: List[dict],
@@ -158,7 +190,7 @@ class MongoRepository(RepositoryInterface):
 
     def replace_on_id(
         self,
-        table_or_collection: str,
+        collection: str,
         id: str,
         data_validator: Callable,
         data: List[dict],
@@ -167,7 +199,7 @@ class MongoRepository(RepositoryInterface):
 
     def replace_many(
         self,
-        table_or_collection: str,
+        collection: str,
         filters: dict,
         data_validator: Callable,
         data: List[dict],
@@ -176,14 +208,14 @@ class MongoRepository(RepositoryInterface):
 
     # Deleting existing data
 
-    def delete(self, table_or_collection: str, filters: dict, first: bool = False):
+    def delete(self, collection: str, filters: dict, first: bool = False):
         ...
 
-    def delete_one(self, table_or_collection: str, **filters):
+    def delete_one(self, collection: str, **filters):
         ...
 
-    def delete_by_id(self, table_or_collection: str, id: str):
+    def delete_by_id(self, collection: str, id: str):
         ...
 
-    def delete_many(self, table_or_collection: str, **filters):
+    def delete_many(self, collection: str, **filters):
         ...
