@@ -1,5 +1,5 @@
-from typing import List, Union, Any, Callable
 from abc import ABCMeta, abstractmethod
+from typing import Any, Callable, List, Union
 
 
 class RepositoryInterface(metaclass=ABCMeta):
@@ -7,7 +7,7 @@ class RepositoryInterface(metaclass=ABCMeta):
     # RAW
 
     @abstractmethod
-    def execute_query(self, query: Any):
+    def execute_query(self, table_or_collection: str, query: Any):
         ...
 
     # finding data

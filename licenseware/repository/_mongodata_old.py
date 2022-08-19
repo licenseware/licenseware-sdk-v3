@@ -89,20 +89,21 @@ And the same is for the next iterations until `len(results)` is 0.
 
 """
 
-import os
 import json
-from typing import Union, Tuple, List, Dict
+import os
+from typing import Dict, Tuple, Union
 from uuid import UUID
-from pymongo import MongoClient, ASCENDING, DESCENDING
-from pymongo.collection import Collection
+
 from bson.json_util import dumps
 from bson.objectid import ObjectId
-from pymongo.write_concern import WriteConcern
-from pymongo.read_concern import ReadConcern
+from pymongo import ASCENDING, DESCENDING, MongoClient
+from pymongo.collection import Collection
 from pymongo.errors import CollectionInvalid
+from pymongo.read_concern import ReadConcern
+from pymongo.write_concern import WriteConcern
 
-from licenseware.utils.logger import log
 from licenseware.common.constants import envs
+from licenseware.utils.logger import log
 
 
 def validate_data(schema, data):
@@ -502,7 +503,7 @@ def _append_query(dict_: dict) -> dict:
     Force append to mongo document
     """
 
-    _id = dict_.pop("_id", None)
+    dict_.pop("_id", None)
 
     # log.warning(_id)
 
