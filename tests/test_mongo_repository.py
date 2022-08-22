@@ -56,6 +56,15 @@ def test_add_update_operators():
 
     data = {
         "field1": 1,
+        "field_dict": {
+            "f1": "somedata",
+            "anotherli": [
+                "asd",
+                12,
+                {"another_dict": "some_data"},
+                {"another_dict_list": ["deeper1", 2, 3, 4]},
+            ],
+        },
         "some_list_int": [1, 2, 3],
         "some_list_dict": [
             {"simplefield1": 1},
@@ -69,11 +78,12 @@ def test_add_update_operators():
         ],
     }
 
-    update_query = utils.add_update_operators(data, append=False)
+    update_query = utils.add_update_operators(data, append=True)
 
     # print(update_query)
 
     assert "$set" in update_query
+    assert "$addToSet" in update_query
 
 
 # pytest -s -v tests/test_mongo_repository.py::test_mongo_raw_connection
