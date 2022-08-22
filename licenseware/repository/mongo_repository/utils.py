@@ -17,15 +17,26 @@ def get_object_id(oid: str):
     return oid
 
 
+def _has_custom_update(data: dict):
+    custom_update = False
+    for k in data.keys():
+        custom_update = k.startswith("$")
+        if not custom_update:
+            break
+    return custom_update
+
+
 def add_update_operators(data: dict, append: bool):
 
     if not isinstance(data, dict):
         return data
 
-    if not append:
-        first_key = list(data.keys())[0]
-        if not first_key.startswith("$"):
-            data = {"$set": data}
+    custom_update = _has_custom_update(data)
+
+    if append is False and custom_update is False:
+        return {"$set": data}
+
+    if custom_update:
         return data
 
     set_data = {"$set": {}}
