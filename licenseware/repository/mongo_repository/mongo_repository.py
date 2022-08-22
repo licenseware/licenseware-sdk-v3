@@ -1,6 +1,7 @@
 from typing import Callable, List, Tuple, Union
 
 from pymongo.collection import Collection
+from pymongo.cursor import Cursor
 
 from licenseware.repository.repository_interface import RepositoryInterface
 
@@ -11,32 +12,35 @@ class MongoRepository(RepositoryInterface):
     def __init__(self, db_connection) -> None:
         self.db = db_connection
 
+    def _setid(self, data: dict):
+        if data is None:  # pragma no cover
+            return {}
+        data["_id"] = utils.get_object_id_str(data["_id"])
+        return data
+
+    def _setids(self, cursor: Cursor):
+        return [
+            {**doc, **{"_id": utils.get_object_id_str(doc["_id"])}} for doc in cursor
+        ]
+
     # RAW
 
     def execute_query(self, collection: str, query: List[dict]):
         col: Collection = self.db[collection]
         cursor = col.aggregate(pipeline=query, allowDiskUse=True)
-        return [
-            {**doc, **{"_id": utils.get_object_id_str(doc["_id"])}} for doc in cursor
-        ]
+        return self._setids(cursor)
 
     # finding data
 
     def find_one(self, collection: str, filters: dict) -> dict:
         col: Collection = self.db[collection]
         data = col.find_one(filters)
-        if data is None:
-            return {}
-        data["_id"] = utils.get_object_id_str(data["_id"])
-        return data
+        return self._setid(data)
 
     def find_by_id(self, collection: str, id: str) -> dict:
         col: Collection = self.db[collection]
         data = col.find_one({"_id": utils.get_object_id(id)})
-        if data is None:
-            return {}
-        data["_id"] = utils.get_object_id_str(data["_id"])
-        return data
+        return self._setid(data)
 
     def find_many(
         self,
@@ -48,24 +52,21 @@ class MongoRepository(RepositoryInterface):
     ) -> List[dict]:
         col: Collection = self.db[collection]
 
-        if "_id" in filters:
+        if "_id" in filters:  # pragma no cover
             filters["_id"] = utils.get_object_id(filters["_id"])
 
         cursor = col.find(filter=filters, skip=skip, limit=limit, sort=sort)
-
-        return [
-            {**doc, **{"_id": utils.get_object_id_str(doc["_id"])}} for doc in cursor
-        ]
+        return self._setids(cursor)
 
     def distinct(self, collection: str, field: str, filters: dict = None) -> List[str]:
         col: Collection = self.db[collection]
 
-        if filters is not None:
+        if filters is not None:  # pragma no cover
             if "_id" in filters:
                 filters["_id"] = utils.get_object_id(filters["_id"])
 
-        cursor = col.distinct(key=field, filter=filters)
-        return cursor
+        data = col.distinct(key=field, filter=filters)
+        return data
 
     def count(self, collection: str, filters: dict = None) -> int:
         col: Collection = self.db[collection]
@@ -112,13 +113,12 @@ class MongoRepository(RepositoryInterface):
         if data_validator is not None:
             data = data_validator(data)
         col: Collection = self.db[collection]
-        if overwrite:
+        if overwrite:  # pragma no cover
             col.delete_many(
                 {"_id": {"$in": [utils.get_object_id(d["_id"]) for d in data]}}
             )
         col.insert_many(data)
-        data = [{**d, **{"_id": utils.get_object_id_str(d["_id"])}} for d in data]
-        return data
+        return self._setids(data)
 
     # Updating existing data
 
@@ -132,7 +132,7 @@ class MongoRepository(RepositoryInterface):
         upsert: bool = True,
         array_filters: List[dict] = None,
     ) -> dict:
-        if data_validator is not None:
+        if data_validator is not None:  # pragma no cover
             data = data_validator(data)
         col: Collection = self.db[collection]
         data = col.find_one_and_update(
@@ -142,10 +142,7 @@ class MongoRepository(RepositoryInterface):
             array_filters=array_filters,
             return_document=True,
         )
-        if data is None:
-            return {}
-        data["_id"] = utils.get_object_id_str(data["_id"])
-        return data
+        return self._setid(data)
 
     def update_on_id(
         self,
@@ -157,7 +154,7 @@ class MongoRepository(RepositoryInterface):
         upsert: bool = True,
         array_filters: List[dict] = None,
     ) -> dict:
-        if data_validator is not None:
+        if data_validator is not None:  # pragma no cover
             data = data_validator(data)
         col: Collection = self.db[collection]
         data = col.find_one_and_update(
@@ -167,10 +164,7 @@ class MongoRepository(RepositoryInterface):
             array_filters=array_filters,
             return_document=True,
         )
-        if data is None:
-            return {}
-        data["_id"] = utils.get_object_id_str(data["_id"])
-        return data
+        return self._setid(data)
 
     def update_many(
         self,
@@ -182,7 +176,7 @@ class MongoRepository(RepositoryInterface):
         upsert: bool = True,
         array_filters: List[dict] = None,
     ) -> int:
-        if data_validator is not None:
+        if data_validator is not None:  # pragma no cover
             data = data_validator(data)
         col: Collection = self.db[collection]
         return col.update_many(
@@ -209,10 +203,7 @@ class MongoRepository(RepositoryInterface):
             upsert=upsert,
             return_document=True,
         )
-        if data is None:
-            return {}
-        data["_id"] = utils.get_object_id_str(data["_id"])
-        return data
+        return self._setid(data)
 
     def replace_on_id(
         self,
@@ -231,10 +222,7 @@ class MongoRepository(RepositoryInterface):
             upsert=upsert,
             return_document=True,
         )
-        if data is None:
-            return {}
-        data["_id"] = utils.get_object_id_str(data["_id"])
-        return data
+        return self._setid(data)
 
     def replace_many(
         self,

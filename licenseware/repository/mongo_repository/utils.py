@@ -24,7 +24,4 @@ def add_update_operators(data: dict, append: bool):
         if not first_key.startswith("$"):
             data = {"$set": data}
 
-    if isinstance(data, list):
-        data = {"$set": data}
-
     return data

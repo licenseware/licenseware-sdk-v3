@@ -34,7 +34,9 @@ def default_filenames_validation_handler(
 
     validation_response = []
 
-    if not isinstance(validation_parameters, UploaderValidationParameters):
+    if not isinstance(
+        validation_parameters, UploaderValidationParameters
+    ):  # pragma no cover
         validation_parameters = UploaderValidationParameters(**validation_parameters)
 
     if validation_parameters.ignore_filenames:

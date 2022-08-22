@@ -18,7 +18,9 @@ def default_filecontents_validation_handler(
     validation_parameters: UploaderValidationParameters,
 ) -> FileValidationResponse:
 
-    if not isinstance(validation_parameters, UploaderValidationParameters):
+    if not isinstance(
+        validation_parameters, UploaderValidationParameters
+    ):  # pragma no cover
         validation_parameters = UploaderValidationParameters(**validation_parameters)
 
     filename_validation_response = get_filenames_response(

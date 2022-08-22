@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Callable, List, Tuple, Union
 
 
-class RepositoryInterface(metaclass=ABCMeta):
+class RepositoryInterface(metaclass=ABCMeta):  # pragma no cover
 
     # RAW
 
