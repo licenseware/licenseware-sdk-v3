@@ -97,6 +97,7 @@ def test_mongo_repository_insert_one(mongo_connection):
 
     def data_validator_func(_data):
         assert "field_name" in _data
+        return _data
 
     data_to_insert = {"field_name": "some_data"}
 
@@ -121,6 +122,7 @@ def test_mongo_repository_insert_one_with_id(mongo_connection):
 
     def data_validator_func(_data):
         assert "field_name" in _data
+        return _data
 
     data_to_insert = {"field_name": "some_data"}
 
@@ -201,6 +203,7 @@ def test_mongo_repository_insert_many(mongo_connection):
     def data_validator_func(_data):
         for d in _data:
             assert "field_name" in d
+        return _data
 
     data_to_insert = [
         {"field_name": "some_data1"},
@@ -316,12 +319,13 @@ def test_mongo_repository_update_on_id(mongo_connection):
 
     result = repo.update_on_id(
         "TestCollection",
-        id="some-id",
+        id="somssse-id",
         data={"field_name": "some_data1"},
         data_validator=None,
+        upsert=True,
     )
 
-    print(result)
+    # print(result)
     assert result["field_name"] == "some_data1"
 
 
@@ -333,9 +337,118 @@ def test_mongo_repository_update_many(mongo_connection):
     result = repo.update_many(
         "TestCollection",
         filters={"field_name": "some_data1"},
-        data=[{"field_name": "some_data_reupdated_1"}],
+        data={"field_name": "some_data_reupdated_1"},
         data_validator=None,
     )
 
-    print(result)
-    # assert result["field_name"] == "some_data1"
+    # print(result)
+    assert result > 0
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_replace_one
+def test_mongo_repository_replace_one(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    result = repo.replace_one(
+        "TestCollection",
+        filters={"field_name": "some_data1"},
+        data={"field_name": "some_data_reupdated_1"},
+        data_validator=None,
+    )
+
+    # print(result)
+    assert isinstance(result, dict)
+    assert result["field_name"] == "some_data_reupdated_1"
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_replace_on_id
+def test_mongo_repository_replace_on_id(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    result = repo.replace_on_id(
+        "TestCollection",
+        id="some-id",
+        data={"field_name": "some_data_reupdated_1"},
+        data_validator=None,
+    )
+
+    # print(result)
+    assert isinstance(result, dict)
+    assert result["field_name"] == "some_data_reupdated_1"
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_replace_many
+def test_mongo_repository_replace_many(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    result = repo.replace_many(
+        "TestCollection",
+        filters={"field_name": "some_data1"},
+        data={"field_name": "some_data_reupdated_1"},
+        data_validator=None,
+    )
+
+    # print(result)
+    assert result > 0
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_delete_one
+def test_mongo_repository_delete_one(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    repo.insert_one(
+        "TestCollection", data_validator=None, data={"field_name": "some_data1"}
+    )
+
+    result = repo.delete_one(
+        "TestCollection",
+        filters={"field_name": "some_data1"},
+    )
+
+    # print(result)
+    assert result > 0
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_delete_on_id
+def test_mongo_repository_delete_on_id(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    data = repo.insert_one(
+        "TestCollection", data_validator=None, data={"field_name": "some_data1"}
+    )
+
+    result = repo.delete_on_id(
+        "TestCollection",
+        id=data["_id"],
+    )
+
+    # print(result)
+    assert result > 0
+
+
+# pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_delete_many
+def test_mongo_repository_delete_many(mongo_connection):
+
+    repo = MongoRepository(mongo_connection)
+
+    repo.insert_many(
+        "TestCollection",
+        data_validator=None,
+        data=[
+            {"field_name": "some_data1"},
+            {"field_name": "some_data2"},
+        ],
+    )
+
+    result = repo.delete_many(
+        "TestCollection",
+        filters={"field_name": {"$exists": True}},
+    )
+
+    # print(result)
+    assert result > 0

@@ -26,7 +26,7 @@ class MongoRepository(RepositoryInterface):
         col: Collection = self.db[collection]
         data = col.find_one(filters)
         if data is None:
-            return []
+            return {}
         data["_id"] = utils.get_object_id_str(data["_id"])
         return data
 
@@ -34,7 +34,7 @@ class MongoRepository(RepositoryInterface):
         col: Collection = self.db[collection]
         data = col.find_one({"_id": utils.get_object_id(id)})
         if data is None:
-            return []
+            return {}
         data["_id"] = utils.get_object_id_str(data["_id"])
         return data
 
@@ -130,92 +130,141 @@ class MongoRepository(RepositoryInterface):
         data: dict,
         append: bool = False,
         upsert: bool = True,
+        array_filters: List[dict] = None,
     ) -> dict:
         if data_validator is not None:
             data = data_validator(data)
         col: Collection = self.db[collection]
-        col.update_one(
+        data = col.find_one_and_update(
             filter=filters,
             update=utils.add_update_operators(data, append),
             upsert=upsert,
+            array_filters=array_filters,
+            return_document=True,
         )
-        return self.find_one(collection, data)
+        if data is None:
+            return {}
+        data["_id"] = utils.get_object_id_str(data["_id"])
+        return data
 
     def update_on_id(
         self,
         collection: str,
-        id: dict,
+        id: str,
         data_validator: Callable,
         data: dict,
         append: bool = False,
         upsert: bool = True,
-    ):
+        array_filters: List[dict] = None,
+    ) -> dict:
         if data_validator is not None:
             data = data_validator(data)
         col: Collection = self.db[collection]
-        col.update_one(
+        data = col.find_one_and_update(
             filter={"_id": utils.get_object_id(id)},
             update=utils.add_update_operators(data, append),
             upsert=upsert,
+            array_filters=array_filters,
+            return_document=True,
         )
-        return self.find_one(collection, data)
+        if data is None:
+            return {}
+        data["_id"] = utils.get_object_id_str(data["_id"])
+        return data
 
     def update_many(
         self,
         collection: str,
         filters: dict,
         data_validator: Callable,
-        data: dict,
+        data: List[dict],
         append: bool = False,
         upsert: bool = True,
-    ):
+        array_filters: List[dict] = None,
+    ) -> int:
         if data_validator is not None:
             data = data_validator(data)
         col: Collection = self.db[collection]
-        col.update_many(
+        return col.update_many(
             filter=filters,
             update=utils.add_update_operators(data, append),
             upsert=upsert,
-        )
-        return self.find_many(collection, data)
+            array_filters=array_filters,
+        ).matched_count
 
     def replace_one(
         self,
         collection: str,
         filters: dict,
         data_validator: Callable,
-        data: List[dict],
-    ):
-        ...
+        data: dict,
+        upsert: bool = True,
+    ) -> dict:
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
+        data = col.find_one_and_replace(
+            filter=filters,
+            replacement=data,
+            upsert=upsert,
+            return_document=True,
+        )
+        if data is None:
+            return {}
+        data["_id"] = utils.get_object_id_str(data["_id"])
+        return data
 
     def replace_on_id(
         self,
         collection: str,
         id: str,
         data_validator: Callable,
-        data: List[dict],
-    ):
-        ...
+        data: dict,
+        upsert: bool = True,
+    ) -> dict:
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
+        data = col.find_one_and_replace(
+            filter={"_id": utils.get_object_id(id)},
+            replacement=data,
+            upsert=upsert,
+            return_document=True,
+        )
+        if data is None:
+            return {}
+        data["_id"] = utils.get_object_id_str(data["_id"])
+        return data
 
     def replace_many(
         self,
         collection: str,
         filters: dict,
         data_validator: Callable,
-        data: List[dict],
-    ):
-        ...
+        data: dict,
+        upsert: bool = True,
+    ) -> int:
+        if data_validator is not None:
+            data = data_validator(data)
+        col: Collection = self.db[collection]
+        deleted_count = col.delete_many(filter=filters).deleted_count
+        modified_count = col.update_many(
+            filter=filters,
+            update=utils.add_update_operators(data, False),
+            upsert=upsert,
+        ).modified_count
+        return deleted_count or modified_count or int(upsert)
 
     # Deleting existing data
 
-    def delete(self, collection: str, filters: dict, first: bool = False):
-        ...
+    def delete_one(self, collection: str, filters: dict) -> int:
+        col: Collection = self.db[collection]
+        return col.delete_one(filter=filters).deleted_count
 
-    def delete_one(self, collection: str, **filters):
-        ...
+    def delete_on_id(self, collection: str, id: str) -> int:
+        col: Collection = self.db[collection]
+        return col.delete_one(filter={"_id": utils.get_object_id(id)}).deleted_count
 
-    def delete_by_id(self, collection: str, id: str):
-        ...
-
-    def delete_many(self, collection: str, **filters):
-        ...
+    def delete_many(self, collection: str, filters: dict) -> int:
+        col: Collection = self.db[collection]
+        return col.delete_many(filter=filters).deleted_count

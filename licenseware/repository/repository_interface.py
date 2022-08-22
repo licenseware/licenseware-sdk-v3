@@ -73,39 +73,87 @@ class RepositoryInterface(metaclass=ABCMeta):
     # Updating existing data
 
     @abstractmethod
-    def update_one(self) -> dict:
+    def update_one(
+        self,
+        table_or_collection: str,
+        filters: dict,
+        data_validator: Callable,
+        data: dict,
+        append: bool = False,
+        upsert: bool = True,
+        array_filters: List[dict] = None,
+    ) -> dict:
         ...
 
     @abstractmethod
-    def update_on_id(self) -> dict:
+    def update_on_id(
+        self,
+        table_or_collection: str,
+        filters: dict,
+        data_validator: Callable,
+        data: List[dict],
+        append: bool = False,
+        upsert: bool = True,
+        array_filters: List[dict] = None,
+    ) -> int:
         ...
 
     @abstractmethod
-    def update_many(self) -> List[dict]:
+    def update_many(
+        self,
+        table_or_collection: str,
+        filters: dict,
+        data_validator: Callable,
+        data: List[dict],
+        append: bool = False,
+        upsert: bool = True,
+        array_filters: List[dict] = None,
+    ) -> int:
         ...
 
     @abstractmethod
-    def replace_one(self) -> dict:
+    def replace_one(
+        self,
+        table_or_collection: str,
+        filters: dict,
+        data_validator: Callable,
+        data: dict,
+        upsert: bool = True,
+    ) -> dict:
         ...
 
     @abstractmethod
-    def replace_on_id(self) -> dict:
+    def replace_on_id(
+        self,
+        table_or_collection: str,
+        id: str,
+        data_validator: Callable,
+        data: dict,
+        upsert: bool = True,
+    ) -> dict:
         ...
 
     @abstractmethod
-    def replace_many(self) -> List[dict]:
+    def replace_many(
+        self,
+        table_or_collection: str,
+        filters: dict,
+        data_validator: Callable,
+        data: dict,
+        upsert: bool = True,
+    ) -> int:
         ...
 
     # Deleting existing data
 
     @abstractmethod
-    def delete_one(self) -> dict:
+    def delete_one(self, table_or_collection: str, filters: dict) -> int:
         ...
 
     @abstractmethod
-    def delete_by_id(self) -> dict:
+    def delete_on_id(self, table_or_collection: str, id: str) -> int:
         ...
 
     @abstractmethod
-    def delete_many(self) -> List[dict]:
+    def delete_many(self, table_or_collection: str, filters: dict) -> int:
         ...
