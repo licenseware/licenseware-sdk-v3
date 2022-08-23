@@ -3,6 +3,7 @@ loguru~=0.6
 openpyxl~=3.0
 pandas~=1.2
 pymongo==4.2.0
+marshmallow==3.17.0
 # Development
 pytest<7
 coverage<7
