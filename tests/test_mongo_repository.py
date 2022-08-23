@@ -112,7 +112,9 @@ def test_mongo_repository_insert_one(mongo_connection):
     data_to_insert = {"field_name": "some_data"}
 
     inserted_data = repo.insert_one(
-        "TestCollection", data_validator_func, data_to_insert
+        collection="TestCollection",
+        data_validator=data_validator_func,
+        data=data_to_insert,
     )
 
     # print(inserted_data)
@@ -137,10 +139,10 @@ def test_mongo_repository_insert_one_with_id(mongo_connection):
     data_to_insert = {"field_name": "some_data"}
 
     inserted_data = repo.insert_with_id(
-        "TestCollection",
-        "custom-id",
-        data_validator_func,
-        data_to_insert,
+        collection="TestCollection",
+        id="custom-id",
+        data_validator=data_validator_func,
+        data=data_to_insert,
         overwrite=False,
     )
 
@@ -152,18 +154,18 @@ def test_mongo_repository_insert_one_with_id(mongo_connection):
 
     with t.assertRaises(pymongo.errors.DuplicateKeyError):
         inserted_data1 = repo.insert_with_id(
-            "TestCollection",
-            "custom-id",
-            data_validator_func,
-            data_to_insert,
+            collection="TestCollection",
+            id="custom-id",
+            data_validator=data_validator_func,
+            data=data_to_insert,
             overwrite=False,
         )
 
     inserted_data2 = repo.insert_with_id(
-        "TestCollection",
-        "custom-id",
-        data_validator_func,
-        data_to_insert,
+        collection="TestCollection",
+        id="custom-id",
+        data_validator=data_validator_func,
+        data=data_to_insert,
         overwrite=True,
     )
 
@@ -171,10 +173,10 @@ def test_mongo_repository_insert_one_with_id(mongo_connection):
     assert "field_name" in inserted_data2
 
     inserted_data3 = repo.insert_with_id(
-        "TestCollection",
-        "62fe1ef69474f79fe0dca114",
-        data_validator_func,
-        data_to_insert,
+        collection="TestCollection",
+        id="62fe1ef69474f79fe0dca114",
+        data_validator=data_validator_func,
+        data=data_to_insert,
         overwrite=False,
     )
 
@@ -182,10 +184,10 @@ def test_mongo_repository_insert_one_with_id(mongo_connection):
     assert "field_name" in inserted_data3
 
     inserted_data4 = repo.insert_with_id(
-        "TestCollection",
-        "62fe1ef69474f79fe0dca114",
-        data_validator_func,
-        data_to_insert,
+        collection="TestCollection",
+        id="62fe1ef69474f79fe0dca114",
+        data_validator=data_validator_func,
+        data=data_to_insert,
         overwrite=True,
     )
 
@@ -198,7 +200,7 @@ def test_mongo_repository_db_raw_operations(mongo_connection):
 
     repo = MongoRepository(mongo_connection)
 
-    col: Collection = repo.db["TestCollection"]
+    col: Collection = repo.db_connection["TestCollection"]
     col.drop()
     docs = col.count_documents({})
 
@@ -208,7 +210,7 @@ def test_mongo_repository_db_raw_operations(mongo_connection):
 # pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_insert_many
 def test_mongo_repository_insert_many(mongo_connection):
 
-    repo = MongoRepository(mongo_connection)
+    repo = MongoRepository(mongo_connection, collection="TestCollection")
 
     def data_validator_func(_data):
         for d in _data:
@@ -223,9 +225,8 @@ def test_mongo_repository_insert_many(mongo_connection):
     ]
 
     inserted_data = repo.insert_many(
-        "TestCollection",
-        data_validator_func,
-        data_to_insert,
+        data_validator=data_validator_func,
+        data=data_to_insert,
         overwrite=False,
     )
 
@@ -240,20 +241,23 @@ def test_mongo_repository_find(mongo_connection):
 
     repo = MongoRepository(mongo_connection)
 
-    results = repo.find_one("TestCollection", {"field_name": "some_data1"})
+    results = repo.find_one(
+        collection="TestCollection",
+        filters={"field_name": "some_data1"},
+    )
     assert isinstance(results["_id"], str)
 
-    res1 = repo.find_by_id("TestCollection", id=results["_id"])
+    res1 = repo.find_by_id(collection="TestCollection", id=results["_id"])
     assert isinstance(res1["_id"], str)
 
-    resmany = repo.find_many("TestCollection", {})
+    resmany = repo.find_many(collection="TestCollection", filters={})
 
     assert len(resmany) > 0
     assert isinstance(resmany[0]["_id"], str)
 
     resmany1 = repo.find_many(
-        "TestCollection",
-        {},
+        collection="TestCollection",
+        filters={},
         sort=[("field_name", pymongo.ASCENDING), ("_id", pymongo.DESCENDING)],
     )
 
@@ -266,7 +270,7 @@ def test_mongo_repository_distinct(mongo_connection):
     repo = MongoRepository(mongo_connection)
 
     results = repo.distinct(
-        "TestCollection",
+        collection="TestCollection",
         field="field_name",
     )
 
@@ -275,14 +279,14 @@ def test_mongo_repository_distinct(mongo_connection):
     assert len(set(results)) == len(results)
 
     results1 = repo.distinct(
-        "TestCollection",
+        collection="TestCollection",
         field="field_name",
         filters={"field_name": "some_data1"},
     )
 
     assert len(set(results1)) == 1
 
-    docs = repo.count("TestCollection")
+    docs = repo.count(collection="TestCollection")
 
     assert isinstance(docs, int)
     assert docs > 0
@@ -294,8 +298,8 @@ def test_mongo_repository_execute_query(mongo_connection):
     repo = MongoRepository(mongo_connection)
 
     results = repo.execute_query(
-        "TestCollection",
-        [
+        collection="TestCollection",
+        query=[
             {
                 "$match": {"field_name": "some_data1"},
             }
@@ -308,14 +312,16 @@ def test_mongo_repository_execute_query(mongo_connection):
 
 # pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_update_one
 def test_mongo_repository_update_one(mongo_connection):
+    def validation_func(data):
+        assert "field_name" in data
+        return data
 
-    repo = MongoRepository(mongo_connection)
+    repo = MongoRepository(mongo_connection, data_validator=validation_func)
 
     result = repo.update_one(
-        "TestCollection",
+        collection="TestCollection",
         filters={"field_name": "some_data1"},
         data={"field_name": "some_data_updated1"},
-        data_validator=None,
     )
 
     # print(result)
@@ -325,13 +331,11 @@ def test_mongo_repository_update_one(mongo_connection):
 # pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_update_on_id
 def test_mongo_repository_update_on_id(mongo_connection):
 
-    repo = MongoRepository(mongo_connection)
+    repo = MongoRepository(mongo_connection, collection="TestCollection")
 
     result = repo.update_on_id(
-        "TestCollection",
         id="somssse-id",
         data={"field_name": "some_data1"},
-        data_validator=None,
         upsert=True,
     )
 
@@ -345,10 +349,9 @@ def test_mongo_repository_update_many(mongo_connection):
     repo = MongoRepository(mongo_connection)
 
     result = repo.update_many(
-        "TestCollection",
+        collection="TestCollection",
         filters={"field_name": "some_data1"},
         data={"field_name": "some_data_reupdated_1"},
-        data_validator=None,
     )
 
     # print(result)
@@ -361,10 +364,9 @@ def test_mongo_repository_replace_one(mongo_connection):
     repo = MongoRepository(mongo_connection)
 
     result = repo.replace_one(
-        "TestCollection",
+        collection="TestCollection",
         filters={"field_name": "some_data1"},
         data={"field_name": "some_data_reupdated_1"},
-        data_validator=None,
     )
 
     # print(result)
@@ -378,10 +380,9 @@ def test_mongo_repository_replace_on_id(mongo_connection):
     repo = MongoRepository(mongo_connection)
 
     result = repo.replace_on_id(
-        "TestCollection",
+        collection="TestCollection",
         id="some-id",
         data={"field_name": "some_data_reupdated_1"},
-        data_validator=None,
     )
 
     # print(result)
@@ -395,10 +396,9 @@ def test_mongo_repository_replace_many(mongo_connection):
     repo = MongoRepository(mongo_connection)
 
     result = repo.replace_many(
-        "TestCollection",
+        collection="TestCollection",
         filters={"field_name": "some_data1"},
         data={"field_name": "some_data_reupdated_1"},
-        data_validator=None,
     )
 
     # print(result)
@@ -410,12 +410,10 @@ def test_mongo_repository_delete_one(mongo_connection):
 
     repo = MongoRepository(mongo_connection)
 
-    repo.insert_one(
-        "TestCollection", data_validator=None, data={"field_name": "some_data1"}
-    )
+    repo.insert_one(collection="TestCollection", data={"field_name": "some_data1"})
 
     result = repo.delete_one(
-        "TestCollection",
+        collection="TestCollection",
         filters={"field_name": "some_data1"},
     )
 
@@ -429,11 +427,12 @@ def test_mongo_repository_delete_on_id(mongo_connection):
     repo = MongoRepository(mongo_connection)
 
     data = repo.insert_one(
-        "TestCollection", data_validator=None, data={"field_name": "some_data1"}
+        collection="TestCollection",
+        data={"field_name": "some_data1"},
     )
 
     result = repo.delete_on_id(
-        "TestCollection",
+        collection="TestCollection",
         id=data["_id"],
     )
 
@@ -444,11 +443,9 @@ def test_mongo_repository_delete_on_id(mongo_connection):
 # pytest -s -v tests/test_mongo_repository.py::test_mongo_repository_delete_many
 def test_mongo_repository_delete_many(mongo_connection):
 
-    repo = MongoRepository(mongo_connection)
+    repo = MongoRepository(mongo_connection, collection="TestCollection")
 
     repo.insert_many(
-        "TestCollection",
-        data_validator=None,
         data=[
             {"field_name": "some_data1"},
             {"field_name": "some_data2"},
@@ -456,7 +453,6 @@ def test_mongo_repository_delete_many(mongo_connection):
     )
 
     result = repo.delete_many(
-        "TestCollection",
         filters={"field_name": {"$exists": True}},
     )
 

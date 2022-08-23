@@ -1,16 +1,17 @@
 import uuid
-import pytest
-from typing import List
-from pymongo import MongoClient
 from dataclasses import dataclass
-from licenseware import history, MongoRepository
-from licenseware.uploader.default_handlers.default_filenames_validation_handler import (
-    default_filenames_validation_handler,
-)
+
+import pytest
+from pymongo import MongoClient
+
+from licenseware import MongoRepository, history
+from licenseware.constants.base_types import BaseTypes
 from licenseware.uploader.default_handlers.default_filecontents_validation_handler import (
     default_filecontents_validation_handler,
 )
-from licenseware.constants.base_types import BaseTypes
+from licenseware.uploader.default_handlers.default_filenames_validation_handler import (
+    default_filenames_validation_handler,
+)
 
 
 @pytest.fixture
@@ -42,8 +43,8 @@ def test_history_log_decorator(mongo_connection):
     class Config:
         pass
 
-    config = Config()
-    repo = MongoRepository(mongo_connection)
+    Config()
+    MongoRepository(mongo_connection)
 
     history.log_filename_validation()
 

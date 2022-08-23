@@ -262,6 +262,14 @@ FMW_FILTERS = (
 
 FMW_FILTERS will be an instance of `ReportFilter` which will make available the list of filters on `metadata` object.
 
+For each column type if `allowed_filters` parameter is not filled the default filters for that column type will be added.
+
+If `column_type` is not specified either, then `ReportFilter` will try to detect the type based on the other parameters.
+
+You can take a look on the `ReportFilter` implementation to see how the defaults are applied.
+
+
+
 
 - Declaring the report
 
@@ -423,13 +431,103 @@ Up we declare the table component metadata for `component_id="device_table"`.
 This is very similar to report attributes (ex: `BarHorizontalAttrs`).
 Method `column` appends columns to table component. 
 Method `column` has the following parameters, most of them with sensible defaults:
-- prop: str - this is required, place the name of the field here;
-- name: str = None - if not filed, value will be computed from prop;
-- values: list = None - provide a list of values, a dropdown will appear in frontend;
-- type: ColumnTypes = None - if values is filled type will be automatically set to enum, if distinct_key and foreign_key are filled type will be set automatically to entity, otherwise a default type string will be set. Make sure to specify type for the other types not covered automatically if needed; 
-- editable: bool = True - by default all fields are editable (the user can change the field data). If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to False.
-- visible: bool = True - by default all fields are visible to the user. Same defaults apply as for editable.
-- hashable: bool = False - by default all fields are hashable. Same defaults apply as for editable.
-- required: bool = False - by default all fields not required. If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to True.
-- distinct_key:str = None - here place the name of the field from which you want a list of unique items;
-- foreign_key:str = None  - here place the name of the foreign key field;
+- `prop`: str - this is required, place the name of the field here;
+- `name`: str = None - if not filed, value will be computed from prop;
+- `values`: list = None - provide a list of values, a dropdown will appear in frontend;
+- `type`: ColumnTypes = None - if values is filled type will be automatically set to enum, if distinct_key and foreign_key are filled type will be set automatically to entity, otherwise a default type string will be set. Make sure to specify type for the other types not covered automatically if needed; 
+- `editable`: bool = True - by default all fields are editable (the user can change the field data). If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to False.
+- `visible`: bool = True - by default all fields are visible to the user. Same defaults apply as for editable.
+- `hashable`: bool = False - by default all fields are hashable. Same defaults apply as for editable.
+- `required`: bool = False - by default all fields not required. If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to True.
+- `distinct_key`:str = None - here place the name of the field from which you want a list of unique items;
+- `foreign_key`:str = None  - here place the name of the foreign key field;
+
+
+
+# Mongo Repository
+
+The data to be useful needs to be saved somewhere that's where the `MongoRepository` class comes in handy.
+It includes handling of mongo `ObjectId` field which is not json parsable + some custom handling.
+
+First import the repo implementation:
+```py
+from licenseware import MongoRepository
+```
+
+Provide a get mongodb connection function:
+```py
+
+from pymongo import MongoClient
+
+def create_mongo_connection():
+    MONGO_DATABASE_NAME = "testdb"
+    MONGO_CONNECTION_STRING = "mongodb://lware:lware-secret@localhost:27017"
+    mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[MONGO_DATABASE_NAME]
+    return mongo_connection
+
+```
+
+Provide a collection data validator:
+```py
+from marshmallow import Schema, fields
+
+class EntitiesSchema(Schema):
+    entities = fields.List(fields.Raw, required=True)
+
+
+def entities_validator(data):
+    data = EntitiesSchema(many=True if isinstance(data, list) else False).load(data)
+    return data
+
+```
+The `data_validator` needs to be a function which will `raise` an error if data is not as requested.
+
+
+Instantiate the repo with the mongo connection:
+```py
+
+mongo_connection = create_mongo_connection()
+
+repo = MongoRepository(
+    mongo_connection, 
+    collection = "MyCollection",
+    data_validator = entities_validator
+)
+
+```
+The `data_validator` validator needs to return the data provided. 
+
+Now the `repo` is ready to use.
+
+Insert some data:
+```py
+
+inserted_data = repo.insert_one(
+    data={"field_name": "some_data"}
+)
+
+```
+We specified the `collection` and `data_validator` function on instantiation, but we can provide other collection names or validators on the repo method parameters (not recommended).
+
+Insert some special data:
+```py
+
+def custom_validator(data):
+    assert "field_name" in data.keys()
+    assert data["field_name"] in ["some_special_data"]  
+    return data
+
+inserted_data = repo.insert_one(
+    data={"field_name": "some_special_data"}
+    collection="SpecialCollection",
+    data_validator=custom_validator
+)
+
+```
+
+Ideally you should create one repo per collection because this way you don't need to specify collection and data_validator each time you call a repo method.
+
+The `data_validator` can be set to `None` while figuring out what to do with the data, but you will see a warning that the data inserted/updated/replaced has no validation. So, make sure you provide a `data_validator` function once you are ready.
+
+Checkout `licenseware/repository/mongo_repository` for more information.
+

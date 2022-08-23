@@ -1,6 +1,7 @@
 import random
 from uuid import UUID
-from marshmallow import Schema, fields, ValidationError
+
+from marshmallow import Schema, ValidationError, fields
 
 
 def _valid_uuid(value):
@@ -70,11 +71,11 @@ class EntitiesSchema(Schema):
     entities = fields.List(fields.Raw, required=True)
 
 
-def history_validator(data):
-    data = HistorySchema(many=True if isinstance(data, list) else False).load(data)
+def entities_validator(data):
+    data = EntitiesSchema(many=True if isinstance(data, list) else False).load(data)
     return data
 
 
-def entities_validator(data):
-    data = EntitiesSchema(many=True if isinstance(data, list) else False).load(data)
+def history_validator(data):
+    data = HistorySchema(many=True if isinstance(data, list) else False).load(data)
     return data

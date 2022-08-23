@@ -1,21 +1,19 @@
 import inspect
 import traceback
-from typing import Any, Callable, Union
 from copy import deepcopy
 from functools import wraps
-from licenseware.utils.logger import log as logg
-from .history_schemas import entities_validator
-from .metadata import get_metadata, create_metadata, add_event_id_to_payload
-from .step import save_step
+from typing import Any, Callable, Union
+
+from licenseware.constants.default_collections import Collections
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.utils.logger import log as logg
+
+from .history_schemas import entities_validator
+from .metadata import add_event_id_to_payload, create_metadata, get_metadata
+from .step import save_step
 
 
-def add_entities(
-    event_id: str,
-    entities: list,
-    repo: MongoRepository,
-    collections
-):
+def add_entities(event_id: str, entities: list, repo: MongoRepository):
     """
     Add reference ids to entities like databases, devices etc
     Usage:
@@ -33,7 +31,7 @@ def add_entities(
         data={"entities": entities},
         append=True,
         data_validator=entities_validator,
-        collection=collections.MONGO_COLLECTION_HISTORY_NAME,
+        collection=Collections.MONGO_COLLECTION_HISTORY_NAME,
     )
 
 
@@ -57,12 +55,12 @@ def remove_entities(
         filters={"event_id": event_id},
         data_validator=None,
         data={"$pull": {"entities": {"$in": entities}}},
-        collection=repo.collections.MONGO_COLLECTION_HISTORY_NAME,
+        collection=Collections.MONGO_COLLECTION_HISTORY_NAME,
     )
 
     return repo.find_one(
         filters={"event_id": event_id},
-        collection=repo.collections.MONGO_COLLECTION_HISTORY_NAME,
+        collection=Collections.MONGO_COLLECTION_HISTORY_NAME,
     )
 
 
