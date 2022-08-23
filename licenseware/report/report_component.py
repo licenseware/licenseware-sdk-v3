@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, Callable, NewType, Union
+from typing import Callable, NewType, Union
 
 import requests
 
+from licenseware.config.config import Config
 from licenseware.constants.attributes_type import AttributesType
 from licenseware.constants.states import States
 from licenseware.utils.alter_string import get_altered_strings
@@ -36,7 +37,7 @@ class NewReportComponent:
     ]
     order: int = None
     filters: ReportFilter = None
-    config: Any = None
+    config: Config = None
 
     def __post_init__(self):
 

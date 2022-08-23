@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Dict, List
 
 import requests
 
+from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
@@ -37,7 +38,7 @@ class NewReport:
     filters: ReportFilter = None
     components: List[NewReportComponent] = None
     registrable: bool = True
-    config: Any = None
+    config: Config = None
 
     def __post_init__(self):
 

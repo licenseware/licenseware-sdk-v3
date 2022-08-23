@@ -1,17 +1,9 @@
 import uuid
-from dataclasses import dataclass
 
 import pytest
 from pymongo import MongoClient
 
-from licenseware import MongoRepository, history
-from licenseware.constants.base_types import BaseTypes
-from licenseware.uploader.default_handlers.default_filecontents_validation_handler import (
-    default_filecontents_validation_handler,
-)
-from licenseware.uploader.default_handlers.default_filenames_validation_handler import (
-    default_filenames_validation_handler,
-)
+from licenseware import Config, MongoRepository, history
 
 
 @pytest.fixture
@@ -22,31 +14,69 @@ def mongo_connection():
     return mongo_connection
 
 
-class Collections(BaseTypes):
-    MONGO_COLLECTION_DATA_NAME = "Data"
-    MONGO_COLLECTION_UTILIZATION_NAME = "Quota"
-    MONGO_COLLECTION_HISTORY_NAME = "ProcessingHistory"
-    MONGO_COLLECTION_UPLOADERS_STATUS_NAME = "UploadersStatus"
-    MONGO_COLLECTION_REPORT_SNAPSHOTS_NAME = "ReportSnapshots"
-    MONGO_COLLECTION_FEATURES_NAME = "Features"
-    MONGO_COLLECTION_TOKEN_NAME = "Tokens"
-    # Outdated
-    MONGO_COLLECTION_ANALYSIS_NAME = "History"
-
-
 # pytest -s -v tests/test_history.py
 
 
-# pytest -s -v tests/test_history.py::test_history_log_decorator
-def test_history_log_decorator(mongo_connection):
-    @dataclass
-    class Config:
+# pytest -s -v tests/test_history.py::test_history_log_filename_validation
+def test_history_log_filename_validation(mongo_connection):
+    class CustomConfig(Config):
         pass
 
-    Config()
-    MongoRepository(mongo_connection)
+    config = CustomConfig()
 
-    history.log_filename_validation()
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    response = history.log_filename_validation(
+        tenant_id=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        filename_validation=[
+            {
+                "status": "success",
+                "filename": "okfile.csv",
+                "message": "file ok",
+            }
+        ],
+        repo=history_repo,
+    )
+
+    # print(response)
+    assert "filename_validation" in response
+
+
+# pytest -s -v tests/test_history.py::test_history_log_filecontent_validation
+def test_history_log_filecontent_validation(mongo_connection):
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    response = history.log_filecontent_validation(
+        tenant_id=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        filecontent_validation=[
+            {
+                # status = fields.String()
+                # filename = fields.String()
+                # filepath = fields.String()
+                # message = fields.String()
+            }
+        ],
+        filepaths=["./file1.csv"],
+        repo=history_repo,
+    )
+
+    # print(response)
+    assert "filename_validation" in response
 
 
 # pytest -s -v tests/test_history.py::test_history_log_success

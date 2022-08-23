@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import List
 
 import requests
 
+from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
@@ -20,7 +21,7 @@ class NewApp:
     icon: str = None
     app_meta: dict = None
     integration_details: List[dict] = None
-    config: Any = None
+    config: Config = None
 
     def __post_init__(self):
 

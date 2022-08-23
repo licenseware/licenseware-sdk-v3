@@ -8,9 +8,9 @@ from licenseware.constants.default_collections import Collections
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.logger import log as logg
 
-from .history_schemas import entities_validator
 from .metadata import add_event_id_to_payload, create_metadata, get_metadata
-from .step import save_step
+from .schemas import entities_validator
+from .step import save_filecontent_validation, save_filename_validation, save_step
 
 
 def add_entities(event_id: str, entities: list, repo: MongoRepository):
@@ -208,12 +208,43 @@ def log_failure(
     return metadata
 
 
-def log_filename_validation():
-    pass
+def log_filename_validation(
+    tenant_id: str,
+    event_id: str,
+    uploader_id: str,
+    app_id: str,
+    filename_validation: list,
+    repo: MongoRepository,
+):
+
+    return save_filename_validation(
+        tenant_id=tenant_id,
+        event_id=event_id,
+        uploader_id=uploader_id,
+        app_id=app_id,
+        filename_validation=filename_validation,
+        repo=repo,
+    )
 
 
-def log_filecontent_validation():
-    pass
+def log_filecontent_validation(
+    tenant_id: str,
+    event_id: str,
+    uploader_id: str,
+    app_id: str,
+    filecontent_validation: list,
+    filepaths: list,
+    repo: MongoRepository,
+):
+    return save_filecontent_validation(
+        tenant_id=tenant_id,
+        event_id=event_id,
+        uploader_id=uploader_id,
+        app_id=app_id,
+        filecontent_validation=filecontent_validation,
+        filepaths=filepaths,
+        repo=repo,
+    )
 
 
 def log(

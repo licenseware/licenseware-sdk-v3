@@ -1,4 +1,5 @@
 from licenseware.app import *
+from licenseware.config import *
 from licenseware.constants import *
 from licenseware.datatable import *
 from licenseware.jinja import *

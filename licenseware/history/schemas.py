@@ -57,14 +57,14 @@ class HistorySchema(Schema):
     app_id = fields.String(required=True)
     uploader_id = fields.String(required=True)
     filename_validation = fields.List(fields.Nested(FileNameValidationSchema))
-    file_content_validation = fields.List(fields.Nested(FileContentValidationSchema))
+    filecontent_validation = fields.List(fields.Nested(FileContentValidationSchema))
     files_uploaded = fields.List(fields.String)
     processing_details = fields.List(
         fields.Nested(ProcessingDetailsSchema), allow_none=True
     )
     updated_at = fields.String()
     filename_validation_updated_at = fields.String()
-    file_content_validation_updated_at = fields.String()
+    filecontent_validation_updated_at = fields.String()
 
 
 class EntitiesSchema(Schema):

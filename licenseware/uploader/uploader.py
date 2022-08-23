@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, Callable, List, Tuple, Union
+from typing import Callable, List, Tuple, Union
 
 import requests
 
+from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.constants.uploader_types import (
     FileValidationResponse,
@@ -45,7 +46,7 @@ class NewUploader:
     check_status_handler: Callable[
         [UploaderId], UploaderStatusResponse
     ] = default_check_status_handler
-    config: Any = None
+    config: Config = None
 
     def __post_init__(self):
 
