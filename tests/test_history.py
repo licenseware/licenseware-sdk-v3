@@ -3,7 +3,7 @@ import uuid
 import pytest
 from pymongo import MongoClient
 
-from licenseware import Config, MongoRepository, history
+from licenseware import Config, History, MongoRepository, history
 
 
 @pytest.fixture
@@ -15,6 +15,135 @@ def mongo_connection():
 
 
 # pytest -s -v tests/test_history.py
+
+
+# pytest -s -v tests/test_history.py::test_history_class_log_filename_validation
+def test_history_class_log_filename_validation(mongo_connection):
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    history = History(
+        tenant_id=str(uuid.uuid4()),
+        authorization=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        repo=history_repo,
+    )
+
+    response = history.log_filename_validation(
+        validation_response=[
+            {
+                "status": "success",
+                "filename": "okfile.csv",
+                "message": "file ok",
+            }
+        ]
+    )
+
+    assert "filename_validation" in response
+
+
+# pytest -s -v tests/test_history.py::test_history_class_log_filecontent_validation
+def test_history_class_log_filecontent_validation(mongo_connection):
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    history = History(
+        tenant_id=str(uuid.uuid4()),
+        authorization=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        repo=history_repo,
+    )
+
+    response = history.log_filecontent_validation(
+        validation_response=[
+            {
+                "status": "success",
+                "filename": "okfile.csv",
+                "message": "file ok",
+            }
+        ],
+        filepaths=["./okfile.csv"],
+    )
+
+    assert "filecontent_validation" in response
+
+
+# pytest -s -v tests/test_history.py::test_history_class_log_success
+def test_history_class_log_success(mongo_connection):
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    history = History(
+        tenant_id=str(uuid.uuid4()),
+        authorization=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        repo=history_repo,
+    )
+
+    response = history.log_success(
+        step="Gathering data",
+        filepath="./somecsv.csv",
+        on_success_save=None,
+        func_source="app/some_package/some_module/some_func",
+    )
+
+    assert "step" in response
+
+
+# pytest -s -v tests/test_history.py::test_history_class_log_failure
+def test_history_class_log_failure(mongo_connection):
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    history = History(
+        tenant_id=str(uuid.uuid4()),
+        authorization=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        repo=history_repo,
+    )
+
+    response = history.log_failure(
+        step="Gathering data",
+        filepath="./file.csv",
+        error_string="str(err)",
+        traceback_string="import traceback > traceback.format_exc(err)",
+        on_failure_save="Faled gathering data",
+        func_source="app/some_package/some_module/some_func",
+    )
+
+    assert "step" in response
 
 
 # pytest -s -v tests/test_history.py::test_history_log_filename_validation
@@ -65,10 +194,9 @@ def test_history_log_filecontent_validation(mongo_connection):
         app_id="ifmp-service",
         filecontent_validation=[
             {
-                # status = fields.String()
-                # filename = fields.String()
-                # filepath = fields.String()
-                # message = fields.String()
+                "status": "success",
+                "filename": "file.csv",
+                "message": "File is ok",
             }
         ],
         filepaths=["./file1.csv"],
@@ -76,13 +204,17 @@ def test_history_log_filecontent_validation(mongo_connection):
     )
 
     # print(response)
-    assert "filename_validation" in response
+    assert "filecontent_validation" in response
 
 
 # pytest -s -v tests/test_history.py::test_history_log_success
 def test_history_log_success(mongo_connection):
+    class CustomConfig(Config):
+        pass
 
-    repo = MongoRepository(mongo_connection)
+    config = CustomConfig()
+
+    repo = MongoRepository(mongo_connection, collection=config.MONGO_COLLECTION.HISTORY)
 
     response = history.log_success(
         func="some_processing_func_name",
@@ -99,15 +231,19 @@ def test_history_log_success(mongo_connection):
 
     result = repo.find_one(
         filters={"tenant_id": response["tenant_id"]},
-        collection=repo.collections.MONGO_COLLECTION_HISTORY_NAME,
+        collection=config.MONGO_COLLECTION.HISTORY,
     )
     assert result
 
 
 # pytest -s -v tests/test_history.py::test_history_log_failure
 def test_history_log_failure(mongo_connection):
+    class CustomConfig(Config):
+        pass
 
-    repo = MongoRepository(mongo_connection)
+    config = CustomConfig()
+
+    repo = MongoRepository(mongo_connection, collection=config.MONGO_COLLECTION.HISTORY)
 
     response = history.log_failure(
         func="some_processing_func_name",
@@ -126,27 +262,19 @@ def test_history_log_failure(mongo_connection):
 
     result = repo.find_one(
         filters={"tenant_id": response["tenant_id"]},
-        collection=repo.collections.MONGO_COLLECTION_HISTORY_NAME,
+        collection=config.MONGO_COLLECTION.HISTORY,
     )
     assert result
-
-    {
-        "callable": "some_processing_func_name",
-        "step": "some_processing_func_name",
-        "source": None,
-        "tenant_id": "1015246f-f7a3-417f-be7f-af81aaf48076",
-        "event_id": "f215d3c0-6ef9-4666-acac-559e499b1423",
-        "app_id": "fomo-service",
-        "uploader_id": "some_uploader_id",
-        "filepath": "./somefile.csv",
-        "file_name": "somefile.csv",
-    }
 
 
 # pytest -s -v tests/test_history.py::test_history_entities
 def test_history_entities(mongo_connection):
+    class CustomConfig(Config):
+        pass
 
-    repo = MongoRepository(mongo_connection)
+    config = CustomConfig()
+
+    repo = MongoRepository(mongo_connection, collection=config.MONGO_COLLECTION.HISTORY)
 
     response_failure = history.log_failure(
         func="some_processing_func_name",
@@ -183,4 +311,56 @@ def test_history_entities(mongo_connection):
     assert isinstance(response_remove["entities"], list)
     assert len(response_remove["entities"]) == 0
 
-    repo.delete_many(filters={}, collection=Collections.MONGO_COLLECTION_HISTORY_NAME)
+    repo.delete_many(filters={}, collection=config.MONGO_COLLECTION.HISTORY)
+
+
+# pytest -s -v tests/test_history.py::test_history_class_entities
+def test_history_class_entities(mongo_connection):
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    history = History(
+        tenant_id=str(uuid.uuid4()),
+        authorization=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        repo=history_repo,
+    )
+
+    response_failure = history.log_failure(
+        step="Gathering data",
+        filepath="./file.csv",
+        error_string="str(err)",
+        traceback_string="import traceback > traceback.format_exc(err)",
+        on_failure_save="Faled gathering data",
+        func_source="app/some_package/some_module/some_func",
+    )
+
+    assert "step" in response_failure
+
+    response = history.add_entities(
+        entities=[str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4())],
+    )
+
+    # print(response)
+
+    assert isinstance(response["entities"], list)
+    assert len(response["entities"]) == 3
+
+    response_remove = history.remove_entities(
+        entities=response["entities"],
+    )
+
+    # print(response_remove)
+
+    assert isinstance(response_remove["entities"], list)
+    assert len(response_remove["entities"]) == 0
+
+    history_repo.delete_many(filters={}, collection=config.MONGO_COLLECTION.HISTORY)

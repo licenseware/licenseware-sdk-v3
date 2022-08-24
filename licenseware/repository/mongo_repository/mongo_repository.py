@@ -38,12 +38,16 @@ class MongoRepository(RepositoryInterface):
         return col
 
     def _get_validated_data(self, data, data_validator: Callable):
-        if data_validator is not None:
-            data = data_validator(data)
-        elif self.data_validator is not None:
-            data = self.data_validator(data)
-        else:
+
+        if data_validator is None and self.data_validator is None:
             log.warning("Attention! No data validator function provided!")
+            return data
+
+        if data_validator is not None:
+            return data_validator(data)
+
+        if self.data_validator is not None:
+            return self.data_validator(data)
 
         return data
 
@@ -90,9 +94,8 @@ class MongoRepository(RepositoryInterface):
     ) -> List[str]:
         col = self._get_collection(collection)
         if filters is not None:  # pragma no cover
-            if "_id" in filters:
+            if "_id" in filters:  # pragma no cover
                 filters["_id"] = utils.get_object_id(filters["_id"])
-
         data = col.distinct(key=field, filter=filters)
         return data
 

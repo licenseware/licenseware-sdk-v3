@@ -2,6 +2,7 @@ from licenseware.app import *
 from licenseware.config import *
 from licenseware.constants import *
 from licenseware.datatable import *
+from licenseware.history.history_class import History
 from licenseware.jinja import *
 from licenseware.notifications import *
 from licenseware.report import *

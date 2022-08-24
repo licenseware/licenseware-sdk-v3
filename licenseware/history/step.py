@@ -1,7 +1,6 @@
 import datetime
 from typing import Any
 
-from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.logger import log as logg
@@ -80,7 +79,7 @@ def save_processing_details(metadata, response, repo: MongoRepository):
                 "traceback": response["traceback"],
                 "callable": metadata["callable"],
                 "source": metadata["source"],
-                "file_name": metadata["file_name"],
+                "filename": metadata["filename"],
                 "updated_at": datetime.datetime.utcnow().isoformat(),
             }
         ],
@@ -94,7 +93,6 @@ def save_processing_details(metadata, response, repo: MongoRepository):
         data=data,
         data_validator=history_validator,
         append=True,
-        collection=repo.collections.MONGO_COLLECTION_HISTORY_NAME,
     )
 
 
@@ -110,12 +108,6 @@ def save_step(
     # We can't track files without an event_id
     if metadata["event_id"] is None:
         return
-
-    if metadata["callable"] == "validate_filenames":
-        return save_filename_validation(metadata, response[0], repo=repo)
-
-    if metadata["callable"] == "validate_filecontents":
-        return save_filecontent_validation(metadata, response[0], repo=repo)
 
     # Success cases
     if not raised_error and on_success_save:

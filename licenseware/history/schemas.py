@@ -24,16 +24,9 @@ def validate_uuid4(value):
         raise ValidationError("Not a valid uuid4 string")
 
 
-class FileNameValidationSchema(Schema):
+class FileValidationSchema(Schema):
     status = fields.String()
     filename = fields.String()
-    message = fields.String()
-
-
-class FileContentValidationSchema(Schema):
-    status = fields.String()
-    filename = fields.String()
-    filepath = fields.String()
     message = fields.String()
 
 
@@ -56,8 +49,8 @@ class HistorySchema(Schema):
     event_id = fields.String(required=True, validate=validate_uuid4)
     app_id = fields.String(required=True)
     uploader_id = fields.String(required=True)
-    filename_validation = fields.List(fields.Nested(FileNameValidationSchema))
-    filecontent_validation = fields.List(fields.Nested(FileContentValidationSchema))
+    filename_validation = fields.List(fields.Nested(FileValidationSchema))
+    filecontent_validation = fields.List(fields.Nested(FileValidationSchema))
     files_uploaded = fields.List(fields.String)
     processing_details = fields.List(
         fields.Nested(ProcessingDetailsSchema), allow_none=True
@@ -78,4 +71,13 @@ def entities_validator(data):
 
 def history_validator(data):
     data = HistorySchema(many=True if isinstance(data, list) else False).load(data)
+    return data
+
+
+def remove_entities_validator(data):
+    # {"$pull": {"entities": {"$in": entities}}}
+    assert isinstance(data["$pull"]["entities"]["$in"], list)
+    assert len(data["$pull"]["entities"]["$in"]) > 0
+    for d in data["$pull"]["entities"]["$in"]:
+        assert isinstance(d, str)
     return data

@@ -46,7 +46,7 @@ class NewReportComponent:
         assert hasattr(self.config, "REGISTER_REPORT_COMPONENT_URL")
         assert hasattr(self.config, "get_machine_token")
 
-        if isinstance(self.filters, ReportFilter):
+        if isinstance(self.filters, ReportFilter):  # pragma no cover
             self.filters = self.filters.metadata
 
         self.app_id = self.config.APP_ID

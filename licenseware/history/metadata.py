@@ -1,4 +1,5 @@
 import inspect
+import os
 
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 
@@ -25,11 +26,9 @@ def create_metadata(
         "app_id": app_id,
         "uploader_id": uploader_id,
         "filepath": filepath,
+        "filename": os.path.basename(filepath),
     }
-    if isinstance(metadata["filepath"], str):
-        metadata["file_name"] = metadata["filepath"].split("/")[-1]
-    else:
-        metadata["file_name"] = ""
+
     return metadata
 
 
@@ -62,14 +61,3 @@ def get_metadata(func, func_args, func_kwargs):
             )
 
     return metadata
-
-
-def add_event_id_to_payload(metadata, response):
-    """If history decorator is added on the validation functions from sdk append event_id to payload"""
-    if metadata["callable"] in ["validate_filenames", "upload_files"]:
-        if isinstance(response, tuple):
-            if len(response) == 2:
-                return {**response[0], **{"event_id": metadata["event_id"]}}, response[
-                    1
-                ]
-    return response

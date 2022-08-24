@@ -1,5 +1,5 @@
 from dataclasses import asdict, dataclass
-from typing import List, NewType, Tuple
+from typing import List, NewType
 
 UploaderId = NewType("UploaderId", str)
 
@@ -18,7 +18,7 @@ class ValidationResponse:
 class FileValidationResponse:
     status: str
     message: str
-    validation: Tuple[ValidationResponse]
+    validation: List[ValidationResponse]
     event_id: str
 
     def dict(self):

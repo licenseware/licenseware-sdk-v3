@@ -84,13 +84,14 @@ def test_report_filter_utils():
     allowed_filters = ReportFilter()._determine_allowed_filters(
         ReportFilter.TYPE.STRING
     )
-
     assert allowed_filters == [ReportFilter.FILTER.EQUALS, ReportFilter.FILTER.CONTAINS]
+
+    allowed_filters = ReportFilter()._determine_allowed_filters(ReportFilter.TYPE.BOOL)
+    assert allowed_filters == [ReportFilter.FILTER.EQUALS]
 
     allowed_filters = ReportFilter()._determine_allowed_filters(
         ReportFilter.TYPE.NUMBER
     )
-
     assert allowed_filters == [
         ReportFilter.FILTER.EQUALS,
         ReportFilter.FILTER.GREATER_THAN,
@@ -99,10 +100,23 @@ def test_report_filter_utils():
         ReportFilter.FILTER.LESS_OR_EQUAL_TO,
     ]
 
-    column_type = ReportFilter()._determine_column_type("column", ["allowed_values"])
+    allowed_filters = ReportFilter()._determine_allowed_filters(ReportFilter.TYPE.JSON)
 
+    assert allowed_filters == [
+        ReportFilter.FILTER.EQUALS,
+        ReportFilter.FILTER.CONTAINS,
+        ReportFilter.FILTER.IN_LIST,
+        ReportFilter.FILTER.GREATER_THAN,
+        ReportFilter.FILTER.GREATER_OR_EQUAL_TO,
+        ReportFilter.FILTER.LESS_THAN,
+        ReportFilter.FILTER.LESS_OR_EQUAL_TO,
+    ]
+
+    column_type = ReportFilter()._determine_column_type("column", ["allowed_values"])
     assert column_type == ReportFilter.TYPE.ENUM
 
     column_type = ReportFilter()._determine_column_type("number_of_devices", None)
-
     assert column_type == ReportFilter.TYPE.NUMBER
+
+    column_type = ReportFilter()._determine_column_type("device_name", None)
+    assert column_type == ReportFilter.TYPE.STRING
