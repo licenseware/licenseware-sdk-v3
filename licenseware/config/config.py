@@ -1,16 +1,9 @@
-from enum import Enum
+from pydantic import BaseSettings
 
-from pydantic import BaseSettings as BaseSettings  # noqa: F401
-
-
-class StrEnum(str, Enum):
-    """
-    This class doesn't do anything, we're just interested in keeping the base in one
-    place so that we can easily change it should we ever want to
-    """
+from licenseware.constants.base_types import BaseTypes
 
 
-class Collections(StrEnum):
+class Collections(BaseTypes):
     DATA = "Data"
     UTILIZATION = "Quota"
     HISTORY = "ProcessingHistory"
@@ -22,7 +15,7 @@ class Collections(StrEnum):
     ANALYSIS = "History"
 
 
-class LogLevel(StrEnum):
+class LogLevel(BaseTypes):
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
@@ -30,19 +23,19 @@ class LogLevel(StrEnum):
     CRITICAL = "CRITICAL"
 
 
-class Environment(StrEnum):
+class Environment(BaseTypes):
     TEST = "TEST"
     DEV = "DEV"
     PROD = "PROD"
     DESKTOP = "DESKTOP"
 
 
-class CeleryBrokerType(StrEnum):
+class CeleryBrokerType(BaseTypes):
     REDIS = "REDIS"
     RABBITMQ = "RABBITMQ"
 
 
-class WebAppFramework(StrEnum):
+class WebAppFramework(BaseTypes):
     FASTAPI = "FASTAPI"
     FLASK = "FLASK"
 
@@ -63,8 +56,8 @@ class Config(BaseSettings):
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
     MONGO_DBNAME: str = "db"
-    MONGO_USER: str = None
-    MONGO_PASSWORD: str = None
+    MONGO_USER: str = "lware"
+    MONGO_PASSWORD: str = "lware-secret"
     MONGO_COLLECTION: Collections = Collections
 
     REDIS_HOST: str = "localhost"

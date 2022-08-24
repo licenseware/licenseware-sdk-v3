@@ -244,6 +244,7 @@ def log_filecontent_validation(
     )
 
 
+# TODO - it's a bit messy
 # def log(
 #     *dargs,
 #     on_success_save: str = None,

@@ -1,5 +1,7 @@
 from typing import List, Union
+
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+
 from . import history
 
 
