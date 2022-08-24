@@ -56,7 +56,7 @@ class Config(BaseSettings):
 
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
-    MONGO_DBNAME: str = get_altered_strings(str(APP_ID + "DB")).title_joined
+    MONGO_DBNAME: str = get_altered_strings(APP_ID).title_joined + "DB"
     MONGO_USER: str = "lware"
     MONGO_PASSWORD: str = "lware-secret"
     MONGO_COLLECTION: Collections = Collections
