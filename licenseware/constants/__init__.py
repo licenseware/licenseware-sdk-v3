@@ -1,7 +1,6 @@
 from .allowed_filters import AllowedFilters
 from .attributes_type import AttributesType
 from .column_types import ColumnTypes
-from .default_collections import Collections
 from .file_types import FileTypes
 from .filter_item_type import FilterItemType
 from .flags import Flags

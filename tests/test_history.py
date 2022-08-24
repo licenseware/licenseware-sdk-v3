@@ -17,6 +17,39 @@ def mongo_connection():
 # pytest -s -v tests/test_history.py
 
 
+# pytest -s -v tests/test_history.py::test_history_log_decorator
+def test_history_log_decorator(mongo_connection):
+
+    from licenseware import Config
+
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    class InfraService:
+        def __init__(self):
+            self.event_id = str(uuid.uuid4())
+            self.filepath = "./somefile"
+            self.uploader_id = "rv_rools"
+            self.app_id = "ifmp-service"
+            self.tenant_id = str(uuid.uuid4())
+            self.repo = MongoRepository(
+                mongo_connection, collection="SomeCustomCollection"
+            )
+            self.config = config
+
+        @history.log
+        def update_relationships(self):
+            """some docs"""
+            print("working")
+            print("done")
+
+    response = InfraService().update_relationships()
+
+    assert response is None
+
+
 # pytest -s -v tests/test_history.py::test_history_class_log_filename_validation
 def test_history_class_log_filename_validation(mongo_connection):
     class CustomConfig(Config):

@@ -1,6 +1,9 @@
 from enum import Enum
 
 
-class BaseTypes(str, Enum):
+class BaseTypes(str, Enum):  # pragma: no cover
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
-        return f"'{self._value_}'"  # pragma: no cover
+        return f"'{self._value_}'"

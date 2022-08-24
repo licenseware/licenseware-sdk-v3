@@ -31,3 +31,13 @@ def get_filepath(func, func_args, func_kwargs):
 def get_filename(func, func_args, func_kwargs):
     filepath = get_value_from_func(func, func_args, func_kwargs, "filepath")
     return os.path.basename(filepath) if filepath else None
+
+
+def get_db_connection(func, func_args, func_kwargs):
+    repo = get_value_from_func(func, func_args, func_kwargs, "repo")
+    return repo.db_connection
+
+
+def get_config(func, func_args, func_kwargs):
+    config = get_value_from_func(func, func_args, func_kwargs, "config")
+    return config

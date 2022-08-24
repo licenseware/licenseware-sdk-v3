@@ -531,3 +531,75 @@ The `data_validator` can be set to `None` while figuring out what to do with the
 
 Checkout `licenseware/repository/mongo_repository` for more information.
 
+
+# History
+
+In order to have a history of the processing steps from begining to the end `licenseware.history.log` decorator can be used to decorate processing functions.
+
+Below is an basic usage example:
+
+```py
+
+from settings import config
+from licenseware import MongoRepository
+
+class InfraService:
+    def __init__(self):
+        self.event_id = str(uuid.uuid4())
+        self.filepath = "./somefile"
+        self.uploader_id = "rv_rools"
+        self.app_id = "ifmp-service"
+        self.tenant_id = str(uuid.uuid4())
+        self.repo = MongoRepository(
+            mongo_connection, collection="SomeCustomCollection"
+        )
+        self.config = config
+
+    @history.log
+    def update_relationships(self):
+        """some docs"""
+        print("working")
+        print("done")
+
+response = InfraService().update_relationships()
+
+```
+
+For history to work we need some basic information (event from worker information + the config from settings) to track the processing steps:
+- `event_id` 
+- `filepath` 
+- `uploader_id` 
+- `app_id` 
+- `tenant_id` 
+- `repo`
+- `config`
+
+Where the `history.log` decorator cannot be used you can create an instance of `History` class and call the following functions where needed:
+
+
+```py
+from licenseware import History
+
+history = History(
+    tenant_id=str(uuid.uuid4()),
+    authorization=str(uuid.uuid4()),
+    event_id=str(uuid.uuid4()),
+    uploader_id="rv_tools",
+    app_id="ifmp-service",
+    repo=history_repo,
+)
+
+
+```
+
+
+
+    response = history.log_filename_validation(
+        validation_response=[
+            {
+                "status": "success",
+                "filename": "okfile.csv",
+                "message": "file ok",
+            }
+        ]
+    )

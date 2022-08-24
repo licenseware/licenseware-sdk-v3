@@ -1,8 +1,9 @@
 import inspect
+import traceback
 from functools import wraps
 from typing import Any, Callable, Union
 
-from licenseware.constants.default_collections import Collections
+from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.repository.repository_interface import RepositoryInterface
 from licenseware.utils.logger import log as logg
 
@@ -29,7 +30,6 @@ def add_entities(event_id: str, entities: list, repo: RepositoryInterface):
         data={"entities": entities},
         append=True,
         data_validator=entities_validator,
-        collection=Collections.MONGO_COLLECTION_HISTORY_NAME,
     )
 
 
@@ -53,12 +53,10 @@ def remove_entities(
         filters={"event_id": event_id},
         data_validator=remove_entities_validator,
         data={"$pull": {"entities": {"$in": entities}}},
-        collection=Collections.MONGO_COLLECTION_HISTORY_NAME,
     )
 
     return repo.find_one(
         filters={"event_id": event_id},
-        collection=Collections.MONGO_COLLECTION_HISTORY_NAME,
     )
 
 
@@ -245,7 +243,6 @@ def log_filecontent_validation(
     )
 
 
-# TODO - it's a bit messy
 def log(
     *dargs,
     on_success_save: str = None,
@@ -392,8 +389,58 @@ def log(
     def _decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            # TODO - handle this
-            return f(*args, **kwargs)
+
+            try:
+                repo = None
+                meta = get_metadata(f, args, kwargs)
+                repo = MongoRepository(
+                    meta.db_connection, collection=meta.config.MONGO_COLLECTION.HISTORY
+                )
+            except Exception:
+                logg.error(traceback.format_exc())
+                repo = None
+
+            try:
+                response = f(*args, **kwargs)
+                if repo is None:
+                    return response
+
+                log_success(
+                    func=meta.step,
+                    tenant_id=meta.tenant_id,
+                    event_id=meta.event_id,
+                    uploader_id=meta.uploader_id,
+                    app_id=meta.app_id,
+                    filepath=meta.filepath,
+                    repo=repo,
+                    on_success_save=on_success_save,
+                )
+
+                return response
+            except Exception as err:
+
+                if repo is None:
+                    raise err
+
+                log_failure(
+                    func=meta.step,
+                    tenant_id=meta.tenant_id,
+                    event_id=meta.event_id,
+                    uploader_id=meta.uploader_id,
+                    app_id=meta.app_id,
+                    filepath=meta.filepath,
+                    repo=repo,
+                    error_string=str(err),
+                    traceback_string=str(traceback.format_exc()),
+                    on_failure_save=on_failure_save,
+                )
+
+                if on_failure_return is not None:
+                    return on_failure_return
+                elif on_failure_return == "None":
+                    return None
+                else:
+                    raise err
 
         return wrapper
 

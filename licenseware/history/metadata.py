@@ -1,7 +1,26 @@
 import inspect
 import os
+from dataclasses import dataclass, fields
+from typing import Any
+
+from licenseware.config.config import Config
 
 from . import utils
+
+
+@dataclass
+class FuncMetadata:
+    callable: str
+    step: str
+    source: str
+    tenant_id: str
+    event_id: str
+    app_id: str
+    uploader_id: str
+    filepath: str
+    filename: str
+    db_connection: Any
+    config: Config
 
 
 def create_metadata(
@@ -31,31 +50,29 @@ def create_metadata(
 
 
 def get_metadata(func, func_args, func_kwargs):
-    """Getting all the data needed to identify and track files uploaded (function name, source and tenant_id)"""
 
-    metadata = {
-        "callable": func.__name__,
-        "step": func.__doc__.strip() if func.__doc__ else func.__name__,
-        "source": str(inspect.getmodule(func))
+    metadata = FuncMetadata(
+        callable=func.__name__,
+        step=func.__doc__.strip() if func.__doc__ else func.__name__,
+        source=str(inspect.getmodule(func))
         .split("from")[1]
         .strip()
         .replace("'", "")
         .replace(">", ""),
-        "tenant_id": utils.get_tenant_id(func, func_args, func_kwargs),
-        "event_id": utils.get_event_id(func, func_args, func_kwargs),
-        "app_id": utils.get_app_id(func, func_args, func_kwargs),
-        "uploader_id": utils.get_uploader_id(func, func_args, func_kwargs),
-        "filepath": utils.get_filepath(func, func_args, func_kwargs),
-        "filename": utils.get_filename(func, func_args, func_kwargs),
-    }
+        tenant_id=utils.get_tenant_id(func, func_args, func_kwargs),
+        event_id=utils.get_event_id(func, func_args, func_kwargs),
+        app_id=utils.get_app_id(func, func_args, func_kwargs),
+        uploader_id=utils.get_uploader_id(func, func_args, func_kwargs),
+        filepath=utils.get_filepath(func, func_args, func_kwargs),
+        filename=utils.get_filename(func, func_args, func_kwargs),
+        db_connection=utils.get_db_connection(func, func_args, func_kwargs),
+        config=utils.get_config(func, func_args, func_kwargs),
+    )
 
-    # log.info(f"History output metadata {metadata}")
-
-    mandatory_fields = ["tenant_id", "event_id", "uploader_id", "app_id", "filepath"]
-    for field in mandatory_fields:
-        if metadata.get(field) is None:
+    for field in fields(metadata):
+        if getattr(metadata, field.name) is None:
             raise Exception(
-                f"No `{field}` found can't create history (see: '{metadata['callable']}' from '{metadata['source']}')"
+                f"Field {field} not found on function (self or args/kwargs)"
             )
 
     return metadata

@@ -105,9 +105,6 @@ def save_step(
     on_failure_save: Any = None,
     raised_error: bool = False,
 ):
-    # We can't track files without an event_id
-    if metadata["event_id"] is None:
-        return
 
     # Success cases
     if not raised_error and on_success_save:
