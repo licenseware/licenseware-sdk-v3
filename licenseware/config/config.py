@@ -1,6 +1,7 @@
 from pydantic import BaseSettings
 
 from licenseware.constants.base_types import BaseTypes
+from licenseware.utils.alter_string import get_altered_strings
 
 
 class Collections(BaseTypes):
@@ -55,7 +56,7 @@ class Config(BaseSettings):
 
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
-    MONGO_DBNAME: str = "db"
+    MONGO_DBNAME: str = get_altered_strings(str(APP_ID + "DB")).title_joined
     MONGO_USER: str = "lware"
     MONGO_PASSWORD: str = "lware-secret"
     MONGO_COLLECTION: Collections = Collections

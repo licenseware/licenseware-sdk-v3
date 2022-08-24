@@ -2,7 +2,7 @@ import datetime
 from typing import Any
 
 from licenseware.constants.states import States
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.repository.repository_interface import RepositoryInterface
 from licenseware.utils.logger import log as logg
 
 from .schemas import history_validator
@@ -14,7 +14,7 @@ def save_filename_validation(
     uploader_id: str,
     app_id: str,
     filename_validation: list,
-    repo: MongoRepository,
+    repo: RepositoryInterface,
 ):
 
     data = {
@@ -37,7 +37,7 @@ def save_filecontent_validation(
     app_id: str,
     filecontent_validation: list,
     filepaths: list,
-    repo: MongoRepository,
+    repo: RepositoryInterface,
 ):
 
     data = {
@@ -61,7 +61,7 @@ def save_filecontent_validation(
     )
 
 
-def save_processing_details(metadata, response, repo: MongoRepository):
+def save_processing_details(metadata, response, repo: RepositoryInterface):
 
     data = {
         "tenant_id": metadata["tenant_id"],
@@ -100,7 +100,7 @@ def save_step(
     *,
     metadata,
     response,
-    repo: MongoRepository,
+    repo: RepositoryInterface,
     on_success_save: Any = None,
     on_failure_save: Any = None,
     raised_error: bool = False,

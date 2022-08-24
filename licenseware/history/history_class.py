@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.repository.repository_interface import RepositoryInterface
 
 from . import history
 
@@ -13,7 +13,7 @@ class History:
         event_id: str,
         app_id: str,
         uploader_id: str,
-        repo: MongoRepository,
+        repo: RepositoryInterface,
     ) -> None:
         self.tenant_id = tenant_id
         self.authorization = authorization
