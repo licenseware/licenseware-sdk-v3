@@ -15,3 +15,4 @@ from .states import States
 from .style_attributes_type import StyleAttrsType
 from .tenant_types import *
 from .uploader_types import *
+from .worker_event_type import WorkerEvent

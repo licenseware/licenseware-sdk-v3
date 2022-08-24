@@ -11,6 +11,7 @@ from licenseware.constants.uploader_types import (
     UploaderQuotaResponse,
     UploaderStatusResponse,
 )
+from licenseware.constants.worker_event_type import WorkerEvent
 from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
     default_check_status_handler,
@@ -29,6 +30,7 @@ class NewUploader:
     description: str
     uploader_id: str
     accepted_file_types: tuple
+    worker: Callable[[WorkerEvent], None]
     validation_parameters: UploaderValidationParameters = None
     encryption_parameters: UploaderEncryptionParameters = None
     flags: Tuple[str] = None
