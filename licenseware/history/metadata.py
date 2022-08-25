@@ -72,7 +72,7 @@ def get_metadata(func, func_args, func_kwargs):
     for field in fields(metadata):
         if getattr(metadata, field.name) is None:
             raise Exception(
-                f"Field {field} not found on function (self or args/kwargs)"
+                f"Field '{field.name}' not found on function '{func.__name__}' (self or args/kwargs)"
             )
 
     return metadata

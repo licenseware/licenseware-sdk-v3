@@ -2,6 +2,7 @@ from typing import Callable, List, Tuple, Union
 
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor
+from pymongo.database import Database
 
 from licenseware.repository.repository_interface import RepositoryInterface
 from licenseware.utils.logger import log
@@ -12,7 +13,7 @@ from . import utils
 class MongoRepository(RepositoryInterface):
     def __init__(
         self,
-        db_connection,
+        db_connection: Database,
         collection: str = None,
         data_validator: Callable = None,
     ):

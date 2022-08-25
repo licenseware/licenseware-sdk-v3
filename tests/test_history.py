@@ -1,9 +1,11 @@
+import unittest
 import uuid
 
 import pytest
 from pymongo import MongoClient
 
 from licenseware import Config, History, MongoRepository, history
+from licenseware.history.metadata import get_metadata
 
 
 @pytest.fixture
@@ -14,7 +16,17 @@ def mongo_connection():
     return mongo_connection
 
 
+t = unittest.TestCase()
+
 # pytest -s -v tests/test_history.py
+
+# pytest -s -v tests/test_history.py::test_get_metadata
+def test_get_metadata():
+    def some_func():
+        pass
+
+    with t.assertRaises(Exception):
+        get_metadata(some_func, func_args=(), func_kwargs={})
 
 
 # pytest -s -v tests/test_history.py::test_history_log_decorator

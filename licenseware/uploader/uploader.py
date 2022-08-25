@@ -17,6 +17,7 @@ from licenseware.uploader.default_handlers import (
     default_check_status_handler,
     default_filecontents_validation_handler,
     default_filenames_validation_handler,
+    default_update_status_handler,
 )
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
@@ -48,6 +49,9 @@ class NewUploader:
     check_status_handler: Callable[
         [UploaderId], UploaderStatusResponse
     ] = default_check_status_handler
+    update_status_handler: Callable[
+        [UploaderId], UploaderStatusResponse
+    ] = default_update_status_handler
     config: Config = None
 
     def __post_init__(self):

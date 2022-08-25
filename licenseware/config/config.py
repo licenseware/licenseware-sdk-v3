@@ -8,7 +8,7 @@ class Collections(BaseTypes):
     DATA = "Data"
     UTILIZATION = "Quota"
     HISTORY = "ProcessingHistory"
-    UPLOADERS_STATUS = "UploadersStatus"
+    UPLOADER_STATUS = "UploaderStatus"
     REPORT_SNAPSHOTS = "ReportSnapshots"
     FEATURE = "Features"
     TOKEN = "Tokens"
