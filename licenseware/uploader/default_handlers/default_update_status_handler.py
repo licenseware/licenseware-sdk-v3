@@ -8,7 +8,8 @@ def default_update_status_handler(
     status: str,
     repo: MongoRepository,
 ):
-    result = repo.insert_one(
-        data={"tenant_id": tenant_id, "uploader_id": uploader_id, "status": status}
+    result = repo.update_one(
+        filters={"tenant_id": tenant_id, "uploader_id": uploader_id},
+        data={"tenant_id": tenant_id, "uploader_id": uploader_id, "status": status},
     )
     return result
