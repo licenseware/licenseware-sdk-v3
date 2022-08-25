@@ -2,6 +2,10 @@ from dataclasses import asdict, dataclass
 from typing import List, NewType
 
 UploaderId = NewType("UploaderId", str)
+TenantId = NewType("TenantId", str)
+Authorization = NewType("Authorization", str)
+Repository = NewType("MongoRepository", str)
+Status = NewType("Status", str)
 
 
 @dataclass

@@ -6,7 +6,11 @@ import requests
 from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.constants.uploader_types import (
+    Authorization,
     FileValidationResponse,
+    Repository,
+    Status,
+    TenantId,
     UploaderId,
     UploaderQuotaResponse,
     UploaderStatusResponse,
@@ -47,10 +51,11 @@ class NewUploader:
         [Union[List[str], List[bytes]]], UploaderQuotaResponse
     ] = default_check_quota_handler
     check_status_handler: Callable[
-        [UploaderId], UploaderStatusResponse
+        [TenantId, Authorization, UploaderId, Repository], UploaderStatusResponse
     ] = default_check_status_handler
     update_status_handler: Callable[
-        [UploaderId], UploaderStatusResponse
+        [TenantId, Authorization, UploaderId, Status, Repository],
+        UploaderStatusResponse,
     ] = default_update_status_handler
     config: Config = None
 
