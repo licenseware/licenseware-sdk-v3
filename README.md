@@ -451,25 +451,12 @@ It includes handling of mongo `ObjectId` field which is not json parsable + some
 
 First import the repo implementation:
 ```py
-from licenseware import MongoRepository
-```
 
-Provide a get mongodb connection function:
-```py
-
-from pymongo import MongoClient
-
-def create_mongo_connection():
-    MONGO_DATABASE_NAME = "testdb"
-    MONGO_CONNECTION_STRING = "mongodb://lware:lware-secret@localhost:27017"
-    mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[MONGO_DATABASE_NAME]
-    return mongo_connection
-
-```
-
-Provide a collection data validator:
-```py
 from marshmallow import Schema, fields
+from settings import config
+from licenseware import MongoRepository
+from app.dependencies.db.mongo import get_mongo_db_connection
+
 
 class EntitiesSchema(Schema):
     entities = fields.List(fields.Raw, required=True)
@@ -479,34 +466,33 @@ def entities_validator(data):
     data = EntitiesSchema(many=True if isinstance(data, list) else False).load(data)
     return data
 
+
+class SomeProcessingClass:
+
+    def __init__(self):
+        # Attention! 
+        # Don't keep it at the module level as a global variable!
+        mongo_connection = get_mongo_db_connection(config)
+        self.repo = MongoRepository(
+            mongo_connection, 
+            collection = config.MONGO_COLLECTION.DATA,
+            data_validator = entities_validator
+        )
+        # Now the `repo` is ready to use!
+
+    def some_func(self):
+        
+        inserted_data = repo.insert_one(
+            data={"field_name": "some_data"}
+        )
+
 ```
-The `data_validator` needs to be a function which will `raise` an error if data is not as requested.
+
+The `data_validator` (entities_validator) needs to be a function which will `raise` an error if data is not as requested.
 You can use any schema package you want marshmallow, pydantic even your own custom assertion on data it just needs to raise an error if data is not as intended.
 
-Instantiate the repo with the mongo connection:
-```py
-
-mongo_connection = create_mongo_connection()
-
-repo = MongoRepository(
-    mongo_connection, 
-    collection = "MyCollection",
-    data_validator = entities_validator
-)
-
-```
 The `data_validator` validator needs to return the data provided. 
 
-Now the `repo` is ready to use.
-
-Insert some data:
-```py
-
-inserted_data = repo.insert_one(
-    data={"field_name": "some_data"}
-)
-
-```
 We specified the `collection` and `data_validator` function on instantiation, but we can provide other collection names or validators on the repo method parameters (not recommended).
 
 Insert some special data:
@@ -517,7 +503,9 @@ def custom_validator(data):
     assert data["field_name"] in ["some_special_data"]  
     return data
 
-inserted_data = repo.insert_one(
+# somewhere in a class method
+
+inserted_data = self.repo.insert_one(
     data={"field_name": "some_special_data"}
     collection="SpecialCollection",
     data_validator=custom_validator
@@ -541,6 +529,7 @@ Below is an basic usage example:
 ```py
 
 from settings import config
+from app.dependencies.db.mongo import get_mongo_db_connection
 from licenseware import MongoRepository
 
 class InfraService:
@@ -550,8 +539,9 @@ class InfraService:
         self.uploader_id = "rv_rools"
         self.app_id = "ifmp-service"
         self.tenant_id = str(uuid.uuid4())
+        mongo_connection = get_mongo_db_connection(config)
         self.repo = MongoRepository(
-            mongo_connection, collection="SomeCustomCollection"
+            mongo_connection, collection=config.MONGO_COLLECTION.DATA
         )
         self.config = config
 
@@ -594,7 +584,7 @@ from licenseware import History
 class ProcessingClass:
     def __init__(self, tenant_id, authorization, event_id, uploader_id, app_id):
         mongo_connection = get_mongo_db_connection(config)
-        
+
         history_repo = MongoRepository(
             mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
         )
@@ -628,3 +618,4 @@ class ProcessingClass:
 As you can see this method is very verbose an ugly this is what `history.log` decorator does under the hood.
 I takes the required parameters and saves success and failures in encountered in a processing pipeline. 
 
+Checkout `licenseware/repository/history` for more information.
