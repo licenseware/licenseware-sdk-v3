@@ -13,7 +13,7 @@ class Collections(BaseTypes):
     FEATURE = "Features"
     TOKEN = "Tokens"
     # Outdated
-    ANALYSIS = "History"
+    MONGO_COLLECTION_ANALYSIS_NAME = "History"
 
 
 class LogLevel(BaseTypes):
