@@ -6,7 +6,7 @@ from licenseware.utils.alter_string import get_altered_strings
 
 class Collections(BaseTypes):
     DATA = "Data"
-    UTILIZATION = "Quota"
+    QUOTA = "Quota"
     HISTORY = "ProcessingHistory"
     UPLOADER_STATUS = "UploaderStatus"
     REPORT_SNAPSHOTS = "ReportSnapshots"
@@ -43,6 +43,7 @@ class WebAppFramework(BaseTypes):
 
 class Config(BaseSettings):
     APP_ID: str = "app"
+    USER_PROFILE_URL: str = None
     REGISTER_APP_URL: str = None
     REGISTER_UPLOADER_URL: str = None
     REGISTER_REPORT_URL: str = None

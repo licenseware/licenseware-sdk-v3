@@ -44,11 +44,15 @@ def test_new_uploader(mocker):
         filename_endswith=FileTypes.GENERIC_EXCEL,  # or [".xls", ".xlsx"]
     )
 
+    def worker_func(event):
+        pass
+
     rv_tools_uploader = NewUploader(
         name="RVTools",
         description="XLSX export from RVTools after scanning your Vmware infrastructure.",
         uploader_id="rv_tools",
         accepted_file_types=FileTypes.GENERIC_EXCEL,
+        worker=worker_func,
         validation_parameters=rv_tools_validation_parameters,
         encryption_parameters=rv_tools_encryption_parameters,
         config=config,
@@ -83,8 +87,8 @@ def test_new_uploader(mocker):
     assert "success" == response["status"]
 
     # TODO
-    # response = rv_tools_uploader.check_quota()
-    # response = rv_tools_uploader.check_status()
+    # response = rv_tools_uploader.check_quota_handler()
+    # response = rv_tools_uploader.check_status_handler()
 
 
 # pytest -s -v tests/test_new_uploader.py::test_new_uploader_custom_handlers
@@ -127,11 +131,15 @@ def test_new_uploader_custom_handlers(mocker):
     # response = rv_tools_uploader.check_quota()
     # response = rv_tools_uploader.check_status()
 
+    def workerfunc(event):
+        pass
+
     rv_tools_uploader = NewUploader(
         name="RVTools",
         description="XLSX export from RVTools after scanning your Vmware infrastructure.",
         uploader_id="rv_tools",
         accepted_file_types=FileTypes.GENERIC_EXCEL,
+        worker=workerfunc,
         validation_parameters=rv_tools_validation_parameters,
         encryption_parameters=rv_tools_encryption_parameters,
         filenames_validation_handler=custom_validate_filenames,

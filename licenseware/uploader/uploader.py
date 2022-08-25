@@ -48,7 +48,7 @@ class NewUploader:
         FileValidationResponse,
     ] = default_filecontents_validation_handler
     check_quota_handler: Callable[
-        [Union[List[str], List[bytes]]], UploaderQuotaResponse
+        [FileValidationResponse], UploaderQuotaResponse
     ] = default_check_quota_handler
     check_status_handler: Callable[
         [TenantId, Authorization, UploaderId, Repository], UploaderStatusResponse

@@ -86,11 +86,15 @@ def test_adding_objects():
         config=config,
     )
 
+    def workerfunc(event):
+        pass
+
     rv_tools_uploader = NewUploader(
         name="RVTools",
         description="XLSX export from RVTools after scanning your Vmware infrastructure.",
         uploader_id="rv_tools",
         accepted_file_types=[".xlsx"],
+        worker=workerfunc,
         config=config,
     )
 
