@@ -481,7 +481,7 @@ def entities_validator(data):
 
 ```
 The `data_validator` needs to be a function which will `raise` an error if data is not as requested.
-
+You can use any schema package you want marshmallow, pydantic even your own custom assertion on data it just needs to raise an error if data is not as intended.
 
 Instantiate the repo with the mongo connection:
 ```py
@@ -576,30 +576,55 @@ For history to work we need some basic information (event from worker informatio
 
 Where the `history.log` decorator cannot be used you can create an instance of `History` class and call the following functions where needed:
 
+- `log_filename_validation` - if you are overwriting the default file names validation function;
+- `log_filecontent_validation` - - if you are overwriting the default file content validation function;
+- `log_success` - place it where function completed succesfully;
+- `log_failure` - place it where function failed to complete, an error occured;
+
+A basic example:
 
 ```py
+
+import traceback
+from settings import config
+from app.dependencies.db.mongo import get_mongo_db_connection
 from licenseware import History
 
-history = History(
-    tenant_id=str(uuid.uuid4()),
-    authorization=str(uuid.uuid4()),
-    event_id=str(uuid.uuid4()),
-    uploader_id="rv_tools",
-    app_id="ifmp-service",
-    repo=history_repo,
-)
 
+class ProcessingClass:
+    def __init__(self, tenant_id, authorization, event_id, uploader_id, app_id):
+        mongo_connection = get_mongo_db_connection(config)
+        
+        history_repo = MongoRepository(
+            mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+        )
+        self.history = History(
+            # etc fill needed params to History class
+        )
+
+
+    def some_processing_func(self, filepath: str):
+
+        try:
+            # processing stuff
+            self.history.log_success(
+                step="some_processing_func",
+                filepath="./somecsv.csv",
+                on_success_save=None,
+                func_source="app/some_package/some_module/some_processing_func",
+            )
+        except Exception as err:
+            self.history.log_failure(
+                step="some_processing_func",
+                filepath=filepath,
+                error_string=str(err),
+                traceback_string=str(traceback.format_exc()),
+                on_failure_save="Faled gathering data",
+                func_source="app/some_package/some_module/some_processing_func",
+            )
 
 ```
 
+As you can see this method is very verbose an ugly this is what `history.log` decorator does under the hood.
+I takes the required parameters and saves success and failures in encountered in a processing pipeline. 
 
-
-    response = history.log_filename_validation(
-        validation_response=[
-            {
-                "status": "success",
-                "filename": "okfile.csv",
-                "message": "file ok",
-            }
-        ]
-    )
