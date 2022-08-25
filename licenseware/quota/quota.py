@@ -2,16 +2,11 @@ import datetime
 import sys
 
 import dateutil.parser as dateparser
-from pymongo.database import Database
 
 from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.get_user_info import get_user_info
-
-
-def quota_validator(data):
-    return data
 
 
 def get_quota_reset_date(current_date: datetime.datetime = datetime.datetime.utcnow()):
@@ -25,30 +20,24 @@ class Quota:
         tenant_id: str,
         authorization: str,
         uploader_id: str,
-        default_units: int,
-        db_connection: Database,
+        free_units: int,
+        repo: MongoRepository,
         config: Config,
     ):
         self.tenant_id = tenant_id
         self.authorization = authorization
         self.uploader_id = uploader_id
         self.app_id = config.APP_ID
-        self.repo = MongoRepository(
-            db_connection,
-            collection=config.MONGO_COLLECTION.QUOTA,
-            data_validator=quota_validator,
-        )
+        self.repo = repo
 
         if config.CURRENT_ENVIRONMENT != config.ENVIRONMENTS.DESKTOP:
-            user_profile = get_user_info(tenant_id, authorization, config)
+            user_info = get_user_info(tenant_id, authorization, config)
         else:
-            user_profile = {"user_id": tenant_id, "plan_type": "UNLIMITED"}
+            user_info = {"user_id": tenant_id, "plan_type": "UNLIMITED"}
 
-        self.user_id = user_profile["user_id"]
+        self.user_id = user_info["user_id"]
         self.monthly_quota = (
-            sys.maxsize
-            if user_profile["plan_type"].upper() == "UNLIMITED"
-            else default_units
+            sys.maxsize if user_info["plan_type"].upper() == "UNLIMITED" else free_units
         )
 
         self.quota_filters = {

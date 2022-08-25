@@ -36,6 +36,7 @@ class NewUploader:
     uploader_id: str
     accepted_file_types: tuple
     worker: Callable[[WorkerEvent], None]
+    free_units: int = 1
     validation_parameters: UploaderValidationParameters = None
     encryption_parameters: UploaderEncryptionParameters = None
     flags: Tuple[str] = None

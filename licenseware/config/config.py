@@ -43,7 +43,7 @@ class WebAppFramework(BaseTypes):
 
 class Config(BaseSettings):
     APP_ID: str = "app"
-    USER_PROFILE_URL: str = None
+    USER_INFO_URL: str = None
     REGISTER_APP_URL: str = None
     REGISTER_UPLOADER_URL: str = None
     REGISTER_REPORT_URL: str = None

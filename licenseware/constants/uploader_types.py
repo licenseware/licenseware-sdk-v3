@@ -52,6 +52,9 @@ class UploaderQuotaResponse:
     monthly_quota: int
     monthly_quota_consumed: int
     quota_reset_date: str
+    app_id: str
+    user_id: str
+    uploader_id: str
 
     def dict(self):
         return asdict(self)  # pragma: no cover

@@ -1,8 +1,9 @@
 import uuid
+
 import pytest
 from pymongo import MongoClient
 
-from licenseware import Config, Quota, MongoRepository
+from licenseware import Config, MongoRepository, Quota
 from licenseware.config import config as cfg
 
 
