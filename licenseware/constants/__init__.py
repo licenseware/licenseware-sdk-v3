@@ -1,7 +1,7 @@
 from .allowed_filters import AllowedFilters
 from .attributes_type import AttributesType
 from .column_types import ColumnTypes
-from .file_types import FileTypes
+from .file_types import DownloadFileType, FileTypes
 from .filter_item_type import FilterItemType, FilterUI
 from .flags import Flags
 from .http import HTTP_METHODS, HTTP_STATUS_CODES

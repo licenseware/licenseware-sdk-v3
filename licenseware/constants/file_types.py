@@ -1,5 +1,6 @@
-# from .base_types import BaseTypes
 from dataclasses import dataclass
+
+from .base_types import BaseTypes
 
 
 @dataclass(frozen=True)
@@ -16,3 +17,9 @@ class FileTypes:
     TGZ: str = ".tgz"
     GENERIC_EXCEL: tuple = (XLS, XLSX)
     GENERIC_ARCHIVE: tuple = (ZIP, TAR, TAR_BZ2, TAR_GZ, TGZ)
+
+
+class DownloadFileType(BaseTypes):
+    JSON = "json"
+    XLSX = "xlsx"
+    CSV = "csv"

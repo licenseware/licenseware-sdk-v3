@@ -1,6 +1,5 @@
 from typing import NewType
 
-
 UploaderId = NewType("UploaderId", str)
 TenantId = NewType("TenantId", str)
 Authorization = NewType("Authorization", str)

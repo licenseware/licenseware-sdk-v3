@@ -1,7 +1,6 @@
 import pytest
-from licenseware import FilterUI, AllowedFilters
-from licenseware import get_mongo_query_from_filters
 
+from licenseware import AllowedFilters, FilterUI, get_mongo_query_from_filters
 
 # pytest -s -v tests/test_get_mongo_query_from_filters.py
 
