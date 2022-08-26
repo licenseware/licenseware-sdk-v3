@@ -1,6 +1,8 @@
 import traceback
 from functools import wraps
 
+from licenseware.constants.web_response import WebResponse
+
 from .logger import log
 
 
@@ -15,7 +17,10 @@ def failsafe(*dargs, fail_code=500):
                 return response
             except Exception as err:
                 log.error(traceback.format_exc())
-                return {"status": "failed", "message": str(err)[0:30]}, fail_code
+                return WebResponse(
+                    content={"status": "failed", "message": str(err)[0:50]},
+                    status_code=fail_code,
+                )
 
         return wrapper
 
