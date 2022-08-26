@@ -7,6 +7,7 @@ from licenseware.constants.uploader_types import (
     FileValidationResponse,
     ValidationResponse,
 )
+from licenseware.constants.web_response import WebResponse
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.file_upload_handler import FileUploadHandler
 
@@ -16,7 +17,7 @@ from .helpers import get_error_message, get_failed_validations, get_filenames_re
 def default_filecontents_validation_handler(
     files: Union[List[bytes], List[str]],
     validation_parameters: UploaderValidationParameters,
-) -> FileValidationResponse:
+) -> WebResponse:
 
     if not isinstance(
         validation_parameters, UploaderValidationParameters
@@ -64,4 +65,4 @@ def default_filecontents_validation_handler(
         validation=tuple(validation_response),
     )
 
-    return file_response
+    return WebResponse(content=file_response, status_code=200)

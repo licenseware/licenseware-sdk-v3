@@ -6,6 +6,7 @@ TenantId = NewType("TenantId", str)
 Authorization = NewType("Authorization", str)
 Repository = NewType("MongoRepository", str)
 Status = NewType("Status", str)
+FreeUnits = NewType("Status", int)
 
 
 @dataclass

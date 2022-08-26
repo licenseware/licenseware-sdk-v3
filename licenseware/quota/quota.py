@@ -5,6 +5,8 @@ import dateutil.parser as dateparser
 
 from licenseware.config.config import Config
 from licenseware.constants.states import States
+from licenseware.constants.uploader_types import UploaderQuotaResponse
+from licenseware.constants.web_response import WebResponse
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.get_user_info import get_user_info
 
@@ -29,6 +31,8 @@ class Quota:
         self.uploader_id = uploader_id
         self.app_id = config.APP_ID
         self.repo = repo
+        # bypass data validation - this is not data from the user
+        repo.data_validator = lambda data: data
 
         if config.CURRENT_ENVIRONMENT != config.ENVIRONMENTS.DESKTOP:
             user_info = get_user_info(tenant_id, authorization, config)
@@ -55,11 +59,16 @@ class Quota:
 
         if utilization_data:
             utilization_data.pop("_id")
-            return {
-                "status": States.SUCCESS,
-                "message": "Quota already initialized",
-                **utilization_data,
-            }, 200
+            return WebResponse(
+                content=UploaderQuotaResponse(
+                    **{
+                        "status": States.SUCCESS,
+                        "message": "Quota already initialized",
+                        **utilization_data,
+                    }
+                ),
+                status_code=200,
+            )
 
         utilization_data = {
             "app_id": self.app_id,
@@ -71,31 +80,41 @@ class Quota:
         }
 
         self.repo.insert_one(data=utilization_data)
+        utilization_data.pop("_id")
 
-        return {
-            "status": States.SUCCESS,
-            "message": "Quota initialized",
-            **utilization_data,
-        }, 200
+        return WebResponse(
+            content=UploaderQuotaResponse(
+                **{
+                    "status": States.SUCCESS,
+                    "message": "Quota initialized",
+                    **utilization_data,
+                }
+            ),
+            status_code=200,
+        )
 
     def update(self, units: int):
 
-        resp, status = self.check(units)
-        if status == 402:
-            return resp, status
+        check_response = self.check(units)
+        if check_response.status_code == 402:
+            return check_response
 
         current_quota = self.repo.find_one(filters=self.quota_filters)
-        current_quota.pop("_id")
         current_quota = self.repo.update_one(
             filters=self.quota_filters,
             data={"$inc": {"monthly_quota_consumed": units}},
         )
-
-        return {
-            "status": States.SUCCESS,
-            "message": "Quota updated",
-            **current_quota,
-        }, 200
+        current_quota.pop("_id")
+        return WebResponse(
+            content=UploaderQuotaResponse(
+                **{
+                    "status": States.SUCCESS,
+                    "message": "Quota initialized",
+                    **current_quota,
+                }
+            ),
+            status_code=200,
+        )
 
     def reset(self):
         return self.repo.update_one(
@@ -109,7 +128,6 @@ class Quota:
     def check(self, units: int = 0):
 
         current_quota = self.repo.find_one(filters=self.quota_filters)
-        current_quota.pop("_id")
         current_date = datetime.datetime.utcnow()
         quota_consumed = current_quota["monthly_quota_consumed"]
         reset_date = dateparser.parse(current_quota["quota_reset_date"])
@@ -118,16 +136,27 @@ class Quota:
             current_quota = self.reset()
 
         quota_within_limits = quota_consumed + units <= current_quota["monthly_quota"]
+        current_quota.pop("_id")
 
         if not quota_within_limits:
-            return {
-                "status": States.FAILED,
-                "message": "Monthly quota exceeded",
-                **current_quota,
-            }, 402
+            return WebResponse(
+                content=UploaderQuotaResponse(
+                    **{
+                        "status": States.FAILED,
+                        "message": "Monthly quota exceeded",
+                        **current_quota,
+                    }
+                ),
+                status_code=402,
+            )
 
-        return {
-            "status": States.SUCCESS,
-            "message": "Utilization within monthly quota",
-            **current_quota,
-        }, 200
+        return WebResponse(
+            content=UploaderQuotaResponse(
+                **{
+                    "status": States.SUCCESS,
+                    "message": "Utilization within monthly quota",
+                    **current_quota,
+                }
+            ),
+            status_code=200,
+        )

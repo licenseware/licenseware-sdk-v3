@@ -6,6 +6,7 @@ from licenseware.constants.uploader_types import (
     FileValidationResponse,
     ValidationResponse,
 )
+from licenseware.constants.web_response import WebResponse
 from licenseware.uploader.default_handlers.validators import (
     validate_required_input_type,
     validate_text_contains_any,
@@ -29,8 +30,10 @@ def _get_error_message(
 
 
 def default_filenames_validation_handler(
-    filenames: List[str], validation_parameters: UploaderValidationParameters
-) -> FileValidationResponse:
+    filenames: List[str],
+    validation_parameters: UploaderValidationParameters,
+    web_response: bool = True,
+) -> WebResponse:
 
     validation_response = []
 
@@ -95,4 +98,7 @@ def default_filenames_validation_handler(
         validation=tuple(validation_response),
     )
 
-    return filename_response
+    if not web_response:
+        return filename_response
+
+    return WebResponse(content=filename_response, status_code=200)

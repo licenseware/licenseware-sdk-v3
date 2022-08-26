@@ -8,6 +8,7 @@ from licenseware.constants.states import States
 from licenseware.constants.uploader_types import (
     Authorization,
     FileValidationResponse,
+    FreeUnits,
     Repository,
     Status,
     TenantId,
@@ -15,6 +16,7 @@ from licenseware.constants.uploader_types import (
     UploaderQuotaResponse,
     UploaderStatusResponse,
 )
+from licenseware.constants.web_response import WebResponse
 from licenseware.constants.worker_event_type import WorkerEvent
 from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
@@ -42,17 +44,26 @@ class NewUploader:
     flags: Tuple[str] = None
     icon: str = None
     filenames_validation_handler: Callable[
-        [List[str], UploaderValidationParameters], FileValidationResponse
+        [List[str], UploaderValidationParameters], WebResponse
     ] = default_filenames_validation_handler
     filecontents_validation_handler: Callable[
         [Union[List[str], List[bytes]], UploaderValidationParameters],
-        FileValidationResponse,
+        WebResponse,
     ] = default_filecontents_validation_handler
     check_quota_handler: Callable[
-        [FileValidationResponse], UploaderQuotaResponse
+        [
+            TenantId,
+            Authorization,
+            UploaderId,
+            FreeUnits,
+            FileValidationResponse,
+            Repository,
+            Config,
+        ],
+        WebResponse,
     ] = default_check_quota_handler
     check_status_handler: Callable[
-        [TenantId, Authorization, UploaderId, Repository], UploaderStatusResponse
+        [TenantId, Authorization, UploaderId, Repository], WebResponse
     ] = default_check_status_handler
     update_status_handler: Callable[
         [TenantId, Authorization, UploaderId, Status, Repository],

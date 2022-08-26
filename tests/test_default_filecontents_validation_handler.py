@@ -322,6 +322,6 @@ def test_default_filecontents_validation_handler():
         files, rv_tools_validation_parameters
     )
 
-    for res in response.validation:
+    for res in response.content.validation:
         # print(res.status, res.message)
         assert res.status == "success"

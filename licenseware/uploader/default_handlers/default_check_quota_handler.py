@@ -1,4 +1,6 @@
 from licenseware.config.config import Config
+from licenseware.constants.states import States
+from licenseware.constants.uploader_types import FileValidationResponse
 from licenseware.quota.quota import Quota
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 
@@ -8,6 +10,7 @@ def default_check_quota_handler(
     authorization: str,
     uploader_id: str,
     free_units: int,
+    validation_response: FileValidationResponse,
     repo: MongoRepository,
     config: Config,
 ):
@@ -21,4 +24,12 @@ def default_check_quota_handler(
         config=config,
     )
 
-    return quota.check()
+    if validation_response is None:
+        return quota.check(units=0)
+
+    nbr_of_files = 0
+    for file in validation_response.validation:
+        if file.status == States.SUCCESS:
+            nbr_of_files += 1
+
+    return quota.check(units=nbr_of_files)

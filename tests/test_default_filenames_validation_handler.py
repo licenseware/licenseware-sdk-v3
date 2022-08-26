@@ -20,7 +20,7 @@ def test_default_filenames_validation_handler():
         filenames, rv_tools_validation_parameters
     )
 
-    for r in res.validation:
+    for r in res.content.validation:
 
         if r.filename == "cpuq.xlsx":
             assert (

@@ -283,7 +283,9 @@ def get_filenames_response(
 ):
 
     filename_validation_response = default_filenames_validation_handler(
-        [FileUploadHandler(f).filename for f in files], validation_parameters
+        [FileUploadHandler(f).filename for f in files],
+        validation_parameters,
+        web_response=False,
     )
 
     for res in filename_validation_response.validation:
