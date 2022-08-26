@@ -31,8 +31,6 @@ class Quota:
         self.uploader_id = uploader_id
         self.app_id = config.APP_ID
         self.repo = repo
-        # bypass data validation - this is not data from the user
-        repo.data_validator = lambda data: data
 
         if config.CURRENT_ENVIRONMENT != config.ENVIRONMENTS.DESKTOP:
             user_info = get_user_info(tenant_id, authorization, config)

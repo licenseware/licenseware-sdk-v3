@@ -28,9 +28,14 @@ class MongoRepository(RepositoryInterface):
         return data
 
     def _setids(self, cursor: Cursor):
-        return [
-            {**doc, **{"_id": utils.get_object_id_str(doc["_id"])}} for doc in cursor
-        ]
+
+        getid = (
+            lambda doc: {"_id": utils.get_object_id_str(doc["_id"])}
+            if "_id" in doc
+            else {}
+        )
+
+        return [{**doc, **getid(doc)} for doc in cursor]
 
     def _get_collection(self, collection: str) -> Collection:
         collection = collection or self.collection
@@ -39,6 +44,9 @@ class MongoRepository(RepositoryInterface):
         return col
 
     def _get_validated_data(self, data, data_validator: Callable):
+
+        if data_validator == "ignore" or self.data_validator == "ignore":
+            return data
 
         if data_validator is None and self.data_validator is None:
             log.warning("Attention! No data validator function provided!")

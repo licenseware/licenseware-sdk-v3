@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from typing import Callable, NewType, Union
+from typing import Callable, NewType
 
 import requests
 
 from licenseware.config.config import Config
 from licenseware.constants.attributes_type import AttributesType
 from licenseware.constants.states import States
+from licenseware.constants.web_response import WebResponse
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
 
@@ -33,8 +34,10 @@ class NewReportComponent:
             Limit,
             Skip,
         ],
-        Union[list, dict],
+        WebResponse,
     ]
+    component_type: str = None
+    description: str = None
     order: int = None
     filters: ReportFilter = None
     config: Config = None
@@ -54,7 +57,15 @@ class NewReportComponent:
         appid = get_altered_strings(self.app_id).dash
         compid = get_altered_strings(self.component_id).dash
 
-        self.component_type = self.attributes.component_type
+        if self.component_type is None:
+            self.component_type = self.attributes.component_type
+
+        if hasattr(self.attributes, "metadata"):
+            self.attributes = self.attributes.metadata
+
+        if hasattr(self.style_attributes, "metadata"):
+            self.style_attributes = self.style_attributes.metadata
+
         self.url = f"/{appid}/report-components/{compid}"
         self.public_url = f"/{appid}/report-components/{compid}/public"
         self.snapshot_url = f"/{appid}/report-components/{compid}/snapshot"
@@ -67,12 +78,13 @@ class NewReportComponent:
                 {
                     "app_id": self.app_id,
                     "component_id": self.component_id,
+                    "description": self.description,
                     "url": self.url,
                     "public_url": self.public_url,
                     "snapshot_url": self.snapshot_url,
                     "order": self.order,
-                    "style_attributes": self.style_attributes.metadata,
-                    "attributes": self.attributes.metadata,
+                    "style_attributes": self.style_attributes,
+                    "attributes": self.attributes,
                     "title": self.title,
                     "type": self.component_type,
                     "filters": self.filters,
