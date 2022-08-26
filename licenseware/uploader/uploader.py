@@ -4,16 +4,10 @@ from typing import Callable, List, Tuple, Union
 import requests
 
 from licenseware.config.config import Config
+from licenseware.constants import alias_types as alias
 from licenseware.constants.states import States
 from licenseware.constants.uploader_types import (
-    Authorization,
     FileValidationResponse,
-    FreeUnits,
-    Repository,
-    Status,
-    TenantId,
-    UploaderId,
-    UploaderQuotaResponse,
     UploaderStatusResponse,
 )
 from licenseware.constants.web_response import WebResponse
@@ -52,21 +46,28 @@ class NewUploader:
     ] = default_filecontents_validation_handler
     check_quota_handler: Callable[
         [
-            TenantId,
-            Authorization,
-            UploaderId,
-            FreeUnits,
+            alias.TenantId,
+            alias.Authorization,
+            alias.UploaderId,
+            alias.FreeUnits,
             FileValidationResponse,
-            Repository,
+            alias.Repository,
             Config,
         ],
         WebResponse,
     ] = default_check_quota_handler
     check_status_handler: Callable[
-        [TenantId, Authorization, UploaderId, Repository], WebResponse
+        [alias.TenantId, alias.Authorization, alias.UploaderId, alias.Repository],
+        WebResponse,
     ] = default_check_status_handler
     update_status_handler: Callable[
-        [TenantId, Authorization, UploaderId, Status, Repository],
+        [
+            alias.TenantId,
+            alias.Authorization,
+            alias.UploaderId,
+            alias.Status,
+            alias.Repository,
+        ],
         UploaderStatusResponse,
     ] = default_update_status_handler
     config: Config = None

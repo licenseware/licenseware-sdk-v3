@@ -1,6 +1,6 @@
 from typing import List
-from licenseware.constants.filter_item_type import FilterUI
 
+from licenseware.constants.filter_item_type import FilterUI
 
 condition_switcher = {
     "equals": lambda column, filter_value: {column: filter_value},

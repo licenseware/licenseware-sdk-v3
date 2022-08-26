@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from typing import Callable, NewType
+from typing import Callable
 
 import requests
 
 from licenseware.config.config import Config
+from licenseware.constants import alias_types as alias
 from licenseware.constants.attributes_type import AttributesType
 from licenseware.constants.states import States
 from licenseware.constants.web_response import WebResponse
@@ -12,12 +13,6 @@ from licenseware.utils.logger import log
 
 from .report_filter import ReportFilter
 from .style_attributes import StyleAttrs
-
-TenantId = NewType("tenant_id", str)
-Authorization = NewType("authorization", str)
-Filters = NewType("filters", str)
-Limit = NewType("limit", int)
-Skip = NewType("skip", int)
 
 
 @dataclass
@@ -28,11 +23,12 @@ class NewReportComponent:
     style_attributes: StyleAttrs
     get_component_data_handler: Callable[
         [
-            TenantId,
-            Authorization,
-            Filters,
-            Limit,
-            Skip,
+            alias.TenantId,
+            alias.Authorization,
+            alias.Repository,
+            alias.Filters,
+            alias.Limit,
+            alias.Skip,
         ],
         WebResponse,
     ]
