@@ -1,14 +1,20 @@
+import datetime
+
+import dateutil.parser as dateparser
 import jwt
 import requests
-import datetime
-import dateutil.parser as dateparser
+
 from licenseware.config.config import Config
 from licenseware.utils.logger import log
 
 
 class ReportPublicToken:
     def __init__(
-        self, tenant_id: str, authorization: str, report_id: str, config: Config
+        self,
+        tenant_id: str = None,
+        authorization: str = None,
+        report_id: str = None,
+        config: Config = None,
     ):
         self.tenant_id = tenant_id
         self.authorization = authorization

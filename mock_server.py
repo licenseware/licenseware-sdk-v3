@@ -1,9 +1,8 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 from pydantic import BaseModel
-from licenseware import MongoRepository
-
 from pymongo import MongoClient
 
+from licenseware import MongoRepository
 from licenseware.config import Config
 
 

@@ -4,7 +4,7 @@ openpyxl~=3.0
 pandas~=1.2
 pymongo==4.2.0
 marshmallow==3.17.0
-PyJWT!=2.4
+PyJWT~=2.4
 # Development
 pytest<7
 coverage<7

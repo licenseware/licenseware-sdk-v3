@@ -1,6 +1,8 @@
 import uuid
+
 import pytest
-from licenseware import ReportPublicToken, Config
+
+from licenseware import Config, ReportPublicToken
 
 # pytest -s -v tests/test_report_public_token.py
 

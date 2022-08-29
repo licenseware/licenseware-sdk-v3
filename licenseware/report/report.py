@@ -57,8 +57,8 @@ class NewReport:
 
         self.report_components: Dict[str, NewReportComponent] = dict()
         self.url = f"/{ns}/reports/{reportid}"
-        self.public_url = f"/{ns}/reports/{reportid}/public"
-        self.snapshot_url = f"/{ns}/reports/{reportid}/snapshot"
+        self.public_url = f"/{ns}/reports/public/{reportid}"
+        self.snapshot_url = f"/{ns}/reports/snapshot/{reportid}"
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
 
     def _get_component_by_id(self, component_id: str):
