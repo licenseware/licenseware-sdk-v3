@@ -19,7 +19,7 @@ condition_switcher = {
 
 def get_mongo_query_from_filters(filter_payload: List[FilterUI]) -> dict:
 
-    if filter_payload is None:
+    if filter_payload is None:  # pragma no cover
         return {}
 
     parsed_filter = {}

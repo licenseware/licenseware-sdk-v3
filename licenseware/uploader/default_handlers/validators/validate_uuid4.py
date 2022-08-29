@@ -4,7 +4,7 @@ from uuid import UUID
 from marshmallow import ValidationError
 
 
-def _valid_uuid(value):
+def _valid_uuid(value):  # pragma no cover
     try:
         if not value:
             return True
@@ -19,6 +19,6 @@ def _valid_uuid(value):
         return False
 
 
-def validate_uuid4(value):
+def validate_uuid4(value):  # pragma no cover
     if not _valid_uuid(value):
         raise ValidationError("Not a valid uuid4 string")
