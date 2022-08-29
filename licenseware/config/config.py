@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseSettings
 
 from licenseware.constants.base_types import BaseTypes
@@ -43,7 +45,10 @@ class WebAppFramework(BaseTypes):
 
 class Config(BaseSettings):
     APP_ID: str = "app"
+    APP_SECRET: str = str(uuid.uuid4())
     USER_INFO_URL: str = None
+    PUBLIC_TOKEN_REPORT_URL: str = None
+    FRONTEND_URL: str = None
     REGISTER_APP_URL: str = None
     REGISTER_UPLOADER_URL: str = None
     REGISTER_REPORT_URL: str = None

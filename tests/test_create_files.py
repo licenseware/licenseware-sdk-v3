@@ -1,11 +1,14 @@
+import os
+import shutil
+
 import pytest
-import os, shutil
+
 from licenseware import (
-    create_xlsx_file,
-    create_json_file,
+    Config,
     create_csv_file,
     create_file,
-    Config,
+    create_json_file,
+    create_xlsx_file,
 )
 
 # pytest -s -v tests/test_create_files.py

@@ -11,4 +11,5 @@ from .attributes_table import TableAttrs
 from .report import NewReport
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
+from .report_public_token import ReportPublicToken
 from .style_attributes import StyleAttrs
