@@ -63,8 +63,8 @@ class NewReportComponent:
             self.style_attributes = self.style_attributes.metadata
 
         self.url = f"/{appid}/report-components/{compid}"
-        self.public_url = f"/{appid}/report-components/{compid}/public"
-        self.snapshot_url = f"/{appid}/report-components/{compid}/snapshot"
+        self.public_url = f"/{appid}/public-report-components/{compid}"
+        self.snapshot_url = f"/{appid}/snapshot-report-components/{compid}"
 
     @property
     def metadata(self):

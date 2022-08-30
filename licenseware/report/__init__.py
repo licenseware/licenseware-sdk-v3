@@ -12,4 +12,5 @@ from .report import NewReport
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
 from .report_public_token import ReportPublicToken
+from .report_snapshot import ReportSnapshot
 from .style_attributes import StyleAttrs

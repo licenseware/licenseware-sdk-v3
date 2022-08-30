@@ -1,15 +1,16 @@
-import uuid
-import string
 import random
+import string
+import uuid
 from datetime import datetime
-from bson.objectid import ObjectId
-from .report import NewReport, NewReportComponent
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from typing import List
+
+from bson.objectid import ObjectId
+
+from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.utils.mongo_limit_skip_filters import insert_mongo_limit_skip_filters
 from licenseware.utils.mongo_query_from_filters import get_mongo_query_from_filters
-from licenseware.utils.mongo_limit_skip_filters import (
-    insert_mongo_limit_skip_filters,
-)
+
+from .report import NewReport, NewReportComponent
 
 
 def shortid(length=6):
@@ -24,12 +25,12 @@ class ReportSnapshot:
         tenant_id: str,
         authorization: str,
         report: NewReport,
-        version: str,
-        filters: List[dict],
-        payload: List[dict],
-        limit: int,
-        skip: int,
         repo: MongoRepository,
+        version: str = None,
+        filters: List[dict] = None,
+        payload: List[dict] = None,
+        limit: int = None,
+        skip: int = None,
     ):
         self.report = report
         self.filters = filters
@@ -131,7 +132,7 @@ class ReportSnapshot:
                 continue
             ids_to_delete.append(ObjectId(d["_id"]))
 
-        deleted_docs = self.repo.delete_one(
+        deleted_docs = self.repo.delete_many(
             filters={
                 "_id": {"$in": ids_to_delete},
                 "tenant_id": self.tenant_id,
@@ -148,7 +149,7 @@ class ReportSnapshot:
                 continue
             versions_to_delete.append(d["version"])
 
-        deleted_docs = self.repo.delete_one(
+        deleted_docs = self.repo.delete_many(
             filters={
                 "version": {"$in": versions_to_delete},
                 "tenant_id": self.tenant_id,
@@ -165,7 +166,7 @@ class ReportSnapshot:
                 continue
             component_uuids_to_delete.append(d["component_uuid"])
 
-        deleted_docs = self.repo.delete_one(
+        deleted_docs = self.repo.delete_many(
             filters={
                 "component_uuid": {"$in": component_uuids_to_delete},
                 "tenant_id": self.tenant_id,
@@ -182,14 +183,14 @@ class ReportSnapshot:
                 continue
             report_uuids_to_delete.append(d["report_uuid"])
 
-        d1 = self.repo.delete_one(
+        d1 = self.repo.delete_many(
             filters={
                 "report_uuid": {"$in": report_uuids_to_delete},
                 "tenant_id": self.tenant_id,
             }
         )
 
-        d2 = self.repo.delete_one(
+        d2 = self.repo.delete_many(
             filters={
                 "for_report_uuid": {"$in": report_uuids_to_delete},
                 "tenant_id": self.tenant_id,
@@ -211,7 +212,7 @@ class ReportSnapshot:
 
     def insert_report_metadata(self):
 
-        report_metadata, _ = self.report.metadata["data"]
+        report_metadata = self.report.metadata["data"][0]
         report_metadata["report_components"] = []
         report_metadata["tenant_id"] = self.tenant_id
         report_metadata["version"] = self.version
@@ -226,7 +227,7 @@ class ReportSnapshot:
 
     def update_report_component_metadata(self, comp: NewReportComponent):
 
-        comp_payload = comp.metadata["data"]
+        comp_payload = comp.metadata["data"][0]
         query_params = f"?version={self.version}&component_id={comp.component_id}"
         comp_payload["snapshot_url"] = self.report.snapshot_url + query_params
 
@@ -286,4 +287,4 @@ class ReportSnapshot:
             if comp.component_id not in inserted_components:
                 inserted_components.add(comp.component_id)
 
-        return {"version": self.version}
+        return self.version
