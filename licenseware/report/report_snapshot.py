@@ -6,6 +6,7 @@ from typing import List
 
 from bson.objectid import ObjectId
 
+from licenseware.config.config import Config
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.mongo_limit_skip_filters import insert_mongo_limit_skip_filters
 from licenseware.utils.mongo_query_from_filters import get_mongo_query_from_filters
@@ -24,9 +25,10 @@ class ReportSnapshot:
         self,
         tenant_id: str,
         authorization: str,
-        report: NewReport,
         repo: MongoRepository,
+        config: Config,
         version: str = None,
+        report: NewReport = None,
         filters: List[dict] = None,
         payload: List[dict] = None,
         limit: int = None,
@@ -37,17 +39,35 @@ class ReportSnapshot:
         self.authorization = authorization
         self.limit = limit
         self.skip = skip
+        self.config = config
         self.payload = payload
         self.tenant_id = tenant_id
-        self.report_id = self.report.report_id
+        self.report_id = self.report.report_id if report is not None else None
         self.report_uuid = str(uuid.uuid4())
         self.version = version or shortid()
         self.snapshot_date = datetime.utcnow().isoformat()
         self.repo = repo
+        self.data_repo = MongoRepository(
+            repo.db_connection, collection=config.MONGO_COLLECTION.DATA
+        )
 
-    def get_snapshot_version(self):
-        snapshot = self.generate_snapshot()
-        return f"Created snapshot version `{snapshot['version']}`"
+    def generate_snapshot(self):
+
+        report_metadata = self.insert_report_metadata()
+
+        inserted_components = set()
+        for comp in self.report.components:
+
+            if comp.component_id in inserted_components:
+                continue
+
+            self.update_report_component_metadata(comp)
+            self.insert_component_data(comp, report_metadata)
+
+            if comp.component_id not in inserted_components:
+                inserted_components.add(comp.component_id)
+
+        return {"version": self.version}
 
     def get_available_versions(self):
 
@@ -57,7 +77,7 @@ class ReportSnapshot:
             {"$project": {"_id": 0, "versions": "$versions"}},
         ]
         results = self.repo.execute_query(pipeline)
-        return results[0] if len(results) == 1 else results
+        return results[0] if len(results) == 1 else {"versions": []}
 
     def get_snapshot_metadata(self):
 
@@ -71,7 +91,7 @@ class ReportSnapshot:
         )
         return results
 
-    def get_snapshot_component(self):
+    def get_snapshot_component(self, component_id: str):
 
         match_filters = get_mongo_query_from_filters(self.filters)
 
@@ -81,8 +101,7 @@ class ReportSnapshot:
                     **match_filters,
                     **{
                         "tenant_id": self.tenant_id,
-                        "report_id": self.report_id,
-                        "component_id": self.request.args.get("component_id"),
+                        "component_id": component_id,
                         "version": self.version,
                         "for_report_uuid": {"$exists": True},
                     },
@@ -109,106 +128,127 @@ class ReportSnapshot:
 
         raise Exception("Didn't found any match on field `_id` on this `tenant_id`")
 
-    def _id_belongs_to_report(self, _id: str):
-
-        results = self.repo.count(
-            filters={
-                "_id": _id,
-                "tenant_id": self.tenant_id,
-                "report_uuid": {"$exists": True},
-            }
-        )
-
-        return bool(results)
-
-    def _delete_by_ids(self):
-
-        ids_to_delete = []
-        for d in self.payload:
-            if not d.get("_id"):
-                continue
-            # we can't delete report metadata and leave it's components hanging
-            if self._id_belongs_to_report(d["_id"]):
-                continue
-            ids_to_delete.append(ObjectId(d["_id"]))
+    def _delete_by_version(self):
 
         deleted_docs = self.repo.delete_many(
             filters={
-                "_id": {"$in": ids_to_delete},
+                "version": self.version,
                 "tenant_id": self.tenant_id,
             }
         )
 
         return deleted_docs
 
-    def _delete_by_versions(self):
+    # def _delete_by_versions(self):
 
-        versions_to_delete = []
-        for d in self.payload:
-            if not d.get("version"):
-                continue
-            versions_to_delete.append(d["version"])
+    #     versions_to_delete = []
+    #     for d in self.payload:
+    #         if not d.get("version"):
+    #             continue
+    #         versions_to_delete.append(d["version"])
 
-        deleted_docs = self.repo.delete_many(
-            filters={
-                "version": {"$in": versions_to_delete},
-                "tenant_id": self.tenant_id,
-            }
-        )
+    #     deleted_docs = self.repo.delete_many(
+    #         filters={
+    #             "version": {"$in": versions_to_delete},
+    #             "tenant_id": self.tenant_id,
+    #         }
+    #     )
 
-        return deleted_docs
+    #     return deleted_docs
 
-    def _delete_by_component_uuids(self):
+    # def _id_belongs_to_report(self, _id: str):
 
-        component_uuids_to_delete = []
-        for d in self.payload:
-            if not d.get("component_uuid"):
-                continue
-            component_uuids_to_delete.append(d["component_uuid"])
+    #     results = self.repo.count(
+    #         filters={
+    #             "_id": _id,
+    #             "tenant_id": self.tenant_id,
+    #             "report_uuid": {"$exists": True},
+    #         }
+    #     )
 
-        deleted_docs = self.repo.delete_many(
-            filters={
-                "component_uuid": {"$in": component_uuids_to_delete},
-                "tenant_id": self.tenant_id,
-            }
-        )
+    #     return bool(results)
 
-        return deleted_docs
+    # def _delete_by_ids(self):
 
-    def _delete_by_report_uuids(self):
+    #     if self.payload is None:
+    #         return 0
 
-        report_uuids_to_delete = []
-        for d in self.payload:
-            if not d.get("report_uuid"):
-                continue
-            report_uuids_to_delete.append(d["report_uuid"])
+    #     ids_to_delete = []
+    #     for d in self.payload:
+    #         if not d.get("_id"):
+    #             continue
+    #         # we can't delete report metadata and leave it's components hanging
+    #         if self._id_belongs_to_report(d["_id"]):
+    #             continue
+    #         ids_to_delete.append(ObjectId(d["_id"]))
 
-        d1 = self.repo.delete_many(
-            filters={
-                "report_uuid": {"$in": report_uuids_to_delete},
-                "tenant_id": self.tenant_id,
-            }
-        )
+    #     deleted_docs = self.repo.delete_many(
+    #         filters={
+    #             "_id": {"$in": ids_to_delete},
+    #             "tenant_id": self.tenant_id,
+    #         }
+    #     )
 
-        d2 = self.repo.delete_many(
-            filters={
-                "for_report_uuid": {"$in": report_uuids_to_delete},
-                "tenant_id": self.tenant_id,
-            }
-        )
+    #     return deleted_docs
 
-        deleted_docs = d1 + d2
+    # def _delete_by_component_uuids(self):
 
-        return deleted_docs
+    #     if self.payload is None:
+    #         return 0
 
-    def delete_snapshot(self):
+    #     component_uuids_to_delete = []
+    #     for d in self.payload:
+    #         if not d.get("component_uuid"):
+    #             continue
+    #         component_uuids_to_delete.append(d["component_uuid"])
 
-        self._delete_by_ids()
-        self._delete_by_versions()
-        self._delete_by_component_uuids()
-        self._delete_by_report_uuids()
+    #     deleted_docs = self.repo.delete_many(
+    #         filters={
+    #             "component_uuid": {"$in": component_uuids_to_delete},
+    #             "tenant_id": self.tenant_id,
+    #         }
+    #     )
 
-        return "Requested items were deleted"
+    #     return deleted_docs
+
+    # def _delete_by_report_uuids(self):
+
+    #     if self.payload is None:
+    #         return 0
+
+    #     report_uuids_to_delete = []
+    #     for d in self.payload:
+    #         if not d.get("report_uuid"):
+    #             continue
+    #         report_uuids_to_delete.append(d["report_uuid"])
+
+    #     d1 = self.repo.delete_many(
+    #         filters={
+    #             "report_uuid": {"$in": report_uuids_to_delete},
+    #             "tenant_id": self.tenant_id,
+    #         }
+    #     )
+
+    #     d2 = self.repo.delete_many(
+    #         filters={
+    #             "for_report_uuid": {"$in": report_uuids_to_delete},
+    #             "tenant_id": self.tenant_id,
+    #         }
+    #     )
+
+    #     deleted_docs = d1 + d2
+
+    #     return deleted_docs
+
+    # def delete_snapshot(self):
+    # self._delete_by_ids()
+    # self._delete_by_versions()
+    # self._delete_by_component_uuids()
+    # self._delete_by_report_uuids()
+
+    def delete_snapshot_version(self):
+        self._delete_by_version()
+        return {"message": f"Report snapshot version '{self.version}' was deleted"}
 
     def insert_report_metadata(self):
 
@@ -228,8 +268,7 @@ class ReportSnapshot:
     def update_report_component_metadata(self, comp: NewReportComponent):
 
         comp_payload = comp.metadata["data"][0]
-        query_params = f"?version={self.version}&component_id={comp.component_id}"
-        comp_payload["snapshot_url"] = self.report.snapshot_url + query_params
+        comp_payload["snapshot_url"] = comp.snapshot_url + f"/{self.version}"
 
         self.repo.update_one(
             filters={
@@ -248,7 +287,7 @@ class ReportSnapshot:
         component_data = comp.get_component_data_handler(
             self.tenant_id,
             self.authorization,
-            self.repo,
+            self.data_repo,
             self.filters,
             self.limit,
             self.skip,
@@ -270,21 +309,3 @@ class ReportSnapshot:
         elif isinstance(component_data, dict) and len(component_data) > 0:
             component_data = {**component_data, **component_pinned}
             self.repo.insert_one(data=component_data)
-
-    def generate_snapshot(self):
-
-        report_metadata = self.insert_report_metadata()
-
-        inserted_components = set()
-        for comp in self.report.components:
-
-            if comp.component_id in inserted_components:
-                continue
-
-            self.update_report_component_metadata(comp)
-            self.insert_component_data(comp, report_metadata)
-
-            if comp.component_id not in inserted_components:
-                inserted_components.add(comp.component_id)
-
-        return self.version

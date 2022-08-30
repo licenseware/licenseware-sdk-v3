@@ -1,7 +1,7 @@
 import pytest
-import uuid
 from pymongo import MongoClient
-from licenseware import ReportSnapshot, MongoRepository, Config
+
+from licenseware import Config, MongoRepository, ReportSnapshot
 
 # pytest -s -v tests/test_report_snaphot.py
 
@@ -17,7 +17,7 @@ def mongo_connection():
 
 def test_report_snaphot(mongo_connection):
 
-    config = Config()
+    Config()
 
     # rs = ReportSnapshot(
     #     tenant_id=str(uuid.uuid4()),
