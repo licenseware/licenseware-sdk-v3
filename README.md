@@ -200,6 +200,22 @@ This `rv_tools_uploader` instance will make available the following needed metho
 - `register` - method which will send uploader's metadata to discovery/registry-service;
 
 
+Each uploader created needs to be `registered`in the `uploaders/__init__.py` file:
+
+```py
+from settings import config
+from licenseware import RegisteredUploaders
+
+from .rv_tools.uploader import rv_tools_uploader
+
+uploaders = [rv_tools_uploader]
+
+
+registered_uploaders = RegisteredUploaders(uploaders, config)
+
+```
+
+The `registered_uploaders` will be imported on app startup in the `app/api/defaults/uploader_router.py` and will be used to auto generate api routes for each uploader.
 
 
 # Reports
@@ -294,10 +310,27 @@ This report instance provides the following objects for use:
 - `metadata` - property which contains the json payload for registry service;
 
 
-- Declaring a new report component
+Each report created needs to be `registered`in the `reports/__init__.py` file:
+
+```py
+from settings import config
+from licenseware import RegisteredReports
+
+from .device_details.report import devices_overview_report
+
+reports = [devices_overview_report]
+
+
+registered_reports = RegisteredReports(reports, config)
+
+```
+
+The `registered_reports` will be imported on app startup in the `app/api/defaults/*_report_router.py` and will be used to auto generate api routes for each report.
+
+
+# Report Components 
 
 A report can contain one or more report components. Here we declare a `summary` report component type.
-
 
 - Declaring report component attributes
 
@@ -361,6 +394,27 @@ Now that we have declared report component attributes, style attributes and the 
 fmw_deployment_report.attach(fmw_summary_component)
 
 ```
+
+
+Each report component created needs to be `registered`in the `report_components/__init__.py` file:
+
+```py
+from settings import config
+from licenseware import RegisteredComponents
+
+from .all_devices.component import all_devices_component
+
+report_components = [all_devices_component]
+
+
+registered_components = RegisteredComponents(report_components, config)
+
+```
+
+
+The `registered_components` will be imported on app startup in the `app/api/defaults/*_report_component_router.py` and will be used to auto generate api routes for each report component.
+
+
 
 # Datatable
 

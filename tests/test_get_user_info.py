@@ -1,7 +1,8 @@
-import pytest
 import uuid
-from licenseware import get_user_info, Config
 
+import pytest
+
+from licenseware import Config, get_user_info
 
 # pytest -s -v tests/test_get_user_info.py
 
