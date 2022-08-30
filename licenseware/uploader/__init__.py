@@ -1,4 +1,5 @@
 from .encryption_parameters import UploaderEncryptionParameters
 from .encryption_selector import EncryptionSelector
+from .registered_uploaders import RegisteredUploaders
 from .uploader import NewUploader
 from .validation_parameters import UploaderValidationParameters

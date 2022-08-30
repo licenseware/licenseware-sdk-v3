@@ -1,14 +1,15 @@
 from enum import Enum
 from typing import Any, Dict, List
+
 from licenseware.config.config import Config
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
-from licenseware.report.report_component import NewReportComponent
-from licenseware.report.report_snapshot import ReportSnapshot
-from licenseware.report.report_public_token import ReportPublicToken
 from licenseware.constants.web_response import WebResponse
+from licenseware.report.report_component import NewReportComponent
+from licenseware.report.report_public_token import ReportPublicToken
+from licenseware.report.report_snapshot import ReportSnapshot
+from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.utils.failsafe_decorator import failsafe
 from licenseware.utils.create_file import create_file
+from licenseware.utils.failsafe_decorator import failsafe
 
 
 class RegisteredComponents:

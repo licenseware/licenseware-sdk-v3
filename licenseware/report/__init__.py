@@ -8,6 +8,8 @@ from .attributes_stacked_area import StackedAreaAttrs
 from .attributes_stacked_bar_vertical import StackedBarVerticalAttrs
 from .attributes_summary import SummaryAttrs
 from .attributes_table import TableAttrs
+from .registered_components import RegisteredComponents
+from .registered_reports import RegisteredReports
 from .report import NewReport
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
