@@ -12,7 +12,11 @@ from licenseware.utils.create_xlsx_file import create_xlsx_file
 from licenseware.utils.failsafe_decorator import failsafe
 
 
-class RegisteredReports:
+class RegisteredReports:  # pragma no cover
+    """
+    This class acts as a proxy between the web framework and the implementation
+    """
+
     def __init__(self, reports: List[NewReport], config: Config) -> None:
         self.config = config
         self.reports = reports

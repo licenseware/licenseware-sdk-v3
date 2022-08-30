@@ -12,7 +12,11 @@ from licenseware.utils.create_file import create_file
 from licenseware.utils.failsafe_decorator import failsafe
 
 
-class RegisteredComponents:
+class RegisteredComponents:  # pragma no cover
+    """
+    This class acts as a proxy between the web framework and the implementation
+    """
+
     def __init__(self, components: List[NewReportComponent], config: Config) -> None:
         self.config = config
         self.components = components

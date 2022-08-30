@@ -1,4 +1,4 @@
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Header
 from pydantic import BaseModel
 from pymongo import MongoClient
 
@@ -56,6 +56,26 @@ def delete_report_public_token(token: str):
 
 
 app.include_router(public_token)
+
+
+# User related
+
+user_auth = APIRouter(tags=["User auth related"])
+
+
+@user_auth.get("/user-info")
+def get_user_info(
+    tenant_id: str = Header(convert_underscores=False),
+    auth_jwt: str = Header(convert_underscores=False),
+):
+    if not auth_jwt:
+        return None
+
+    user_info = {"user_id": tenant_id, "plan_type": "UNLIMITED"}
+    return user_info
+
+
+app.include_router(user_auth)
 
 
 if __name__ == "__main__":

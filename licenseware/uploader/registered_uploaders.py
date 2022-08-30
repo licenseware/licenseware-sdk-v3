@@ -13,7 +13,11 @@ from licenseware.utils.failsafe_decorator import failsafe
 from licenseware.utils.file_upload_handler import FileUploadHandler
 
 
-class RegisteredUploaders:
+class RegisteredUploaders:  # pragma no cover
+    """
+    This class acts as a proxy between the web framework and the implementation
+    """
+
     def __init__(self, uploaders: List[NewUploader], config: Config) -> None:
         self.config = config
         self.uploaders = uploaders
