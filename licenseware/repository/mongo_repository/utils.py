@@ -28,7 +28,7 @@ def _has_custom_update(data: dict):
 
 def add_update_operators(data: dict, append: bool):
 
-    if not isinstance(data, dict):
+    if not isinstance(data, dict):  # pragma no cover
         return data
 
     custom_update = _has_custom_update(data)

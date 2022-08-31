@@ -45,7 +45,9 @@ class MongoRepository(RepositoryInterface):
 
     def _get_validated_data(self, data, data_validator: Callable):
 
-        if data_validator == "ignore" or self.data_validator == "ignore":
+        if (
+            data_validator == "ignore" or self.data_validator == "ignore"
+        ):  # pragma no cover
             return data
 
         if data_validator is None and self.data_validator is None:
@@ -55,7 +57,7 @@ class MongoRepository(RepositoryInterface):
         if data_validator is not None:
             return data_validator(data)
 
-        if self.data_validator is not None:
+        if self.data_validator is not None:  # pragma no cover
             return self.data_validator(data)
 
         return data

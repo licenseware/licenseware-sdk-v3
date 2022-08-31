@@ -1,6 +1,22 @@
 # Licenseware SDK v3
 <img src="./coverage.svg">
 
+
+
+# Contents
+
+1. [Developing](#Developing)
+2. [Uploaders](#Uploaders)
+3. [Reports](#Reports)
+4. [Report Components](#Report-Components)
+5. [Datatable](#Datatable)
+6. [Mongo Repository](#Mongo-Repository)
+7. [History](#History)
+8. [Kafka Streams](#pubsub) 
+
+
+
+<a name="Developing"></a>
 # Developing
 
 - clone the repository;
@@ -14,13 +30,14 @@
 - build licenseware wheel: `make build`;
 
 
+<a name="Uploaders"></a>
 # Uploaders
 
 An `uploader` is reponsible for handling files uploaded for processing. 
 Each uploader will have it's own (mostly) unique attributes and actions. 
 These attributes and actions which define an uploader are needed to handle the file from the upload up to file processing handler.
 
-## How to create a new uploader
+- Create a new uploader
 
 Import configuration
 ```py
@@ -218,6 +235,7 @@ registered_uploaders = RegisteredUploaders(uploaders, config)
 The `registered_uploaders` will be imported on app startup in the `app/api/defaults/uploader_router.py` and will be used to auto generate api routes for each uploader.
 
 
+<a name="Reports"></a>
 # Reports
 
 After the `Uploader` validates the files, the files are sent to processing and processed what remains is to provide useful insights by aggregating saved data resulted after processing in small digestable chunks of data.
@@ -328,6 +346,7 @@ registered_reports = RegisteredReports(reports, config)
 The `registered_reports` will be imported on app startup in the `app/api/defaults/*_report_router.py` and will be used to auto generate api routes for each report.
 
 
+<a name="Report-Components"></a>
 # Report Components 
 
 A report can contain one or more report components. Here we declare a `summary` report component type.
@@ -414,8 +433,7 @@ registered_components = RegisteredComponents(report_components, config)
 
 The `registered_components` will be imported on app startup in the `app/api/defaults/*_report_component_router.py` and will be used to auto generate api routes for each report component.
 
-
-
+<a name="Datatable"></a>
 # Datatable
 
 We have `uploaders` which handle files uploaded and sent to procesing, `reports` which take the data processed and show it to the user in a insightful way we also can provide a way for the user to manipulate/update the data processed using `datatable`. With Datatable we can provide `excel like` features on the web.
@@ -497,7 +515,7 @@ Method `column` has the following parameters, most of them with sensible default
 - `foreign_key`:str = None  - here place the name of the foreign key field;
 
 
-
+<a name="Mongo-Repository"></a>
 # Mongo Repository
 
 The data to be useful needs to be saved somewhere that's where the `MongoRepository` class comes in handy.
@@ -574,6 +592,7 @@ The `data_validator` can be set to `None` while figuring out what to do with the
 Checkout `licenseware/repository/mongo_repository` for more information.
 
 
+<a name="History"></a>
 # History
 
 In order to have a history of the processing steps from begining to the end `licenseware.history.log` decorator can be used to decorate processing functions.
@@ -673,3 +692,78 @@ As you can see this method is very verbose an ugly this is what `history.log` de
 I takes the required parameters and saves success and failures in encountered in a processing pipeline. 
 
 Checkout `licenseware/repository/history` for more information.
+
+
+<a name="pubsub"></a>
+# Kafka Streams (Pub-Sub)
+
+Basic usage:
+
+On the kafka broker side define topics(channels)
+
+```py
+
+from licensware import Topic
+from confluent_kafka.admin import AdminClient
+
+admin_client = AdminClient({'bootstrap.servers': 'mybroker'})
+
+topic = Topic(admin_client)
+
+topic.new("user_events")
+topic.new("app_events")
+
+
+topic.delete("app_events")
+
+
+```
+
+On the app side define stream producer (publisher)
+
+```py
+from licensware import Producer, TopicType, EventType
+from confluent_kafka import Producer as KafkaProducer
+
+
+producer_client = KafkaProducer({'bootstrap.servers': 'mybroker1,mybroker2'})
+
+producer = Producer(producer_client)
+
+
+data_stream = {
+    "event_type": EventType.ACCOUNT_CREATED,
+    "tenant_id": None,
+    "etc": "data"
+}
+
+producer.publish(TopicType.USER_EVENTS, data)
+
+
+```
+
+You can also define a consumer (subscriber)
+
+```py
+from licenseware import EventType, TopicType, Consumer
+from confluent_kafka import Consumer as KafkaConsumer
+
+
+consumer_client = KafkaConsumer({'bootstrap.servers': 'mybroker1,mybroker2'})
+
+consumer = Consumer(consumer_client)
+
+
+def account_created_handler(*args, **kwargs):
+    return "some processed data"
+
+
+consumer.dispatch(EventType.ACCOUNT_CREATED, account_created_handler)
+# etc
+
+
+if __name__ == "__main__":
+    
+    consumer.listen()
+
+```

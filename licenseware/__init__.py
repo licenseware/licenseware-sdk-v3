@@ -3,8 +3,8 @@ from licenseware.config import *
 from licenseware.constants import *
 from licenseware.datatable import *
 from licenseware.history.history_class import History
-from licenseware.jinja import *
 from licenseware.notifications import *
+from licenseware.pubsub import *
 from licenseware.quota import *
 from licenseware.report import *
 from licenseware.repository import *

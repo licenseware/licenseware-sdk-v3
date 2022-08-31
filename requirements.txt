@@ -5,6 +5,7 @@ pandas~=1.2
 pymongo==4.2.0
 marshmallow==3.17.0
 PyJWT~=2.4
+confluent-kafka~=1.9
 # Development
 pytest<7
 coverage<7

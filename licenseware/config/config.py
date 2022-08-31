@@ -43,7 +43,7 @@ class WebAppFramework(BaseTypes):
     FLASK = "FLASK"
 
 
-class Config(BaseSettings):
+class Config(BaseSettings):  # pragma no cover
     APP_ID: str = "app"
     APP_SECRET: str = str(uuid.uuid4())
     USER_INFO_URL: str = None

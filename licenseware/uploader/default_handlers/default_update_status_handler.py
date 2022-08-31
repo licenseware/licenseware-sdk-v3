@@ -7,7 +7,7 @@ def default_update_status_handler(
     uploader_id: str,
     status: str,
     repo: MongoRepository,
-):
+):  # pragma no cover
     result = repo.update_one(
         filters={"tenant_id": tenant_id, "uploader_id": uploader_id},
         data={"tenant_id": tenant_id, "uploader_id": uploader_id, "status": status},

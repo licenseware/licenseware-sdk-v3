@@ -32,7 +32,7 @@ class Quota:
         self.app_id = config.APP_ID
         self.repo = repo
 
-        if config.CURRENT_ENVIRONMENT != config.ENVIRONMENTS.DESKTOP:
+        if config.CURRENT_ENVIRONMENT != config.ENVIRONMENTS.DESKTOP:  # pragma no cover
             user_info = get_user_info(tenant_id, authorization, config)
         else:
             user_info = {"user_id": tenant_id, "plan_type": "UNLIMITED"}
