@@ -124,11 +124,7 @@ class RegisteredUploaders:  # pragma no cover
             "app_id": self.config.APP_ID,
         }
 
-        # t = Thread(target=uploader.worker, args=(event,))
-        # t.start()
-
-        uploader.worker(event)
-
+        uploader.worker.delay(event)
         return validation_response
 
     @failsafe

@@ -6,13 +6,11 @@ pymongo==4.2.0
 marshmallow==3.17.0
 PyJWT~=2.4
 confluent-kafka~=1.9
-# Development
+redis~=3.5
 pytest<7
 coverage<7
 coverage-badge<1
 pytest-mock<3
-# Extra
-Flask~=2.1
 fastapi~=0.78
 python-multipart
 uvicorn~=0.18

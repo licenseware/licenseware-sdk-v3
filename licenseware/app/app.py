@@ -106,6 +106,7 @@ class NewApp:
 
         return metadata_payload
 
+    @property
     def full_metadata(self):
 
         reports_metadata = (
