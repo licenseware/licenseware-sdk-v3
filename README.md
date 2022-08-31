@@ -703,18 +703,17 @@ On the kafka broker side define topics(channels)
 
 ```py
 
-from licensware import Topic
+from licensware import Topic, TopicType
 from confluent_kafka.admin import AdminClient
 
 admin_client = AdminClient({'bootstrap.servers': 'mybroker'})
 
 topic = Topic(admin_client)
 
-topic.new("user_events")
-topic.new("app_events")
+topic.new(TopicType.USER_EVENTS)
+topic.new(TopicType.APP_EVENTS)
 
-
-topic.delete("app_events")
+topic.delete(TopicType.APP_EVENTS)
 
 
 ```
