@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import Callable
 
-import requests
-
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
 from licenseware.constants.attributes_type import AttributesType
@@ -89,26 +87,3 @@ class NewReportComponent:
         }
 
         return metadata_payload
-
-    def register(self):  # pragma: no cover
-
-        response = requests.post(
-            url=self.config.REGISTER_REPORT_COMPONENT_URL,
-            json=self.metadata,
-            headers={"Authorization": self.config.get_machine_token()},
-        )
-
-        if response.status_code == 200:
-            return {
-                "status": States.SUCCESS,
-                "message": f"Report component '{self.component_id}' register successfully",
-                "content": self.metadata,
-            }, 200
-
-        nokmsg = f"Could not register component '{self.component_id}'"
-        log.error(nokmsg)
-        return {
-            "status": States.FAILED,
-            "message": nokmsg,
-            "content": self.metadata,
-        }, 400

@@ -110,26 +110,3 @@ class NewReport:
         }
 
         return metadata_payload
-
-    def register(self):
-
-        response = requests.post(  # pragma: no cover
-            url=self.config.REGISTER_REPORT_URL,
-            json=self.metadata,
-            headers={"Authorization": self.config.get_machine_token()},
-        )
-
-        if response.status_code == 200:  # pragma: no cover
-            return {
-                "status": States.SUCCESS,
-                "message": f"Report '{self.report_id}' register successfully",
-                "content": self.metadata,
-            }, 200
-
-        nokmsg = f"Could not register report '{self.report_id}'"  # pragma: no cover
-        log.error(nokmsg)  # pragma: no cover
-        return {
-            "status": States.FAILED,
-            "message": nokmsg,
-            "content": self.metadata,
-        }, 400  # pragma: no cover

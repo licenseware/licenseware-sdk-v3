@@ -13,3 +13,5 @@ def notify_upload_status(event: dict, status: str):
     log.info(
         f"APP PROCESSING EVENT: {event['app_id']} in status: {upload_status}\n for uploader {event['uploader_id']} for tenant {event['tenant_id']}"
     )
+
+    # TODO - publish kafka stream

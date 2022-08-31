@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-import requests
-
 from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.report.report import NewReport, NewReportComponent
@@ -108,30 +106,6 @@ class NewApp:
 
         return metadata_payload
 
-    def register(self):  # pragma: no cover
-
-        response = requests.post(
-            url=self.config.REGISTER_APP_URL,
-            json=self.metadata,
-            headers={"Authorization": self.config.get_machine_token()},
-        )
-
-        if response.status_code == 200:
-            return {
-                "status": States.SUCCESS,
-                "message": f"App '{self.app_id}' register successfully",
-                "content": self.metadata,
-            }, 200
-
-        nokmsg = f"Could not register app '{self.app_id}'"
-        log.error(nokmsg)
-        return {
-            "status": States.FAILED,
-            "message": nokmsg,
-            "content": self.metadata,
-        }, 400
-
-    @property
     def full_metadata(self):
 
         reports_metadata = (
@@ -160,26 +134,3 @@ class NewApp:
         }
 
         return metadata
-
-    def register_all(self):  # pragma: no cover
-
-        response = requests.post(
-            url=self.config.REGISTER_ALL_URL,
-            json=self.full_metadata,
-            headers={"Authorization": self.config.get_machine_token()},
-        )
-
-        if response.status_code == 200:
-            return {
-                "status": States.SUCCESS,
-                "message": f"App full metadata '{self.app_id}' register successfully",
-                "content": self.full_metadata,
-            }, 200
-
-        nokmsg = f"Could not register full metadata app '{self.app_id}'"
-        log.error(nokmsg)
-        return {
-            "status": States.FAILED,
-            "message": nokmsg,
-            "content": self.full_metadata,
-        }, 400
