@@ -445,55 +445,40 @@ from licenseware import DataTable, ColumnTypes, CrudHandler
 
 
 class CrudDeviceTable(CrudHandler): 
-
-    # you can provide some init values if you want
-
-    def get(self, params):
-        return params
-
-    def post(self, payload):
-        return payload
-
-    def put(self, payload):
-        return payload
-
-    def delete(self, payload):
-        return payload
+    # In most cases you don't need to provide `crud_handler` to `DataTable`.
+    # In the case that you need to do that just overwrite the methods you need (get, put or delete)
+    ...
 
 
+devices = (
 
-devices = DataTable(
+DataTable(
     title="Devices", 
     component_id="device_table",
-    crud_handler=CrudDeviceTable, # class or instance which inherits from CrudHandler abstract class
+    crud_handler=CrudDeviceTable, 
     config=config,
-    compound_indexes = [["tenant_id", "name"], ["tenant_id", "name", "device_type"]],
-    simple_indexes = [
-        "_id",
-        "tenant_id",
-        "name",
-        "is_parent_to",
-        "cpu_model",
-    ]
 )
 
-devices.column("_id", editable=False, visible=False)
-devices.column("tenant_id", editable=False, visible=False)
-devices.column("name", required=True)
-devices.column("is_parent_to", distinct_key="name", foreign_key="name")
-devices.column("capped", required=True, type=ColumnTypes.BOOL)
-devices.column(
+.column("_id", editable=False, visible=False)
+.column("tenant_id", editable=False, visible=False)
+.column("name", required=True)
+.column("is_parent_to", distinct_key="name", foreign_key="name")
+.column("capped", required=True, type=ColumnTypes.BOOL)
+.column(
     "device_type", 
     required=True, 
     values=["Virtual", "Pool", "Domain", "Physical", "Cluster", "Unknown"]
 )
-devices.column(
+.column(
     "operating_system_type", 
     values=["Solaris", "ESX", "Linux", "AIX", "HP-UX", "Windows", "Other"]
 )
-devices.column("total_number_of_processors", type=ColumnTypes.NUMBER)
-devices.column("updated_at", editable=False, type=ColumnTypes.DATE)
-devices.column("raw_data", editable=False, type=ColumnTypes.JSON)
+.column("total_number_of_processors", type=ColumnTypes.NUMBER)
+.column("updated_at", editable=False, type=ColumnTypes.DATE)
+.column("raw_data", editable=False, type=ColumnTypes.JSON)
+
+)
+
 
 ```
 
@@ -514,6 +499,24 @@ Method `column` has the following parameters, most of them with sensible default
 - `required`: bool = False - by default all fields not required. If prop is one of "tenant_id", "_id", "updated_at" editable will be set automatically to True.
 - `distinct_key`:str = None - here place the name of the field from which you want a list of unique items;
 - `foreign_key`:str = None  - here place the name of the foreign key field;
+
+
+Each datatable component created needs to be `registered`in the `datatables/__init__.py` file:
+
+```py
+from licenseware import RegisteredDataTables
+from settings import config
+
+from .devices_table import devices_table
+from .devices_table_simple import devices_table_simple
+
+datatables = [devices_table, devices_table_simple]
+
+registered_datatables = RegisteredDataTables(datatables, config)
+
+```
+
+The `registered_datatables` will be imported on app startup in the `app/api/defaults/datatables_router.py`/`app/api/defaults/app_router.py` and will be used to auto generate api routes for each report datatable.
 
 
 <a name="Mongo-Repository"></a>
