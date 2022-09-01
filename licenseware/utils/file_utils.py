@@ -1,6 +1,7 @@
-import os, re
+import os
 import shutil
 import subprocess
+
 from .logger import log
 
 accepted_archives = (

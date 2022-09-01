@@ -2,6 +2,7 @@ from dataclasses import asdict, dataclass
 from typing import List
 from urllib.parse import urlencode
 
+from licenseware.config.config import Config
 from licenseware.constants.column_types import ColumnTypes
 from licenseware.report.style_attributes import StyleAttrs
 from licenseware.utils.alter_string import get_altered_strings
@@ -82,6 +83,7 @@ class DataTableColumn:
 class DataTable:
     title: str
     component_id: str
+    config: Config
     crud_handler: CrudHandler
     simple_indexes: List[str] = None
     compound_indexes: List[List[str]] = None
@@ -93,12 +95,15 @@ class DataTable:
 
         assert isinstance(self.crud_handler, CrudHandler)
 
-        self.columns: List[DataTableColumn] = []
+        ns = get_altered_strings(self.config.APP_ID).dash
+        compdash = get_altered_strings(self.component_id).dash
+        self.path = f"/{ns}/{compdash}"
         self.type = "editable_table"
-        self.style_attributes: StyleAttrs = StyleAttrs().width_full
-        self.url = None
-        self.path = "/" + self.component_id
+        self.style_attributes = StyleAttrs().width_full.metadata
+
         self.order = 0
+        self.columns: List[DataTableColumn] = []
+        self.url = None
         self._added_props = set()
 
     def column(
@@ -147,3 +152,19 @@ class DataTable:
 
     def dict(self):
         return {**asdict(self), "columns": [col.dict() for col in self.columns]}
+
+    @property
+    def metadata(self):
+        data = {
+            "url": self.path,
+            "path": self.path,
+            "type": self.type,
+            "order": self.order,
+            "style_attributes": self.style_attributes,
+        }
+
+        selfdata = self.dict()
+        for k in ["crud_handler", "simple_indexes", "compound_indexes", "config"]:
+            selfdata.pop(k)
+
+        return {**data, **selfdata}
