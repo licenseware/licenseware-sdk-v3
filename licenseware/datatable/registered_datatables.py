@@ -10,10 +10,9 @@ from licenseware.utils.failsafe_decorator import failsafe
 
 class RegisteredDataTables:
     def __init__(self, datatables: List[DataTable], config: Config) -> None:
-        self.datatables = datatables
-        self.datatables_metadata = [dt.metadata for dt in datatables]
         self.config = config
-
+        self.datatables = datatables
+        self.datatables_metadata = self._create_and_order_datatables(datatables)
         self.component_enum = Enum(
             "ComponentEnum",
             {
@@ -103,3 +102,13 @@ class RegisteredDataTables:
             return self.component_dispacher[component_id]
         component_id = str(component_id).replace("ComponentEnum.", "")
         return self.component_dispacher[component_id]
+
+    def _create_and_order_datatables(self, datatables: List[DataTable]):
+        order = 0
+        ordered_datatables = []
+        for dt in datatables:
+            data = dt.metadata
+            data["order"] = order
+            ordered_datatables.append(data)
+            order += 1
+        return ordered_datatables

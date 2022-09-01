@@ -51,7 +51,7 @@ def _update_entities_url(path: str, distinct_key: str, foreign_key: str):
 
     entities_url = None
     if distinct_key is not None or foreign_key is not None:
-        query_params = {"_id": "{entity_id}"}
+        query_params = {"id": "{entity_id}"}
         if distinct_key is not None:
             query_params.update({"distinct_key": distinct_key})
         if foreign_key is not None:
@@ -94,7 +94,7 @@ class DataTable:
 
         ns = get_altered_strings(self.config.APP_ID).dash
         compdash = get_altered_strings(self.component_id).dash
-        self.path = f"/{ns}/{compdash}"
+        self.path = f"/{ns}/datatables/{compdash}"
         self.type = "editable_table"
         self.style_attributes = StyleAttrs().width_full.metadata
 
