@@ -440,7 +440,7 @@ We have `uploaders` which handle files uploaded and sent to procesing, `reports`
 
 
 ```py
-
+from settings import config
 from licenseware import DataTable, ColumnTypes, CrudHandler
 
 
@@ -466,6 +466,7 @@ devices = DataTable(
     title="Devices", 
     component_id="device_table",
     crud_handler=CrudDeviceTable, # class or instance which inherits from CrudHandler abstract class
+    config=config,
     compound_indexes = [["tenant_id", "name"], ["tenant_id", "name", "device_type"]],
     simple_indexes = [
         "_id",
