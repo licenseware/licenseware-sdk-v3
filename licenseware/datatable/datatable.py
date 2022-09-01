@@ -1,4 +1,5 @@
 from dataclasses import asdict, dataclass
+from gc import collect
 from typing import List
 from urllib.parse import urlencode
 
@@ -84,15 +85,11 @@ class DataTable:
     title: str
     component_id: str
     config: Config
-    crud_handler: CrudHandler
-    simple_indexes: List[str] = None
-    compound_indexes: List[List[str]] = None
+    crud_handler: CrudHandler = None
 
     def __post_init__(self):
 
-        if not isinstance(self.crud_handler, CrudHandler):
-            self.crud_handler = self.crud_handler()
-
+        self.crud_handler = self.crud_handler() if self.crud_handler else CrudHandler()
         assert isinstance(self.crud_handler, CrudHandler)
 
         ns = get_altered_strings(self.config.APP_ID).dash
@@ -164,7 +161,7 @@ class DataTable:
         }
 
         selfdata = self.dict()
-        for k in ["crud_handler", "simple_indexes", "compound_indexes", "config"]:
+        for k in ["crud_handler", "config"]:
             selfdata.pop(k)
 
         return {**data, **selfdata}

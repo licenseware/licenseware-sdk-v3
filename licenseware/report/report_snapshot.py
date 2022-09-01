@@ -31,8 +31,8 @@ class ReportSnapshot:
         report: NewReport = None,
         filters: List[dict] = None,
         payload: List[dict] = None,
-        limit: int = None,
-        skip: int = None,
+        limit: int = 0,
+        skip: int = 0,
     ):
         self.report = report
         self.filters = filters
