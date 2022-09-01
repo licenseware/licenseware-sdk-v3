@@ -60,7 +60,7 @@ class MongoRepository(RepositoryInterface):
         if self.data_validator is not None:  # pragma no cover
             return self.data_validator(data)
 
-        return data
+        return data  # pragma no cover
 
     # RAW
 

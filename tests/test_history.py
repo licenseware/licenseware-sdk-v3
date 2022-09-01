@@ -158,6 +158,19 @@ def test_history_class_log_success(mongo_connection):
 
     assert "step" in response
 
+    def some_func():
+        """some docs"""
+        ...
+
+    response = history.log_success(
+        step=some_func,
+        filepath="./somecsv.csv",
+        on_success_save=None,
+        func_source="app/some_package/some_module/some_func",
+    )
+
+    assert "step" in response
+
 
 # pytest -s -v tests/test_history.py::test_history_class_log_failure
 def test_history_class_log_failure(mongo_connection):
@@ -181,6 +194,21 @@ def test_history_class_log_failure(mongo_connection):
 
     response = history.log_failure(
         step="Gathering data",
+        filepath="./file.csv",
+        error_string="str(err)",
+        traceback_string="import traceback > traceback.format_exc(err)",
+        on_failure_save="Faled gathering data",
+        func_source="app/some_package/some_module/some_func",
+    )
+
+    assert "step" in response
+
+    def some_func():
+        """some docs"""
+        ...
+
+    response = history.log_failure(
+        step=some_func,
         filepath="./file.csv",
         error_string="str(err)",
         traceback_string="import traceback > traceback.format_exc(err)",
@@ -357,6 +385,57 @@ def test_history_entities(mongo_connection):
     assert len(response_remove["entities"]) == 0
 
     repo.delete_many(filters={}, collection=config.MONGO_COLLECTION.HISTORY)
+
+
+# pytest -s -v tests/test_history.py::test_history_class_log_decorator
+def test_history_class_log_decorator(mongo_connection):
+    class CustomConfig(Config):
+        pass
+
+    config = CustomConfig()
+
+    history_repo = MongoRepository(
+        mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    @history.log
+    def some_func(
+        filepath,
+        tenant_id=str(uuid.uuid4()),
+        authorization=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        repo=history_repo,
+        config=config,
+    ):
+        """some docs"""
+
+    some_func(filepath="./some.csv")
+
+    @history.log
+    def some_func_with_raise(
+        filepath,
+        tenant_id=str(uuid.uuid4()),
+        authorization=str(uuid.uuid4()),
+        event_id=str(uuid.uuid4()),
+        uploader_id="rv_tools",
+        app_id="ifmp-service",
+        repo=history_repo,
+        config=config,
+    ):
+        """some docs"""
+        raise Exception("some exception")
+
+    with t.assertRaises(Exception):
+        some_func_with_raise(filepath="./some.csv")
+
+    @history.log
+    def some_func_with_incomplete_params(filepath):
+        """some docs"""
+        return
+
+    some_func_with_incomplete_params(filepath="./some.csv")
 
 
 # pytest -s -v tests/test_history.py::test_history_class_entities

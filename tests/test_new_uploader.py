@@ -82,10 +82,6 @@ def test_new_uploader(mocker):
 
     assert "data" in rv_tools_uploader.metadata
 
-    response, status_code = rv_tools_uploader.register()
-    assert status_code == 200
-    assert "success" == response["status"]
-
     # TODO
     # response = rv_tools_uploader.check_quota_handler()
     # response = rv_tools_uploader.check_status_handler()
@@ -170,7 +166,3 @@ def test_new_uploader_custom_handlers(mocker):
             assert resp.status == "success"
 
     assert "data" in rv_tools_uploader.metadata
-
-    response, status_code = rv_tools_uploader.register()
-    assert status_code == 200
-    assert "success" == response["status"]
