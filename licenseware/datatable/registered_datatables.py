@@ -9,7 +9,11 @@ from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.failsafe_decorator import failsafe
 
 
-class RegisteredDataTables:
+class RegisteredDataTables:  # pragma no cover
+    """
+    This class acts as a proxy between the web framework and the implementation
+    """
+
     def __init__(self, datatables: List[DataTable], config: Config) -> None:
         self.config = config
         self.datatables = datatables

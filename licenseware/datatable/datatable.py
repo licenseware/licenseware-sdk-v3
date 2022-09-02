@@ -89,6 +89,8 @@ class DataTable:
 
     def __post_init__(self):
 
+        assert self.config.APP_ID is not None
+
         self.crud_handler = self.crud_handler() if self.crud_handler else CrudHandler()
         assert isinstance(self.crud_handler, CrudHandler)
 

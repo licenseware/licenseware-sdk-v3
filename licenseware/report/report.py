@@ -33,22 +33,18 @@ class NewReport:
     name: str
     description: str
     report_id: str
+    config: Config
     connected_apps: List[str] = None
     flags: List[str] = None
     filters: ReportFilter = None
     components: List[NewReportComponent] = None
     registrable: bool = True
-    config: Config = None
 
     def __post_init__(self):
 
-        assert self.config is not None
-        assert hasattr(self.config, "APP_ID")
-        assert hasattr(self.config, "REGISTER_REPORT_URL")
-        assert hasattr(self.config, "get_machine_token")
+        assert self.config.APP_ID is not None
 
         self.app_id = self.config.APP_ID
-
         ns = get_altered_strings(self.app_id).dash
         reportid = get_altered_strings(self.report_id).dash
 

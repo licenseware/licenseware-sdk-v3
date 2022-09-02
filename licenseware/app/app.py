@@ -2,11 +2,9 @@ from dataclasses import dataclass
 from typing import List
 
 from licenseware.config.config import Config
-from licenseware.constants.states import States
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.utils.logger import log
 
 from . import default_handlers
 
@@ -24,10 +22,6 @@ class NewApp:
     def __post_init__(self):
 
         assert self.config is not None
-        assert hasattr(self.config, "APP_ID")
-        assert hasattr(self.config, "REGISTER_APP_URL")
-        assert hasattr(self.config, "REGISTER_ALL_URL")
-        assert hasattr(self.config, "get_machine_token")
 
         self.app_id = self.config.APP_ID
         appid = get_altered_strings(self.app_id).dash

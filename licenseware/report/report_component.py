@@ -30,18 +30,15 @@ class NewReportComponent:
         ],
         WebResponse,
     ]
+    config: Config
     component_type: str = None
     description: str = None
     order: int = None
     filters: ReportFilter = None
-    config: Config = None
 
     def __post_init__(self):
 
-        assert self.config is not None
-        assert hasattr(self.config, "APP_ID")
-        assert hasattr(self.config, "REGISTER_REPORT_COMPONENT_URL")
-        assert hasattr(self.config, "get_machine_token")
+        assert self.config.APP_ID is not None
 
         if isinstance(self.filters, ReportFilter):  # pragma no cover
             self.filters = self.filters.metadata

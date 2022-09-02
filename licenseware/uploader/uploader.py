@@ -20,7 +20,6 @@ from licenseware.uploader.default_handlers import (
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.utils.logger import log
 
 
 @dataclass
@@ -29,6 +28,7 @@ class NewUploader:
     description: str
     uploader_id: str
     accepted_file_types: tuple
+    config: Config
     worker: Callable[[WorkerEvent], None]
     free_units: int = 1
     validation_parameters: UploaderValidationParameters = None
@@ -68,17 +68,12 @@ class NewUploader:
         ],
         UploaderStatusResponse,
     ] = default_update_status_handler
-    config: Config = None
 
     def __post_init__(self):
 
-        assert self.config is not None
-        assert hasattr(self.config, "APP_ID")
-        assert hasattr(self.config, "REGISTER_UPLOADER_URL")
-        assert hasattr(self.config, "get_machine_token")
+        assert self.config.APP_ID is not None
 
         self.app_id = self.config.APP_ID
-
         self.validation_parameters = (
             self.validation_parameters.dict()
             if self.validation_parameters is not None
