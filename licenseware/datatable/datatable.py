@@ -1,5 +1,5 @@
+import re
 from dataclasses import asdict, dataclass
-from gc import collect
 from typing import List
 from urllib.parse import urlencode
 
@@ -102,6 +102,7 @@ class DataTable:
         self.columns: List[DataTableColumn] = []
         self.url = None
         self._added_props = set()
+        self._non_editable_fields = set()
 
     def column(
         self,
@@ -145,6 +146,9 @@ class DataTable:
 
         self.columns.append(col)
 
+        if not col.editable:
+            self._non_editable_fields.add(col.prop)
+
         return self
 
     def dict(self):
@@ -165,3 +169,54 @@ class DataTable:
             selfdata.pop(k)
 
         return {**data, **selfdata}
+
+    def validate(self, data: dict):
+        self._check_non_editable_fields(data)
+        self._check_data_types(data)
+
+    def _check_non_editable_fields(self, data: dict):
+        for field in self._non_editable_fields:
+            if field in data:
+                raise ValueError(
+                    f"Fields '{self._non_editable_fields}' can't be edited"
+                )
+
+    def _check_data_types(self, data: dict):
+
+        for col in self.columns:
+            for field, value in data.items():
+
+                if col.prop != field:
+                    continue
+
+                if col.required is False and value is None:
+                    continue
+
+                if col.type == ColumnTypes.STRING:
+                    if not isinstance(value, str):
+                        raise ValueError(
+                            f"Field '{field}' must be 'string'  (ex: 'some-string')"
+                        )
+                elif col.type == ColumnTypes.NUMBER:
+                    if not isinstance(value, (int, float)):
+                        raise ValueError(
+                            f"Field '{field}' must be 'number' (ex: 12, or 14.3)"
+                        )
+                elif col.type == ColumnTypes.DATE:
+                    if not re.fullmatch(
+                        r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}", value
+                    ):
+                        raise ValueError(
+                            f"Field '{field}' must be 'date' (ex: '2022-09-01T06:01:38.621461')"
+                        )
+                elif col.type == ColumnTypes.BOOL:
+                    if not isinstance(value, bool):
+                        raise ValueError(f"Field '{field}' must be 'bool'")
+                elif col.type == ColumnTypes.JSON:
+                    if not isinstance(value, (dict, list)):
+                        raise ValueError(f"Field '{field}' must be 'json'")
+                elif col.type == ColumnTypes.ENUM:
+                    if not isinstance(value, list):
+                        raise ValueError(f"Field '{field}' must be 'enum'")
+                elif col.type == ColumnTypes.ENTITY:
+                    continue

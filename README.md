@@ -483,7 +483,6 @@ DataTable(
 ```
 
 Class `CrudDeviceTable` is responsible for interacting with the database and providing the data required.
-Since the way data is structured can vary from case to case it's up to you to provide the logic. 
 
 Up we declare the table component metadata for `component_id="device_table"`. 
 This is very similar to report attributes (ex: `BarHorizontalAttrs`).
@@ -591,7 +590,29 @@ inserted_data = self.repo.insert_one(
 
 Ideally you should create one repo per collection because this way you don't need to specify collection and data_validator each time you call a repo method.
 
-The `data_validator` can be set to `None` while figuring out what to do with the data, but you will see a warning that the data inserted/updated/replaced has no validation. So, make sure you provide a `data_validator` function once you are ready.
+The `data_validator` can be set to `None` while figuring out what to do with the data, but you will see a warning that the data inserted/updated/replaced has no validation. So, make sure you provide a `data_validator` function once you are ready. If you really don't need a data validator you could set `data_validator="ignore"` this will bypass the data validation step (use it with care).
+
+Note that you could always create a new repo collection based on an existing created repo.
+
+```py
+
+repo_data = MongoRepository(
+    mongo_connection, 
+    collection = config.MONGO_COLLECTION.DATA,
+    data_validator = entities_validator
+)
+
+# later in the process you need another collection
+
+repo_newcollection = MongoRepository(
+    repo_data.db_connection, 
+    collection = "CustomCollection",
+    data_validator = "ignore"
+)
+
+```
+
+If you need to create indexes or other extra configurations please create them on app startup (main.py file).
 
 Checkout `licenseware/repository/mongo_repository` for more information.
 

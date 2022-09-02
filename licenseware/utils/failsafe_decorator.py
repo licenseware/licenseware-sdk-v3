@@ -18,7 +18,7 @@ def failsafe(*dargs, fail_code=500):
             except Exception as err:
                 log.error(traceback.format_exc())
                 return WebResponse(
-                    content={"status": "failed", "message": str(err)[0:50]},
+                    content={"status": "failed", "message": str(err)[0:250]},
                     status_code=fail_code,
                 )
 

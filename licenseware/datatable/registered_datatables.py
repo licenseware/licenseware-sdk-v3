@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 from licenseware.config.config import Config
 from licenseware.constants.web_response import WebResponse
 from licenseware.datatable.datatable import DataTable
+from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.failsafe_decorator import failsafe
 
@@ -41,17 +42,17 @@ class RegisteredDataTables:
         limit: int = 0,
         skip: int = 0,
     ):
+        repo = self._get_data_repo(db_connection)
         component = self._get_current_component(component_id)
         result = component.crud_handler.get(
             tenant_id,
             authorization,
-            db_connection,
             id,
             foreign_key,
             distinct_key,
             limit,
             skip,
-            self.config.MONGO_COLLECTION.DATA,
+            repo,
         )
         return WebResponse(status_code=200, content=result)
 
@@ -65,14 +66,15 @@ class RegisteredDataTables:
         id: str,
         new_data: dict,
     ):
+        repo = self._get_data_repo(db_connection)
         component = self._get_current_component(component_id)
+        component.validate(new_data)
         result = component.crud_handler.put(
             tenant_id,
             authorization,
-            db_connection,
             id,
             new_data,
-            self.config.MONGO_COLLECTION.DATA,
+            repo,
         )
         return WebResponse(status_code=200, content=result)
 
@@ -85,17 +87,24 @@ class RegisteredDataTables:
         component_id: str,
         id: str,
     ):
+        repo = self._get_data_repo(db_connection)
         component = self._get_current_component(component_id)
         result = component.crud_handler.delete(
             tenant_id,
             authorization,
-            db_connection,
             id,
-            self.config.MONGO_COLLECTION.DATA,
+            repo,
         )
         return WebResponse(status_code=200, content=result)
 
     # PRIVATE
+
+    def _get_data_repo(self, db_connection: Any):
+        return MongoRepository(
+            db_connection,
+            collection=self.config.MONGO_COLLECTION.DATA,
+            data_validator="ignore",
+        )
 
     def _get_current_component(self, component_id: Enum):
         if isinstance(component_id, str):

@@ -1,5 +1,3 @@
-from typing import Any
-
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 
 
@@ -8,15 +6,13 @@ class CrudHandler:
         self,
         tenant_id: str,
         authorization: str,
-        db_connection: Any,
         id: str,
         foreign_key: str,
         distinct_key: str,
         limit: int,
         skip: int,
-        collection: str,
+        repo: MongoRepository,
     ):
-        repo = MongoRepository(db_connection, collection)
 
         if id is not None:
             return repo.find_one(filters={"_id": id, "tenant_id": tenant_id})
@@ -35,24 +31,20 @@ class CrudHandler:
         self,
         tenant_id: str,
         authorization: str,
-        db_connection: Any,
         id: str,
         new_data: dict,
-        collection: str,
+        repo: MongoRepository,
     ):
-        repo = MongoRepository(db_connection, collection)
         new_data.pop("_id", None)
         return repo.update_one(
-            filters={"_id": id, "tenant_id": tenant_id}, data=new_data
+            filters={"_id": id, "tenant_id": tenant_id}, data=new_data, upsert=False
         )
 
     def delete(
         self,
         tenant_id: str,
         authorization: str,
-        db_connection: Any,
         id: str,
-        collection: str,
+        repo: MongoRepository,
     ):
-        repo = MongoRepository(db_connection, collection)
         return repo.delete_one(filters={"_id": id, "tenant_id": tenant_id})
