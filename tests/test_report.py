@@ -1,5 +1,4 @@
 import unittest
-from dataclasses import dataclass
 
 import pytest
 
@@ -12,7 +11,11 @@ from licenseware import (
     StyleAttrs,
     SummaryAttrs,
 )
-from licenseware.report.report import _parse_report_components, _update_connected_apps
+from licenseware.report.report import (
+    Config,
+    _parse_report_components,
+    _update_connected_apps,
+)
 
 # pytest -s -v tests/test_report.py
 
@@ -21,17 +24,8 @@ t = unittest.TestCase()
 
 # pytest -s -v tests/test_report.py::test_parse_report_components
 def test_parse_report_components():
-    @dataclass
-    class Config:
-        APP_ID = "fmw"
-        REGISTER_REPORT_URL = ""
-        REGISTER_REPORT_COMPONENT_URL = ""
 
-        @staticmethod
-        def get_machine_token():
-            return "machine token from envs"
-
-    config = Config()
+    config = Config(FRONTEND_URL="")
 
     # Declaring some attributes
     summary = (
@@ -71,11 +65,8 @@ def test_parse_report_components():
 
 # pytest -s -v tests/test_report.py::test_update_connected_apps
 def test_update_connected_apps():
-    @dataclass
-    class Config:
-        APP_ID = "fmw"
 
-    config = Config()
+    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
 
     connected_apps = None
     updated_connected_apps = _update_connected_apps(connected_apps, config)
@@ -98,18 +89,7 @@ def test_report_creation(mocker):
 
     mocker.patch("requests.post", return_value=RequestsResponse)
 
-    # External configuration
-    @dataclass
-    class Config:
-        APP_ID = "fmw"
-        REGISTER_REPORT_URL = ""
-        REGISTER_REPORT_COMPONENT_URL = ""
-
-        @staticmethod
-        def get_machine_token():
-            return "machine token from envs"
-
-    config = Config()
+    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
 
     FMW_FILTERS = (
         ReportFilter()

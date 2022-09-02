@@ -67,7 +67,7 @@ def recursive_unzip(file_path: str):
 
     if is_archive(file_path):
         unziped_base = unzip(file_path)
-        if unziped_base is None:
+        if unziped_base is None:  # pragma no cover
             return
     else:
         unziped_base = file_path
@@ -84,7 +84,7 @@ def recursive_unzip(file_path: str):
                 continue
 
             unzipped_path = unzip(fpath)
-            if unzipped_path is None:
+            if unzipped_path is None:  # pragma no cover
                 continue
 
             os.remove(fpath)

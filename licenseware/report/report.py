@@ -43,6 +43,10 @@ class NewReport:
     def __post_init__(self):
 
         assert self.config.APP_ID is not None
+        assert self.config.FRONTEND_URL is not None
+        assert self.config.PUBLIC_TOKEN_REPORT_URL is not None
+        assert self.config.APP_SECRET is not None
+        assert self.config.get_machine_token is not None
 
         self.app_id = self.config.APP_ID
         ns = get_altered_strings(self.app_id).dash

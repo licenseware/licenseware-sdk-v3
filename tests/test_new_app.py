@@ -1,10 +1,10 @@
 import json
 import unittest
-from dataclasses import dataclass
 
 import pytest
 
 from licenseware import (
+    Config,
     Flags,
     Icons,
     NewApp,
@@ -20,24 +20,10 @@ from licenseware import (
 t = unittest.TestCase()
 
 
-@dataclass
-class Config:
-    APP_ID = "fmw"
-    REGISTER_REPORT_URL = ""
-    REGISTER_REPORT_COMPONENT_URL = ""
-    REGISTER_APP_URL = ""
-    REGISTER_UPLOADER_URL = ""
-    REGISTER_ALL_URL = ""
-
-    @staticmethod
-    def get_machine_token():
-        return "machine token from envs"
-
-
 # pytest -s -v tests/test_new_app.py::test_new_app
 def test_new_app():
 
-    config = Config()
+    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
 
     fmw = NewApp(
         name="Oracle Middleware Manager",
@@ -52,7 +38,7 @@ def test_new_app():
 # pytest -s -v tests/test_new_app.py::test_adding_objects
 def test_adding_objects():
 
-    config = Config()
+    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
 
     summary = (
         SummaryAttrs()

@@ -1,7 +1,9 @@
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 
 
-class CrudHandler:
+class CrudHandler:  # pragma no cover
+    """Proxy requests to simple repo tested functions"""
+
     def get(
         self,
         tenant_id: str,
