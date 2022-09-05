@@ -33,13 +33,17 @@ def _update_bools(
     return editable, visible, hashable, required
 
 
-def _update_type(type: str, values: List[str], distinct_key: str, foreign_key: str):
+def _update_type(
+    type: str, values: List[str], prop: str, distinct_key: str, foreign_key: str
+):
 
     if type is None:
         if values is not None:
             type = ColumnTypes.ENUM
         elif distinct_key is not None and foreign_key is not None:
             type = ColumnTypes.ENTITY
+        elif "number" in prop:
+            type = ColumnTypes.NUMBER
         else:
             type = ColumnTypes.STRING
 
@@ -129,7 +133,7 @@ class DataTable:
         editable, visible, hashable, required = _update_bools(
             prop, editable, visible, hashable, required
         )
-        type = _update_type(type, values, distinct_key, foreign_key)
+        type = _update_type(type, values, prop, distinct_key, foreign_key)
         entities_url = _update_entities_url(self.path, distinct_key, foreign_key)
 
         col = DataTableColumn(
@@ -173,15 +177,14 @@ class DataTable:
         return {**data, **selfdata}
 
     def validate(self, data: dict):
-        self._check_non_editable_fields(data)
+        data = self._check_non_editable_fields(data)
         self._check_data_types(data)
+        return data
 
     def _check_non_editable_fields(self, data: dict):
         for field in self._non_editable_fields:
-            if field in data:
-                raise ValueError(
-                    f"Fields '{self._non_editable_fields}' can't be edited"
-                )
+            data.pop(field, None)
+        return data
 
     def _check_data_types(self, data: dict):
 
@@ -218,7 +221,9 @@ class DataTable:
                     if not isinstance(value, (dict, list)):
                         raise ValueError(f"Field '{field}' must be 'json'")
                 elif col.type == ColumnTypes.ENUM:
-                    if not isinstance(value, list):
-                        raise ValueError(f"Field '{field}' must be 'enum'")
+                    if value not in col.values:
+                        raise ValueError(
+                            f"Field '{field}' must be an 'enum' from {col.values}"
+                        )
                 elif col.type == ColumnTypes.ENTITY:
                     continue

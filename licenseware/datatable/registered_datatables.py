@@ -72,7 +72,7 @@ class RegisteredDataTables:  # pragma no cover
     ):
         repo = self._get_data_repo(db_connection)
         component = self._get_current_component(component_id)
-        component.validate(new_data)
+        new_data = component.validate(new_data)
         result = component.crud_handler.put(
             tenant_id,
             authorization,
