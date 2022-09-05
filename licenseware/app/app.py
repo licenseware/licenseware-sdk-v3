@@ -32,7 +32,7 @@ class NewApp:
 
         self.app_activation_url = f"/{appid}/activate-app"
         self.refresh_registration_url = f"/{appid}/refresh-registration"
-        self.editable_tables_url = f"/{appid}/editable-tables"
+        self.datatables_url = f"/{appid}/datatables"
         self.history_report_url = f"/{appid}/reports/history-report"
         self.tenant_registration_url = f"/{appid}/register-tenant"
         self.terms_and_conditions_url = f"/{appid}/terms-and-conditions"
@@ -89,7 +89,7 @@ class NewApp:
                     "tenants_with_data_available": default_handlers.get_tenants_with_data_available(),
                     "refresh_registration_url": self.refresh_registration_url,
                     "app_activation_url": self.app_activation_url,
-                    "editable_tables_url": self.editable_tables_url,
+                    "editable_tables_url": self.datatables_url,
                     "history_report_url": self.history_report_url,
                     "tenant_registration_url": self.tenant_registration_url,
                     "terms_and_conditions_url": self.terms_and_conditions_url,
