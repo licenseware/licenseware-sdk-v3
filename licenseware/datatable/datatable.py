@@ -100,6 +100,7 @@ class DataTable:
 
         ns = get_altered_strings(self.config.APP_ID).dash
         compdash = get_altered_strings(self.component_id).dash
+        self.metadata_path = f"/{ns}/datatables"
         self.path = f"/{ns}/datatables/{compdash}"
         self.type = "editable_table"
         self.style_attributes = StyleAttrs().width_full.metadata
