@@ -26,10 +26,6 @@ class RegisteredReports:  # pragma no cover
         )
         self.report_dispacher: Dict[str, NewReport] = {u.report_id: u for u in reports}
 
-    def _get_current_report(self, report_id: Enum):
-        report_id = str(report_id).replace("ReportEnum.", "")
-        return self.report_dispacher[report_id]
-
     @failsafe
     def get_report_metadata(self, report_id: str):
         report = self._get_current_report(report_id)
@@ -101,7 +97,13 @@ class RegisteredReports:  # pragma no cover
     ):
         report = self._get_current_report(report_id)
         repo = self._get_snapshot_repo(db_connection)
-        rpt = ReportSnapshot(tenant_id, authorization, repo, self.config, None, report)
+        rpt = ReportSnapshot(
+            tenant_id=tenant_id,
+            authorization=authorization,
+            repo=repo,
+            config=self.config,
+            report=report,
+        )
         result = rpt.generate_snapshot()
         return WebResponse(status_code=200, content=result)
 
@@ -115,7 +117,13 @@ class RegisteredReports:  # pragma no cover
     ):
         report = self._get_current_report(report_id)
         repo = self._get_snapshot_repo(db_connection)
-        rpt = ReportSnapshot(tenant_id, authorization, repo, self.config, None, report)
+        rpt = ReportSnapshot(
+            tenant_id=tenant_id,
+            authorization=authorization,
+            repo=repo,
+            config=self.config,
+            report=report,
+        )
         result = rpt.get_available_versions()
         return WebResponse(status_code=200, content=result)
 
@@ -131,7 +139,12 @@ class RegisteredReports:  # pragma no cover
         report = self._get_current_report(report_id)
         repo = self._get_snapshot_repo(db_connection)
         rpt = ReportSnapshot(
-            tenant_id, authorization, repo, self.config, version, report
+            tenant_id=tenant_id,
+            authorization=authorization,
+            repo=repo,
+            config=self.config,
+            version=version,
+            report=report,
         )
         result = rpt.get_snapshot_metadata()
         return WebResponse(status_code=200, content=result)
@@ -148,12 +161,21 @@ class RegisteredReports:  # pragma no cover
         report = self._get_current_report(report_id)
         repo = self._get_snapshot_repo(db_connection)
         rpt = ReportSnapshot(
-            tenant_id, authorization, repo, self.config, version, report
+            tenant_id=tenant_id,
+            authorization=authorization,
+            repo=repo,
+            config=self.config,
+            version=version,
+            report=report,
         )
         result = rpt.delete_snapshot()
         return WebResponse(status_code=200, content=result)
 
     # PRIVATE
+
+    def _get_current_report(self, report_id: Enum):
+        report_id = str(report_id).replace("ReportEnum.", "")
+        return self.report_dispacher[report_id]
 
     def _get_data_repo(self, db_connection: Any):
         return MongoRepository(

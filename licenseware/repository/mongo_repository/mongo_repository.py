@@ -62,6 +62,13 @@ class MongoRepository(RepositoryInterface):
 
         return data  # pragma no cover
 
+    def _parse_filters(self, filters: dict):
+        if filters is None:
+            return
+        if "_id" in filters:
+            return {**filters, **{"_id": utils.get_object_id(filters["_id"])}}
+        return filters
+
     # RAW
 
     def execute_query(self, query: List[dict], collection: str = None) -> List[dict]:
@@ -73,7 +80,7 @@ class MongoRepository(RepositoryInterface):
 
     def find_one(self, filters: dict, collection: str = None) -> dict:
         col = self._get_collection(collection)
-        data = col.find_one(filters)
+        data = col.find_one(self._parse_filters(filters))
         return self._setid(data)
 
     def find_by_id(self, id: str, collection: str = None) -> dict:
@@ -91,10 +98,12 @@ class MongoRepository(RepositoryInterface):
     ) -> List[dict]:
 
         col = self._get_collection(collection)
-        if "_id" in filters:  # pragma no cover
-            filters["_id"] = utils.get_object_id(filters["_id"])
-
-        cursor = col.find(filter=filters, skip=skip, limit=limit, sort=sort)
+        cursor = col.find(
+            filter=self._parse_filters(filters),
+            skip=skip,
+            limit=limit,
+            sort=sort,
+        )
         return self._setids(cursor)
 
     def distinct(
@@ -104,10 +113,7 @@ class MongoRepository(RepositoryInterface):
         collection: str = None,
     ) -> List[str]:
         col = self._get_collection(collection)
-        if filters is not None:  # pragma no cover
-            if "_id" in filters:  # pragma no cover
-                filters["_id"] = utils.get_object_id(filters["_id"])
-        data = col.distinct(key=field, filter=filters)
+        data = col.distinct(key=field, filter=self._parse_filters(filters))
         return data
 
     def count(
@@ -119,7 +125,7 @@ class MongoRepository(RepositoryInterface):
         if filters is None:
             filters = {}
 
-        return col.count_documents(filter=filters)
+        return col.count_documents(filter=self._parse_filters(filters))
 
     # Inserting new data
 
@@ -182,7 +188,7 @@ class MongoRepository(RepositoryInterface):
         data = self._get_validated_data(data, data_validator)
         col = self._get_collection(collection)
         data = col.find_one_and_update(
-            filter=filters,
+            filter=self._parse_filters(filters),
             update=utils.add_update_operators(data, append),
             upsert=upsert,
             array_filters=array_filters,
@@ -224,7 +230,7 @@ class MongoRepository(RepositoryInterface):
         data = self._get_validated_data(data, data_validator)
         col = self._get_collection(collection)
         return col.update_many(
-            filter=filters,
+            filter=self._parse_filters(filters),
             update=utils.add_update_operators(data, append),
             upsert=upsert,
             array_filters=array_filters,
@@ -241,7 +247,7 @@ class MongoRepository(RepositoryInterface):
         data = self._get_validated_data(data, data_validator)
         col = self._get_collection(collection)
         data = col.find_one_and_replace(
-            filter=filters,
+            filter=self._parse_filters(filters),
             replacement=data,
             upsert=upsert,
             return_document=True,
@@ -278,7 +284,7 @@ class MongoRepository(RepositoryInterface):
         col = self._get_collection(collection)
         deleted_count = col.delete_many(filter=filters).deleted_count
         modified_count = col.update_many(
-            filter=filters,
+            filter=self._parse_filters(filters),
             update=utils.add_update_operators(data, False),
             upsert=upsert,
         ).modified_count
@@ -288,7 +294,7 @@ class MongoRepository(RepositoryInterface):
 
     def delete_one(self, filters: dict, collection: str = None) -> int:
         col = self._get_collection(collection)
-        return col.delete_one(filter=filters).deleted_count
+        return col.delete_one(filter=self._parse_filters(filters)).deleted_count
 
     def delete_on_id(self, id: str, collection: str = None) -> int:
         col = self._get_collection(collection)
@@ -296,4 +302,4 @@ class MongoRepository(RepositoryInterface):
 
     def delete_many(self, filters: dict, collection: str = None) -> int:
         col = self._get_collection(collection)
-        return col.delete_many(filter=filters).deleted_count
+        return col.delete_many(filter=self._parse_filters(filters)).deleted_count

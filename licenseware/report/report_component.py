@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, List, Union
 
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
@@ -28,7 +28,7 @@ class NewReportComponent:
             alias.Limit,
             alias.Skip,
         ],
-        WebResponse,
+        Union[List[dict], dict],
     ]
     config: Config
     component_type: str = None

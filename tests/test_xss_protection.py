@@ -1,7 +1,8 @@
-import pytest
 import unittest
-from licenseware.utils.xss_protection import xss_protection
 
+import pytest
+
+from licenseware.utils.xss_protection import xss_protection
 
 # pytest -s -v tests/test_xss_protection.py
 

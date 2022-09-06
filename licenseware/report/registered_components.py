@@ -49,9 +49,11 @@ class RegisteredComponents:  # pragma no cover
         repo = self._get_data_repo(db_connection)
         component = self._get_current_component(component_id)
 
-        return component.get_component_data_handler(
+        response = component.get_component_data_handler(
             tenant_id, authorization, repo, filters, limit, skip
         )
+
+        return WebResponse(status_code=200, content=response)
 
     @failsafe
     def get_public_component_data(
@@ -66,7 +68,8 @@ class RegisteredComponents:  # pragma no cover
         repo = self._get_data_repo(db_connection)
         component = self._get_current_component(component_id)
         data = ReportPublicToken(config=self.config).get_token_data(token)
-        return component.get_component_data_handler(
+
+        response = component.get_component_data_handler(
             data["tenant_id"],
             self.config.get_machine_token(),
             repo,
@@ -74,6 +77,8 @@ class RegisteredComponents:  # pragma no cover
             limit,
             skip,
         )
+
+        return WebResponse(status_code=200, content=response)
 
     @failsafe
     def get_snapshot_component_data(
@@ -90,18 +95,44 @@ class RegisteredComponents:  # pragma no cover
         component = self._get_current_component(component_id)
         repo = self._get_snapshot_repo(db_connection)
         rpt = ReportSnapshot(
-            tenant_id,
-            authorization,
-            repo,
-            self.config,
-            version,
-            None,
-            filters,
-            None,
-            limit,
-            skip,
+            tenant_id=tenant_id,
+            authorization=authorization,
+            repo=repo,
+            config=self.config,
+            version=version,
+            filters=filters,
+            limit=limit,
+            skip=skip,
         )
         result = rpt.get_snapshot_component(component.component_id)
+        return WebResponse(status_code=200, content=result)
+
+    @failsafe
+    def update_snapshot_component_data(
+        self,
+        tenant_id: str,
+        authorization: str,
+        db_connection: Any,
+        component_id: str,
+        version: str,
+        id: str,
+        data: dict,
+    ):
+        component = self._get_current_component(component_id)
+        repo = self._get_snapshot_repo(db_connection)
+
+        rpt = ReportSnapshot(
+            tenant_id=tenant_id,
+            authorization=authorization,
+            repo=repo,
+            config=self.config,
+            version=version,
+        )
+
+        result = rpt.update_component_snapshot(
+            id=id, version=version, component_id=component.component_id, data=data
+        )
+
         return WebResponse(status_code=200, content=result)
 
     @failsafe
@@ -117,17 +148,15 @@ class RegisteredComponents:  # pragma no cover
         repo = self._get_data_repo(db_connection)
         component = self._get_current_component(component_id)
 
-        result = component.get_component_data_handler(
+        response = component.get_component_data_handler(
             tenant_id, authorization, repo, None, 0, 0
         )
-        if result.status_code != 200:
-            return result
 
         filepath, filename = create_file(
             tenant_id,
             filename=component.component_id,
             filetype=filetype,
-            data=result.content,
+            data=response,
             config=self.config,
         )
 
@@ -151,7 +180,13 @@ class RegisteredComponents:  # pragma no cover
         repo = self._get_snapshot_repo(db_connection)
         component = self._get_current_component(component_id)
 
-        rpt = ReportSnapshot(tenant_id, authorization, repo, self.config, version)
+        rpt = ReportSnapshot(
+            tenant_id=tenant_id,
+            authorization=authorization,
+            repo=repo,
+            config=self.config,
+            version=version,
+        )
         result = rpt.get_snapshot_component(component.component_id)
 
         filepath, filename = create_file(
