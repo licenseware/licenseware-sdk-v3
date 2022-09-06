@@ -11,3 +11,4 @@ from .get_user_info import get_user_info
 from .logger import log
 from .mongo_limit_skip_filters import insert_mongo_limit_skip_filters
 from .mongo_query_from_filters import get_mongo_query_from_filters
+from .xss_protection import xss_protection
