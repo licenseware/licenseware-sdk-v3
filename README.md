@@ -39,19 +39,9 @@ These attributes and actions which define an uploader are needed to handle the f
 
 - Create a new uploader
 
-Import configuration
-```py
-from config import config
-```
-The `config` object will contain common data for our application.
-Data like:
-- the app id;
-- url to register uploader;
-etc  
-
-
 Import uploader constructors
 ```py
+from settings import config
 from licenseware import (
     NewUploader, 
     UploaderValidationParameters,
@@ -59,6 +49,7 @@ from licenseware import (
     FileTypes
 )
 ```
+- `config` - this object will contain common data for our application;
 - `NewUploader` - this object will `hold` all the information needed (metadata) for describing file(s) which will be uploaded for processing;
 - `UploaderValidationParameters` - this object will contain metadata needed to validate file(s);
 - `UploaderEncryptionParameters` - this object will contain metadata needed to encrypt sensitive data from file(s);
@@ -190,7 +181,6 @@ In the `NewUploader` object we gather all information about this uploader
 - `icon` - the icon of this uploader which will be displayed in frontend;
 - `config` - the configuration class instance will will need to make available the following information:
     * `config.APP_ID` - each service must have an unique ID;
-    * `config.REGISTER_UPLOADER_URL` - the url where this uploader will be registered (discovery/registry service);
     * `config.get_machine_token()` - a function which will return the service's authentification token. This token is available after the services authentificates that's way we need a dynamic way of retreiving it;
 
 
@@ -247,7 +237,7 @@ The same principles apply as with `Uploaders`.
 - Start by importing the report contructors
 
 ```py
-from config import config
+from settings import config
 from licenseware import (
     NewReport, 
     NewReportComponent,
@@ -515,7 +505,7 @@ registered_datatables = RegisteredDataTables(datatables, config)
 
 ```
 
-The `registered_datatables` will be imported on app startup in the `app/api/defaults/datatables_router.py`/`app/api/defaults/app_router.py` and will be used to auto generate api routes for each report datatable.
+The `registered_datatables` will be imported on app startup in the `app/api/defaults/datatables_router.py` and will be used to auto generate api routes for each report datatable.
 
 
 <a name="Mongo-Repository"></a>
