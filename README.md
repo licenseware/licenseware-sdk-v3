@@ -29,7 +29,7 @@
 - install licenseware: `make install`;
 - uninstall licenseware: `make uninstall`;
 - build licenseware wheel: `make build`;
-
+- install from git: `pip3 install git+https://git@github.com/licenseware/licenseware-sdk-v3.git`; 
 
 <a name="Uploaders"></a>
 # Uploaders
