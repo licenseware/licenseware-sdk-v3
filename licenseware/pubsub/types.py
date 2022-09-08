@@ -34,6 +34,13 @@ class EventType:
     APP_ACCESS_GRANTED: str = "AppAccessGranted"
     APP_PERMISSIONS_UPDATED: str = "AppPermissionsUpdated"
     APP_QUOTA_UPDATED: str = "AppQuotaUpdated"
+
+    APP_FULL_METADATA: str = "AppFullMetadata"
+    APP_METADATA: str = "AppMetadata"
+    ULOADER_METADATA: str = "UploaderMetadata"
+    REPORT_METADATA: str = "ReportMetadata"
+    REPORT_COMPONENT_METADATA: str = "ReportMetadata"
+
     UPLOADER_STATUS_UPDATED: str = "UploaderStatusUpdated"
     APP_DATA_UPDATED: str = "AppDataUpdated"
     DATA_SYNC_EVENTS: str = "DataSyncEvents"

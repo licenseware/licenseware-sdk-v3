@@ -48,11 +48,6 @@ class Config(BaseSettings):  # pragma no cover
     USER_INFO_URL: str = None
     PUBLIC_TOKEN_REPORT_URL: str = None
     FRONTEND_URL: str = None
-    REGISTER_APP_URL: str = None
-    REGISTER_UPLOADER_URL: str = None
-    REGISTER_REPORT_URL: str = None
-    REGISTER_REPORT_COMPONENT_URL: str = None
-    REGISTER_ALL_URL: str = None
     FILE_UPLOAD_PATH: str = "/tmp/client-files"
     CURRENT_ENVIRONMENT: Environment = Environment.DEV
     ENVIRONMENTS: Environment = Environment
@@ -69,6 +64,8 @@ class Config(BaseSettings):  # pragma no cover
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
+
+    KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
 
     RABBITMQ_HOST: str = "localhost"
     RABBITMQ_PORT: int = 5672
