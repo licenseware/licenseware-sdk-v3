@@ -24,7 +24,7 @@ class Consumer:
         try:
 
             while True:
-                msg = self.consumer.poll(0.3)
+                msg = self.consumer.poll(0.5)
 
                 if msg is None:
                     continue

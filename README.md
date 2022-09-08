@@ -740,33 +740,38 @@ On the app side define stream producer (publisher)
 from licenseware import Producer, TopicType, EventType
 from confluent_kafka import Producer as KafkaProducer
 
-
-producer_client = KafkaProducer({'bootstrap.servers': 'mybroker1,mybroker2'})
+producer_client = KafkaProducer({"bootstrap.servers": "PLAINTEXT://localhost:9092"})
 
 producer = Producer(producer_client)
-
 
 data_stream = {
     "event_type": EventType.ACCOUNT_CREATED,
     "tenant_id": None,
-    "etc": "data"
+    "etc": "data",
 }
 
 producer.publish(TopicType.USER_EVENTS, data_stream)
-
 
 ```
 
 You can also define a consumer (subscriber)
 
 ```py
-from licenseware import EventType, TopicType, Consumer
+
+from licenseware import Consumer, EventType, TopicType
 from confluent_kafka import Consumer as KafkaConsumer
 
 
-consumer_client = KafkaConsumer({'bootstrap.servers': 'mybroker1,mybroker2'})
+consumer_client = KafkaConsumer(
+    {
+        "bootstrap.servers": "PLAINTEXT://localhost:9092",
+        "group.id": "subscriber-consumer",
+    }
+)
 
 consumer = Consumer(consumer_client)
+
+consumer.subscribe(TopicType.USER_EVENTS)
 
 
 def account_created_handler(*args, **kwargs):
@@ -774,11 +779,9 @@ def account_created_handler(*args, **kwargs):
 
 
 consumer.dispatch(EventType.ACCOUNT_CREATED, account_created_handler)
-# etc
 
 
 if __name__ == "__main__":
-    
     consumer.listen()
 
 ```
