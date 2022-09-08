@@ -1,6 +1,7 @@
 PyJWT~=2.4
 confluent-kafka~=1.9
 fastapi~=0.78
+pydantic==1.10.2
 loguru~=0.6
 marshmallow==3.17.0
 openpyxl~=3.0
