@@ -64,7 +64,7 @@ def test_new_uploader(mocker):
         if resp.filename == "rv_tools.xlsx":
             assert resp.status == "success"
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     files = [fp]
     response = rv_tools_uploader.filecontents_validation_handler(
         files, rv_tools_validation_parameters
@@ -149,7 +149,7 @@ def test_new_uploader_custom_handlers(mocker):
         if resp.filename == "rv_tools.xlsx":
             assert resp.status == "success"
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     files = [fp]
     response = rv_tools_uploader.filecontents_validation_handler(
         files, rv_tools_validation_parameters

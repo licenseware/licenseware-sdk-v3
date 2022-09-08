@@ -15,7 +15,7 @@ def test_sniff_delimiter():
 
     result_map = {"semicolon.csv": ";", "comma.csv": ",", "pipe.csv": "|"}
 
-    snifffp = "./test_files/sniff_delimiter_csv/"
+    snifffp = "./tests/test_files/sniff_delimiter_csv/"
     filepaths = [
         os.path.join(snifffp, f) for f in os.listdir(snifffp) if f.endswith(".csv")
     ]
@@ -25,7 +25,7 @@ def test_sniff_delimiter():
         delimiter = helpers.sniff_delimiter(f)
         assert delimiter == result_map[os.path.basename(fp)]
 
-    fp = "./test_files/lms_detail.csv"
+    fp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(fp)
 
     delimiter = helpers.sniff_delimiter(f)
@@ -35,7 +35,7 @@ def test_sniff_delimiter():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_required_input_type_response
 def test_required_input_type_response():
 
-    fp = "./test_files/lms_detail.csv"
+    fp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(fp)
     vparams = UploaderValidationParameters(required_input_type="csv")
 
@@ -46,7 +46,7 @@ def test_required_input_type_response():
     res = helpers.required_input_type_response(f, vparams)
     assert "File is not of required input type" in res
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     f = FileUploadHandler(fp)
 
     vparams = UploaderValidationParameters(
@@ -59,7 +59,7 @@ def test_required_input_type_response():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_text_contains_all_response
 def test_text_contains_all_response():
 
-    fp = "./test_files/lms_detail.csv"
+    fp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(fp)
     vparams = UploaderValidationParameters(
         text_contains_all=[
@@ -82,7 +82,7 @@ def test_text_contains_all_response():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_text_contains_any_response
 def test_text_contains_any_response():
 
-    fp = "./test_files/lms_detail.csv"
+    fp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(fp)
     vparams = UploaderValidationParameters(
         text_contains_any=[
@@ -106,7 +106,7 @@ def test_text_contains_any_response():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_get_csv_df
 def test_get_csv_df():
 
-    fp = "./test_files/lms_detail.csv"
+    fp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(fp)
     vparams = UploaderValidationParameters(min_rows_number=5, header_starts_at=0)
 
@@ -123,7 +123,7 @@ def test_get_csv_df():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_get_df_sheets
 def test_get_df_sheets():
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     f = FileUploadHandler(fp)
 
     sheets = helpers.get_df_sheets(f)
@@ -134,7 +134,7 @@ def test_get_df_sheets():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_get_excel_dfs
 def test_get_excel_dfs():
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     f = FileUploadHandler(fp)
 
     dfs = helpers.get_excel_dfs(
@@ -148,7 +148,7 @@ def test_get_excel_dfs():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_required_columns_response
 def test_required_columns_response():
 
-    fp = "./test_files/lms_detail.csv"
+    fp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(fp)
     vparams = UploaderValidationParameters(
         required_columns=["RL_SCRIPT_VERSION", "TIMESTAMP", "MACHINE_ID", "VMACHINE_ID"]
@@ -164,7 +164,7 @@ def test_required_columns_response():
     assert isinstance(res, str)
     assert "File doesn't contain the following needed columns" in res
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     f = FileUploadHandler(fp)
 
     vparams = UploaderValidationParameters(
@@ -178,7 +178,7 @@ def test_required_columns_response():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_required_sheets_response
 def test_required_sheets_response():
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     f = FileUploadHandler(fp)
 
     vparams = UploaderValidationParameters(required_sheets=[["vInfo"], ("tabvInfo",)])
@@ -202,7 +202,7 @@ def test_required_sheets_response():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_min_rows_number_response
 def test_min_rows_number_response():
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     f = FileUploadHandler(fp)
 
     vparams = UploaderValidationParameters(
@@ -232,7 +232,8 @@ def test_get_filenames_response():
     )
 
     res = helpers.get_filenames_response(
-        ["./test_files/lms_detail.csv", "./test_files/RVTools.xlsx"], vparams
+        ["./tests/test_files/lms_detail.csv", "./tests/test_files/RVTools.xlsx"],
+        vparams,
     )
 
     for r in res.validation:
@@ -245,7 +246,7 @@ def test_get_filenames_response():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_get_failed_validations
 def test_get_failed_validations():
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     f = FileUploadHandler(fp)
 
     vparams = UploaderValidationParameters(
@@ -263,7 +264,7 @@ def test_get_failed_validations():
 # pytest -s -v tests/test_default_filecontents_validation_handler.py::test_default_filecontents_validation_handler
 def test_default_filecontents_validation_handler():
 
-    # rvtoolsfp = "./test_files/RVTools.xlsx"
+    # rvtoolsfp = "./tests/test_files/RVTools.xlsx"
 
     # with open(rvtoolsfp, 'rb') as f:
     #     file_binary = io.BytesIO(f.read())
@@ -282,7 +283,7 @@ def test_default_filecontents_validation_handler():
 
     # files = [rvtoolsflask, rvtoolsfastapi]
 
-    fp = "./test_files/RVTools.xlsx"
+    fp = "./tests/test_files/RVTools.xlsx"
     files = [fp]
 
     rv_tools_validation_parameters = UploaderValidationParameters(

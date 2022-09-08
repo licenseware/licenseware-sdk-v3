@@ -9,7 +9,7 @@ from licenseware import is_archive, recursive_unzip, unzip
 # pytest -s -v tests/test_file_utils.py::test_file_utils_unzip
 def test_file_utils_unzip():
 
-    zippath = "./test_files/zip.tar.xz"
+    zippath = "./tests/test_files/zip.tar.xz"
 
     unzipedpath = unzip(zippath)
 
@@ -30,7 +30,7 @@ def test_file_utils_unzip():
 # pytest -s -v tests/test_file_utils.py::test_file_utils_recursive_unzip
 def test_file_utils_recursive_unzip():
 
-    zippath = "./test_files/zip.tar.xz"
+    zippath = "./tests/test_files/zip.tar.xz"
 
     unzipedpath = recursive_unzip(zippath)
 

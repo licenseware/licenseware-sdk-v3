@@ -14,7 +14,7 @@ from licenseware import FileUploadHandler
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_objects
 def test_file_handler_objects():
 
-    csvfp = "./test_files/lms_detail.csv"
+    csvfp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(csvfp)
 
     assert "read" in dir(f)
@@ -28,7 +28,7 @@ def test_file_handler_objects():
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_string_input
 def test_file_handler_string_input():
 
-    csvfp = "./test_files/lms_detail.csv"
+    csvfp = "./tests/test_files/lms_detail.csv"
     f = FileUploadHandler(csvfp)
 
     assert f.filename == "lms_detail.csv"
@@ -41,7 +41,7 @@ def test_file_handler_string_input():
     dfcsv = pd.read_csv(f.buffer)
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
-    save_path = "./test_files/testdir"
+    save_path = "./tests/test_files/testdir"
     saved_file_path = f.save(save_path)
     assert os.path.exists(saved_file_path)
     shutil.rmtree(save_path)
@@ -50,7 +50,7 @@ def test_file_handler_string_input():
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_flask_file_storage_input
 def test_file_handler_flask_file_storage_input():
 
-    csvfp = "./test_files/lms_detail.csv"
+    csvfp = "./tests/test_files/lms_detail.csv"
 
     with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
@@ -77,7 +77,7 @@ def test_file_handler_flask_file_storage_input():
     # print(dfcsv.columns)
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
-    save_path = "./test_files/testdir/testfile.csv"
+    save_path = "./tests/test_files/testdir/testfile.csv"
     f.save(save_path)
     assert os.path.exists(save_path)
     shutil.rmtree(os.path.dirname(save_path))
@@ -86,7 +86,7 @@ def test_file_handler_flask_file_storage_input():
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_fastapi_uploadfile_input
 def test_file_handler_fastapi_uploadfile_input():
 
-    csvfp = "./test_files/lms_detail.csv"
+    csvfp = "./tests/test_files/lms_detail.csv"
 
     with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
@@ -112,7 +112,7 @@ def test_file_handler_fastapi_uploadfile_input():
     # print(dfcsv.columns)
     assert "RL_SCRIPT_VERSION,TIMESTAMP,MACHINE_ID" in ",".join(list(dfcsv.columns))
 
-    save_path = "./test_files/testdir/testfile.csv"
+    save_path = "./tests/test_files/testdir/testfile.csv"
     f.save(save_path)
     assert os.path.exists(save_path)
     shutil.rmtree(os.path.dirname(save_path))
@@ -121,7 +121,7 @@ def test_file_handler_fastapi_uploadfile_input():
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_flask_filestorage_input_seek_2_params
 def test_file_handler_flask_filestorage_input_seek_2_params():
 
-    csvfp = "./test_files/RVTools.xlsx"
+    csvfp = "./tests/test_files/RVTools.xlsx"
 
     with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
@@ -144,7 +144,7 @@ def test_file_handler_flask_filestorage_input_seek_2_params():
 # pytest -s -v tests/test_file_upload_handler.py::test_file_handler_fastapi_uploadfile_input_seek_2_params
 def test_file_handler_fastapi_uploadfile_input_seek_2_params():
 
-    csvfp = "./test_files/RVTools.xlsx"
+    csvfp = "./tests/test_files/RVTools.xlsx"
 
     with open(csvfp, "rb") as f:
         file_binary = io.BytesIO(f.read())
