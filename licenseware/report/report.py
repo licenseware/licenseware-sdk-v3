@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from licenseware.config.config import Config
 from licenseware.utils.alter_string import get_altered_strings
-
+from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from . import default_handlers
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
@@ -64,14 +64,16 @@ class NewReport:
             if comp.component_id == component_id:
                 return comp
 
-        raise ValueError(
+        raise Exception(
             f"Component '{component_id}' not found on given report components"
         )  # pragma no cover
 
     def attach(self, component_id: str):
 
         if component_id in self.report_components.keys():
-            raise ValueError(f"Report component '{component_id}' is already attached")
+            raise ErrorAlreadyAttached(
+                f"Report component '{component_id}' is already attached"
+            )
 
         component = self._get_component_by_id(component_id)
 

@@ -10,3 +10,5 @@ from licenseware.report import *
 from licenseware.repository import *
 from licenseware.uploader import *
 from licenseware.utils import *
+from licenseware.dependencies import *
+from licenseware.exceptions import *

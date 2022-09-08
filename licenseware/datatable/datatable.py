@@ -7,7 +7,7 @@ from licenseware.config.config import Config
 from licenseware.constants.column_types import ColumnTypes
 from licenseware.report.style_attributes import StyleAttrs
 from licenseware.utils.alter_string import get_altered_strings
-
+from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from .crud_handler import CrudHandler
 
 
@@ -127,7 +127,7 @@ class DataTable:
     ):
 
         if prop in self._added_props:
-            raise ValueError(f"Column '{prop}' is already added")
+            raise ErrorAlreadyAttached(f"Column '{prop}' is already attached")
         self._added_props.add(prop)
 
         name = _update_name(name, prop)

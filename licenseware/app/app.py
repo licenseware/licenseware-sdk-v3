@@ -5,6 +5,7 @@ from licenseware.config.config import Config
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
+from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 
 from . import default_handlers
 
@@ -42,7 +43,7 @@ class NewApp:
 
         for uploader in uploaders:
             if uploader.uploader_id in self.attached_uploaders.keys():
-                raise ValueError(
+                raise ErrorAlreadyAttached(
                     f"Uploader '{uploader.uploader_id}' already attached to this app"
                 )
             self.attached_uploaders[uploader.uploader_id] = uploader
@@ -53,7 +54,7 @@ class NewApp:
 
         for report in reports:
             if report.report_id in self.attached_reports.keys():
-                raise ValueError(
+                raise ErrorAlreadyAttached(
                     f"Report '{report.report_id}' already attached to this app"
                 )
             self.attached_reports[report.report_id] = report
@@ -64,7 +65,7 @@ class NewApp:
 
         for component in components:
             if component.component_id in self.attached_components.keys():
-                raise ValueError(
+                raise ErrorAlreadyAttached(
                     f"Report component '{component.component_id}' already attached to this app"
                 )
             self.attached_components[component.component_id] = component

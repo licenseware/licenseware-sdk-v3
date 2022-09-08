@@ -11,6 +11,7 @@ from licenseware import (
     NewUploader,
     StyleAttrs,
     SummaryAttrs,
+    ErrorAlreadyAttached,
 )
 
 # pytest -s -v tests/test_new_app.py
@@ -97,13 +98,13 @@ def test_adding_objects():
     assert fmw_deployment_report.report_id in app.attached_reports
     assert fmw_summary_component.component_id in app.attached_components
 
-    with t.assertRaises(ValueError):
+    with t.assertRaises(ErrorAlreadyAttached):
         app.attach_uploaders([rv_tools_uploader])
 
-    with t.assertRaises(ValueError):
+    with t.assertRaises(ErrorAlreadyAttached):
         app.attach_reports([fmw_deployment_report])
 
-    with t.assertRaises(ValueError):
+    with t.assertRaises(ErrorAlreadyAttached):
         app.attach_components([fmw_summary_component])
 
     assert isinstance(app.metadata, dict)

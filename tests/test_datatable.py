@@ -1,6 +1,6 @@
 import unittest
 
-from licenseware import ColumnTypes, Config, DataTable
+from licenseware import ColumnTypes, Config, DataTable, ErrorAlreadyAttached
 
 # pytest -s -v tests/test_datatable.py
 
@@ -12,7 +12,7 @@ def test_datatable_overwrite_prop():
 
     config = Config()
 
-    with t.assertRaises(ValueError):
+    with t.assertRaises(ErrorAlreadyAttached):
         devices = DataTable(
             title="Devices",
             config=config,

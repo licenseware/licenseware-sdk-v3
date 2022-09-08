@@ -8,6 +8,7 @@ from licenseware import (
     ReportFilter,
     StyleAttrs,
     SummaryAttrs,
+    ErrorAlreadyAttached,
 )
 from licenseware.report.report import (
     Config,
@@ -176,7 +177,7 @@ def test_report_creation(mocker):
 
     # Attaching a report component to a report
     fmw_deployment_report.attach("fmw_summary")
-    with t.assertRaises(ValueError):
+    with t.assertRaises(ErrorAlreadyAttached):
         fmw_deployment_report.attach("fmw_summary")
 
     assert fmw_summary_component.get_component_data_handler() == "mock_component_data"
