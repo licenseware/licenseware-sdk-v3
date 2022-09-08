@@ -1,10 +1,9 @@
 import datetime
 
 import dateutil.parser as dateparser
-import jwt
-import requests
 
 from licenseware.config.config import Config
+from licenseware.dependencies import jwt, requests
 from licenseware.utils.logger import log
 
 

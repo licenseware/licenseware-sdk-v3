@@ -1,3 +1,4 @@
+exclude: ^licenseware/dependencies/
 repos:
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
