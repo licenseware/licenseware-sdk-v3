@@ -21,4 +21,4 @@ def test_failsafe_decorator():
     res = somefunc(1, 2)
 
     assert res.status_code == 500
-    assert res.content["message"] == "not enough params"
+    assert res.content["message"] == "Something went wrong"
