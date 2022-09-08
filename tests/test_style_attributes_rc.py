@@ -1,7 +1,5 @@
 import unittest
 
-import pytest
-
 from licenseware import StyleAttrs
 
 # pytest -v -s tests/test_style_attributes_rc.py

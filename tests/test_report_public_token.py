@@ -1,7 +1,5 @@
 import datetime
 
-import pytest
-
 from licenseware import Config, ReportPublicToken
 
 from . import tenant_id

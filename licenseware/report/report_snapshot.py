@@ -4,8 +4,6 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from bson.objectid import ObjectId
-
 from licenseware.config.config import Config
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.mongo_limit_skip_filters import insert_mongo_limit_skip_filters

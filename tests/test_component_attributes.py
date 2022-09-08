@@ -1,5 +1,3 @@
-import pytest
-
 from licenseware import (
     BarHorizontalAttrs,
     ColumnTypes,

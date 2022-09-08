@@ -1,5 +1,3 @@
-import pytest
-
 from licenseware.utils import get_altered_strings
 
 # pytest -s -v tests/test_altered_strings.py

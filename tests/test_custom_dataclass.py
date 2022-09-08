@@ -1,7 +1,5 @@
 from dataclasses import is_dataclass
 
-import pytest
-
 from licenseware import customdataclass
 
 # pytest -s -v tests/test_custom_dataclass.py

@@ -1,8 +1,6 @@
 import os
 import shutil
 
-import pytest
-
 from licenseware import (
     Config,
     create_csv_file,

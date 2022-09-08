@@ -1,7 +1,5 @@
 import unittest
 
-import pytest
-
 from licenseware.uploader.default_handlers.validators import (
     validate_required_input_type,
     validate_text_contains_all,

@@ -1,5 +1,3 @@
-import pytest
-
 from licenseware import Config, get_user_info
 
 from . import tenant_id

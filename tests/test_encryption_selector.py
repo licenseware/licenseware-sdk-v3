@@ -1,5 +1,3 @@
-import pytest
-
 from licenseware import EncryptionSelector
 
 # pytest -s -v tests/test_encryption_selector.py

@@ -3,7 +3,6 @@ from typing import Any
 
 from licenseware.constants.states import States
 from licenseware.repository.repository_interface import RepositoryInterface
-from licenseware.utils.logger import log as logg
 
 from .schemas import history_validator
 

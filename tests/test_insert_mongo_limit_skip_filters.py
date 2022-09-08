@@ -1,5 +1,3 @@
-import pytest
-
 from licenseware import insert_mongo_limit_skip_filters
 
 # pytest -s -v tests/test_insert_mongo_limit_skip_filters.py

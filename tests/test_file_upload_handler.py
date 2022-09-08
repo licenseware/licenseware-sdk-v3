@@ -3,7 +3,6 @@ import os
 import shutil
 
 import pandas as pd
-import pytest
 from fastapi import UploadFile
 from werkzeug.datastructures import FileStorage
 

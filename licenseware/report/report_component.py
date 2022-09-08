@@ -4,10 +4,7 @@ from typing import Callable, List, Union
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
 from licenseware.constants.attributes_type import AttributesType
-from licenseware.constants.states import States
-from licenseware.constants.web_response import WebResponse
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.utils.logger import log
 
 from .report_filter import ReportFilter
 from .style_attributes import StyleAttrs

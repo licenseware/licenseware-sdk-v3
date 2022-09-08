@@ -1,9 +1,5 @@
 import os
 
-import pytest
-from fastapi import UploadFile
-from werkzeug.datastructures import FileStorage
-
 from licenseware import FileUploadHandler
 from licenseware.uploader import UploaderValidationParameters
 from licenseware.uploader.default_handlers import (

@@ -1,7 +1,5 @@
 import unittest
 
-import pytest
-
 from licenseware import ReportFilter
 
 # pytest -v -s tests/test_report_filter.py

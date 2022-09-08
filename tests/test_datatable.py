@@ -1,8 +1,6 @@
 import unittest
 
-import pytest
-
-from licenseware import ColumnTypes, Config, CrudHandler, DataTable
+from licenseware import ColumnTypes, Config, DataTable
 
 # pytest -s -v tests/test_datatable.py
 

@@ -1,8 +1,6 @@
 import json
 import unittest
 
-import pytest
-
 from licenseware import (
     Config,
     Flags,

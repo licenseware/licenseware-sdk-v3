@@ -1,9 +1,7 @@
 import os
 import shutil
 
-import pytest
-
-from licenseware import is_archive, list_files_from_path, recursive_unzip, unzip
+from licenseware import is_archive, recursive_unzip, unzip
 
 # pytest -s -v tests/test_file_utils.py
 
