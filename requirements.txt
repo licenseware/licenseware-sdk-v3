@@ -1,15 +1,11 @@
 PyJWT~=2.4
 confluent-kafka~=1.9
-coverage-badge<1
-coverage<7
 fastapi~=0.78
 loguru~=0.6
 marshmallow==3.17.0
 openpyxl~=3.0
 pandas~=1.2
 pymongo==4.2.0
-pytest-mock<3
-pytest<7
 python-multipart==0.0.5
 redis~=3.5
 requests~=2.28

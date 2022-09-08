@@ -24,6 +24,7 @@
 - create virtualenv: `virtualenv ./`;
 - activate virtualenv: `source ./bin/activate`;
 - install dependencies: `pip3 install -r requirements.txt`;
+- install dependencies: `pip3 install -r requirements-tests.txt`;
 - running tests: `make run-tests`;
 - install licenseware: `make install`;
 - uninstall licenseware: `make uninstall`;

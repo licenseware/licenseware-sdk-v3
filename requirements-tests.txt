@@ -1,0 +1,4 @@
+coverage-badge<1
+coverage<7
+pytest-mock<3
+pytest<7
