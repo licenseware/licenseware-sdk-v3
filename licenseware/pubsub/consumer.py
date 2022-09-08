@@ -3,19 +3,25 @@ from typing import Callable
 
 from confluent_kafka import Consumer as KafkaConsumer
 
-from .types import EventType
+from .types import EventType, TopicType
 
 
 class Consumer:
     def __init__(self, consumer: KafkaConsumer):
         self.consumer = consumer
         self.event_dispacher = dict()
+        self._allowed_topics = TopicType().dict().values()
+        self._subscribed = False
 
     def subscribe(self, topic: str):
+        assert topic in self._allowed_topics
         self.consumer.subscribe([topic])
+        self._subscribed = True
         return self
 
     def dispatch(self, event_type: EventType, event_handler: Callable):
+        if not self._subscribed:
+            raise Exception("Please subscribe to at least one topic/channel")
         self.event_dispacher[event_type] = event_handler
         return self
 
