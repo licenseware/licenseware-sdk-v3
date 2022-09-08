@@ -2,13 +2,13 @@ import unittest
 
 from licenseware import (
     BarHorizontalAttrs,
+    ErrorAlreadyAttached,
     Icons,
     NewReport,
     NewReportComponent,
     ReportFilter,
     StyleAttrs,
     SummaryAttrs,
-    ErrorAlreadyAttached,
 )
 from licenseware.report.report import (
     Config,

@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from typing import List
 
 from licenseware.config.config import Config
+from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 
 from . import default_handlers
 

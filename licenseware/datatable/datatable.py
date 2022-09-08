@@ -5,9 +5,10 @@ from urllib.parse import urlencode
 
 from licenseware.config.config import Config
 from licenseware.constants.column_types import ColumnTypes
+from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.report.style_attributes import StyleAttrs
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
+
 from .crud_handler import CrudHandler
 
 

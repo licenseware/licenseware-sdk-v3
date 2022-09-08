@@ -3,6 +3,7 @@ import unittest
 
 from licenseware import (
     Config,
+    ErrorAlreadyAttached,
     Flags,
     Icons,
     NewApp,
@@ -11,7 +12,6 @@ from licenseware import (
     NewUploader,
     StyleAttrs,
     SummaryAttrs,
-    ErrorAlreadyAttached,
 )
 
 # pytest -s -v tests/test_new_app.py

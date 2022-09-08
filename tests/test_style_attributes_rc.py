@@ -1,6 +1,6 @@
 import unittest
 
-from licenseware import StyleAttrs, ErrorAlreadyAttached
+from licenseware import ErrorAlreadyAttached, StyleAttrs
 
 # pytest -v -s tests/test_style_attributes_rc.py
 

@@ -2,8 +2,9 @@ from dataclasses import dataclass
 from typing import Dict, List
 
 from licenseware.config.config import Config
-from licenseware.utils.alter_string import get_altered_strings
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
+from licenseware.utils.alter_string import get_altered_strings
+
 from . import default_handlers
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter

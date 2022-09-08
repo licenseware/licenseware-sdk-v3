@@ -737,7 +737,7 @@ topic.delete(TopicType.APP_EVENTS)
 On the app side define stream producer (publisher)
 
 ```py
-from licensware import Producer, TopicType, EventType
+from licenseware import Producer, TopicType, EventType
 from confluent_kafka import Producer as KafkaProducer
 
 
@@ -752,7 +752,7 @@ data_stream = {
     "etc": "data"
 }
 
-producer.publish(TopicType.USER_EVENTS, data)
+producer.publish(TopicType.USER_EVENTS, data_stream)
 
 
 ```
