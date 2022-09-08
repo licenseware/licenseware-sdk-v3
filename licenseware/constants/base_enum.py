@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class BaseTypes(str, Enum):  # pragma: no cover
+class BaseEnum(str, Enum):  # pragma: no cover
     def __str__(self):
         return self.name
 

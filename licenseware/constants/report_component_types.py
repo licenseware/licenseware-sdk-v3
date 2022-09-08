@@ -1,7 +1,7 @@
-from licenseware.constants.base_types import BaseTypes
+from licenseware.constants.base_enum import BaseEnum
 
 
-class RCTypes(BaseTypes):
+class RCTypes(BaseEnum):
     PIE = "pie"
     TABLE = "table"
     SUMMARY = "summary"

@@ -1,5 +1,6 @@
 from .allowed_filters import AllowedFilters
 from .attributes_type import AttributesType
+from .base_enum import BaseEnum
 from .column_types import ColumnTypes
 from .file_types import DownloadFileType, FileTypes
 from .filter_item_type import FilterItemType, FilterUI

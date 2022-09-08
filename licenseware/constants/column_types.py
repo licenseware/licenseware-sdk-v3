@@ -1,7 +1,7 @@
-from .base_types import BaseTypes
+from .base_enum import BaseEnum
 
 
-class ColumnTypes(BaseTypes):
+class ColumnTypes(BaseEnum):
     STRING = "string"
     NUMBER = "number"
     DATE = "date"

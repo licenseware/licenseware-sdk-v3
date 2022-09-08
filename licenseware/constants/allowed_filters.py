@@ -1,7 +1,7 @@
-from .base_types import BaseTypes
+from .base_enum import BaseEnum
 
 
-class AllowedFilters(BaseTypes):
+class AllowedFilters(BaseEnum):
     EQUALS = "equals"
     CONTAINS = "contains"
     IN_LIST = "in_list"

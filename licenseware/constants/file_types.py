@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from .base_types import BaseTypes
+from .base_enum import BaseEnum
 
 
 @dataclass(frozen=True)
@@ -19,7 +19,7 @@ class FileTypes:
     GENERIC_ARCHIVE: tuple = (ZIP, TAR, TAR_BZ2, TAR_GZ, TGZ)
 
 
-class DownloadFileType(BaseTypes):
+class DownloadFileType(BaseEnum):
     JSON = "json"
     XLSX = "xlsx"
     CSV = "csv"

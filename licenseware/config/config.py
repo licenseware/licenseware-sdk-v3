@@ -2,11 +2,11 @@ import uuid
 
 from pydantic import BaseSettings
 
-from licenseware.constants.base_types import BaseTypes
+from licenseware.constants.base_enum import BaseEnum
 from licenseware.utils.alter_string import get_altered_strings
 
 
-class Collections(BaseTypes):
+class Collections(BaseEnum):
     DATA = "Data"
     QUOTA = "Quota"
     HISTORY = "ProcessingHistory"
@@ -18,7 +18,7 @@ class Collections(BaseTypes):
     MONGO_COLLECTION_ANALYSIS_NAME = "History"
 
 
-class LogLevel(BaseTypes):
+class LogLevel(BaseEnum):
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
@@ -26,19 +26,19 @@ class LogLevel(BaseTypes):
     CRITICAL = "CRITICAL"
 
 
-class Environment(BaseTypes):
+class Environment(BaseEnum):
     TEST = "TEST"
     DEV = "DEV"
     PROD = "PROD"
     DESKTOP = "DESKTOP"
 
 
-class CeleryBrokerType(BaseTypes):
+class CeleryBrokerType(BaseEnum):
     REDIS = "REDIS"
     RABBITMQ = "RABBITMQ"
 
 
-class WebAppFramework(BaseTypes):
+class WebAppFramework(BaseEnum):
     FASTAPI = "FASTAPI"
     FLASK = "FLASK"
 

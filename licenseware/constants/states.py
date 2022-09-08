@@ -1,7 +1,7 @@
-from .base_types import BaseTypes
+from .base_enum import BaseEnum
 
 
-class States(BaseTypes):
+class States(BaseEnum):
     IDLE = "idle"
     RUNNING = "running"
     SUCCESS = "success"

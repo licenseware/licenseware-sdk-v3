@@ -1,7 +1,7 @@
-from .base_types import BaseTypes
+from .base_enum import BaseEnum
 
 
-class Icons(BaseTypes):
+class Icons(BaseEnum):
     SERVERS = "ServersIcon"
     FEATURES = "FeaturesIcon"
     CPU = "CpuIcon"
