@@ -1,11 +1,12 @@
+import datetime
 from dataclasses import dataclass
 from typing import Dict, List
 
 from licenseware.config.config import Config
+from licenseware.constants.states import States
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.utils.alter_string import get_altered_strings
 
-from . import default_handlers
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
 
@@ -22,7 +23,7 @@ def _update_connected_apps(connected_apps, config):
 
 
 def _parse_report_components(report_components: Dict[str, NewReportComponent]):
-    return [comp.metadata["data"][0] for _, comp in report_components.items()]
+    return [comp.get_metadata() for _, comp in report_components.items()]
 
 
 @dataclass
@@ -83,29 +84,44 @@ class NewReport:
 
         self.report_components[component.component_id] = component
 
-    @property
-    def metadata(self):
+    def get_metadata(self, parrent_app_metadata: dict, tenant_id: str = None):
 
-        metadata_payload = {
-            "data": [
-                {
-                    "app_id": self.app_id,
-                    "report_id": self.report_id,
-                    "name": self.name,
-                    "description": self.description,
-                    "flags": self.flags,
-                    "url": self.url,
-                    "public_url": self.public_url,
-                    "snapshot_url": self.snapshot_url,
-                    "report_components": _parse_report_components(
-                        self.report_components
-                    ),
-                    "connected_apps": self.connected_apps,
-                    "filters": self.filters,
-                    "registrable": self.registrable,
-                    "public_for_tenants": default_handlers.get_tenants_with_public_reports(),
-                }
-            ]
+        # TODO - provide data related to given tenant_id
+
+        metadata = {
+            # TODO - inform fe to use report_id instead of id
+            # "id": 2,
+            "app_id": self.app_id,
+            "report_id": self.report_id,
+            "name": self.name,
+            "description": self.description,
+            "url": self.url,
+            # TODO - not needed anymore, report is loaded dynamically in preview
+            # "preview_image_dark_url": None,
+            "connected_apps": self.connected_apps,
+            "flags": self.flags,
+            # TODO - not needed on registry-service, must be filtered on app.attach_report (same with uploaders, report-components)
+            "registrable": self.registrable,
+            # TODO - updated_at will be used instead
+            # "created_at": "2022-04-04T09:17:21.000000Z",
+            "updated_at": datetime.datetime.utcnow().isoformat(),
+            # TODO - not sure what this is it's on app, uploader also
+            # "private_for_tenants": [],
+            "report_components": _parse_report_components(self.report_components),
+            # TODO - not needed, preview report is loaded dynamically in fe
+            # "preview_image_url": "https:\/\/api-dev.licenseware.io\/ifmp\/reports\/infrastructure_mapping_report\/preview_image",
+            "public_url": self.public_url,
+            "snapshot_url": self.snapshot_url,
+            # TODO - enable this if tenant_id has data for this report
+            "status": States.DISABLED,
+            # TODO - get status from uploaders
+            "processing_status": States.IDLE,
+            # TODO - change this each time a new processing has been done
+            "last_update_date": None,
+            "main_app": parrent_app_metadata,
+            # TODO - get list of connected apps metadata
+            "apps": [],
+            "filters": self.filters,
         }
 
-        return metadata_payload
+        return metadata

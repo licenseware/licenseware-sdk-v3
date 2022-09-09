@@ -8,6 +8,8 @@ class States(BaseEnum):
     FAILED = "failed"
     TIMEOUT = "timeout"
     SKIPPED = "skipped"
+    ENABLED = "enabled"
+    DISABLED = "disabled"
     ACTION_REQUIRED = "action_required"
     REQUEST_ACCEPTED = "accepted"
     REQUEST_REJECTED = "rejected"

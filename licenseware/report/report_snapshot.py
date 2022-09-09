@@ -168,7 +168,7 @@ class ReportSnapshot:
 
     def insert_report_metadata(self):
 
-        report_metadata = self.report.metadata["data"][0]
+        report_metadata = self.report.get_metadata({})
         report_metadata["report_components"] = []
         report_metadata["tenant_id"] = self.tenant_id
         report_metadata["version"] = self.version
@@ -183,7 +183,7 @@ class ReportSnapshot:
 
     def update_report_component_metadata(self, comp: NewReportComponent):
 
-        comp_payload = comp.metadata["data"][0]
+        comp_payload = comp.get_metadata()
         comp_payload["snapshot_url"] = comp.snapshot_url + f"/{self.version}"
 
         self.repo.update_one(

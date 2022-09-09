@@ -58,26 +58,23 @@ class NewReportComponent:
         self.public_url = f"/{appid}/public-report-components/{compid}"
         self.snapshot_url = f"/{appid}/snapshot-report-components/{compid}"
 
-    @property
-    def metadata(self):
+    def get_metadata(self, tenant_id: str = None):
+
+        # TODO - provide related tenant data if needed
 
         metadata_payload = {
-            "data": [
-                {
-                    "app_id": self.app_id,
-                    "component_id": self.component_id,
-                    "description": self.description,
-                    "url": self.url,
-                    "public_url": self.public_url,
-                    "snapshot_url": self.snapshot_url,
-                    "order": self.order,
-                    "style_attributes": self.style_attributes,
-                    "attributes": self.attributes,
-                    "title": self.title,
-                    "type": self.component_type,
-                    "filters": self.filters,
-                }
-            ]
+            "app_id": self.app_id,
+            "component_id": self.component_id,
+            "description": self.description,
+            "url": self.url,
+            "public_url": self.public_url,
+            "snapshot_url": self.snapshot_url,
+            "order": self.order,
+            "style_attributes": self.style_attributes,
+            "attributes": self.attributes,
+            "title": self.title,
+            "type": self.component_type,
+            "filters": self.filters,
         }
 
         return metadata_payload

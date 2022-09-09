@@ -181,9 +181,10 @@ def test_report_creation(mocker):
         fmw_deployment_report.attach("fmw_summary")
 
     assert fmw_summary_component.get_component_data_handler() == "mock_component_data"
-    assert "data" in fmw_summary_component.metadata
+    assert "component_id" in fmw_summary_component.get_metadata()
 
-    d = fmw_deployment_report.metadata["data"][0]
+    d = fmw_deployment_report.get_metadata({})
+    print(d)
     firstfilter = d["filters"][0]["allowed_filters"][0]
     assert isinstance(firstfilter, str)
 
