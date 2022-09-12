@@ -83,6 +83,7 @@ class Config(BaseSettings):  # pragma no cover
 
     CELERY_BROKER_REDIS_DB: int = 1
     CELERY_BACKEND_REDIS_DB: int = 2
+    CELERY_BEATS_REGISTRATION_INTERVAL: int = 600
 
     CELERY_BROKER_TYPE: CeleryBrokerType = CeleryBrokerType.REDIS
     WEBAPP_FRAMEWORK: WebAppFramework = WebAppFramework.FASTAPI
