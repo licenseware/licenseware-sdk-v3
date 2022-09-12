@@ -1,4 +1,3 @@
-import os
 import uuid
 
 from pymongo import MongoClient
@@ -48,14 +47,20 @@ class WebAppFramework(BaseEnum):
 class Config(BaseSettings):  # pragma no cover
     APP_ID: str = "app"
     APP_SECRET: str = str(uuid.uuid4())
-    USER_INFO_URL: str = None
-    PUBLIC_TOKEN_REPORT_URL: str = None
-    FRONTEND_URL: str = None
     FILE_UPLOAD_PATH: str = "/tmp/client-files"
     CURRENT_ENVIRONMENT: Environment = Environment.DEV
     ENVIRONMENTS: Environment = Environment
     LOG_LEVEL: LogLevel = LogLevel.INFO
     PORT: int = 8000
+
+    USER_INFO_URL: str = None
+    PUBLIC_TOKEN_REPORT_URL: str = None
+    FRONTEND_URL: str = None
+
+    MACHINE_LOGIN_URL: str = None
+    MACHINE_TOKEN: str = None
+    MACHINE_NAME: str = None
+    MACHINE_PASSWORD: str = None
 
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
@@ -117,12 +122,8 @@ class Config(BaseSettings):  # pragma no cover
         return mongo_connection
 
     @property
-    def machine_token(self):
-        return os.environ["AUTH_TOKEN"]
-
-    @property
     def machine_auth_headers(self):
-        return {"Authorization": os.environ["AUTH_TOKEN"]}
+        return {"Authorization": self.MACHINE_TOKEN}
 
     class Config:
         env_file = ".env"
