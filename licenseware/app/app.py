@@ -38,6 +38,8 @@ class NewApp:
     def attach_uploaders(self, uploaders: List[NewUploader]):
 
         for uploader in uploaders:
+            if not uploader.registrable:
+                continue
             if uploader.uploader_id in self.attached_uploaders.keys():
                 raise ErrorAlreadyAttached(
                     f"Uploader '{uploader.uploader_id}' already attached to this app"
@@ -49,6 +51,8 @@ class NewApp:
     def attach_reports(self, reports: List[NewReport]):
 
         for report in reports:
+            if not report.registrable:
+                continue
             if report.report_id in self.attached_reports.keys():
                 raise ErrorAlreadyAttached(
                     f"Report '{report.report_id}' already attached to this app"
@@ -60,6 +64,8 @@ class NewApp:
     def attach_components(self, components: List[NewReportComponent]):
 
         for component in components:
+            if not component.registrable:
+                continue
             if component.component_id in self.attached_components.keys():
                 raise ErrorAlreadyAttached(
                     f"Report component '{component.component_id}' already attached to this app"
@@ -70,39 +76,40 @@ class NewApp:
 
     def get_metadata(self, tenant_id: str = None):
 
-        metadata_payload = {
-            # TODO - this id is not required, in fe needs to be updated with app_id
-            # "id": 14,
+        metadata = {
             "app_id": self.app_id,
-            # TODO - this will be always enabled - fe needs to remove handling for this field
             "status": "enabled",
             "name": self.name,
             "description": self.description,
             "icon": self.icon,
-            # TODO - app_activation_url is no longer needed
-            # "app_activation_url": "https:\/\/api-dev.licenseware.io\/oem\/activate_app",
-            # TODO - refresh_registration_url is no longer needed - notify will send all needed info
-            # "refresh_registration_url": "https:\/\/api-dev.licenseware.io\/oem\/refresh_registration",
-            # TODO - same as refresh_registration_url
-            # "tenant_registration_url": "https:\/\/api-dev.licenseware.io\/oem\/register_tenant",
             "history_report_url": self.history_report_url,
             "flags": self.flags,
-            # TODO - created at not needed, only updated_at will keep track of then this was updated
-            # "created_at": "2022-08-22T13:38:02.000000Z",
             "updated_at": datetime.datetime.utcnow().isoformat(),
-            # TODO - inform fe to update `editable_tables_url` field name to `datatables_url`
             "editable_tables_url": self.datatables_url,  # TODO - remove this field when fe updated
             "datatables_url": self.datatables_url,
-            # TODO - not sure what this field returns, probably share reports only for some tenants?
-            # "private_for_tenants": [],
-            # TODO - now without app activation for each app there is only one terms and cond on first login
-            # "terms_and_conditions_url": "https:\/\/api-dev.licenseware.io\/oem\/terms_and_conditions",
             "features": self.features,
             "app_meta": self.app_meta,
             "integration_details": self.integration_details,
         }
 
-        return metadata_payload
+        # TODO - this id is not required, in fe needs to be updated with app_id
+        # "id": 14,
+        # TODO - this will be always enabled - fe needs to remove handling for this field
+        # TODO - app_activation_url is no longer needed
+        # "app_activation_url": "https:\/\/api-dev.licenseware.io\/oem\/activate_app",
+        # TODO - refresh_registration_url is no longer needed - notify will send all needed info
+        # "refresh_registration_url": "https:\/\/api-dev.licenseware.io\/oem\/refresh_registration",
+        # TODO - same as refresh_registration_url
+        # "tenant_registration_url": "https:\/\/api-dev.licenseware.io\/oem\/register_tenant",
+        # TODO - created at not needed, only updated_at will keep track of then this was updated
+        # "created_at": "2022-08-22T13:38:02.000000Z",
+        # TODO - inform fe to update `editable_tables_url` field name to `datatables_url`
+        # TODO - not sure what this field returns, probably share reports only for some tenants?
+        # "private_for_tenants": [],
+        # TODO - now without app activation for each app there is only one terms and cond on first login
+        # "terms_and_conditions_url": "https:\/\/api-dev.licenseware.io\/oem\/terms_and_conditions",
+
+        return metadata
 
     def get_full_metadata(self, tenant_id: str = None):
 

@@ -69,6 +69,7 @@ class NewUploader:
         ],
         UploaderStatusResponse,
     ] = default_update_status_handler
+    registrable: bool = True
 
     def __post_init__(self):
 
@@ -97,14 +98,13 @@ class NewUploader:
 
     def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
-        # TODO - get uploader status if tenant_id present
+        if not self.registrable:
+            return
 
         if self._parrent_app is not None:
             parrent_app_metadata = self._parrent_app.get_metadata()
 
-        metadata_payload = {
-            # TODO - id is not used anymore, inform fe to use uploader_id
-            # "id": 4,
+        metadata = {
             "app_id": self.app_id,
             "name": self.name,
             "uploader_id": self.uploader_id,
@@ -112,31 +112,33 @@ class NewUploader:
             "upload_url": self.upload_url,
             "upload_validation_url": self.upload_validation_url,
             "quota_validation_url": self.quota_validation_url,
-            # TODO - see if this works properly with workers
-            "status_check_url": self.status_check_url,
+            "status_check_url": self.status_check_url,  # TODO - see if this works properly with workers
             "accepted_file_types": self.accepted_file_types,
             "icon": self.icon,
             "flags": self.flags,
-            # TODO - updated_at will be used instead of created_at
-            # "created_at": "2022-04-04T09:17:22.000000Z",
             "updated_at": datetime.datetime.utcnow().isoformat(),
-            # TODO - not sure what this is, is on both app and uploader?
-            # "private_for_tenants": [],
             "validation_parameters": self.validation_parameters,
-            # TODO - this is not needed anymore
-            # "query_params_on_upload": [],
             "encryption_parameters": self.encryption_parameters,
-            # TODO - we need a way to check status based on tenant_id (Improve/fix status_check_url)
-            "status": States.IDLE,
+            "status": States.IDLE,  # TODO - we need a way to check status based on tenant_id (Improve/fix status_check_url)
             "app": parrent_app_metadata,
-            # TODO - keeps track for each tenant_id, app_id, uploader_id of the processing status (not needed anymore)
-            # "tenant_status": {
-            #     "id": 121,
-            #     "uploader_id": 4,
-            #     "status": "idle",
-            #     "created_at": "2022-05-04T09:42:17.000000Z",
-            #     "updated_at": "2022-09-09T06:19:22.000000Z",
-            # },
         }
 
-        return metadata_payload
+        # TODO - get uploader status if tenant_id present
+        # TODO - updated_at will be used instead of created_at
+        # "created_at": "2022-04-04T09:17:22.000000Z",
+        # TODO - not sure what this is, is on both app and uploader?
+        # "private_for_tenants": [],
+        # TODO - this is not needed anymore
+        # "query_params_on_upload": [],
+        # TODO - id is not used anymore, inform fe to use uploader_id
+        # "id": 4,
+        # TODO - keeps track for each tenant_id, app_id, uploader_id of the processing status (not needed anymore)
+        # "tenant_status": {
+        #     "id": 121,
+        #     "uploader_id": 4,
+        #     "status": "idle",
+        #     "created_at": "2022-05-04T09:42:17.000000Z",
+        #     "updated_at": "2022-09-09T06:19:22.000000Z",
+        # },
+
+        return metadata

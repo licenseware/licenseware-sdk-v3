@@ -87,24 +87,22 @@ class NewReport:
 
     def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
+        if not self.registrable:
+            return
+
         # TODO - provide data related to given tenant_id
 
         if self._parrent_app is not None:
             parrent_app_metadata = self._parrent_app.get_metadata()
 
         metadata = {
-            # TODO - inform fe to use report_id instead of id
-            # "id": 2,
             "app_id": self.app_id,
             "report_id": self.report_id,
             "name": self.name,
             "description": self.description,
             "url": self.url,
-            # TODO - not needed anymore, report is loaded dynamically in preview
-            # "preview_image_dark_url": None,
             "connected_apps": self.connected_apps,
             "flags": self.flags,
-            # TODO - not needed on registry-service, must be filtered on app.attach_report (same with uploaders, report-components)
             "registrable": self.registrable,
             # TODO - updated_at will be used instead
             # "created_at": "2022-04-04T09:17:21.000000Z",
@@ -127,5 +125,10 @@ class NewReport:
             "apps": [],
             "filters": self.filters,
         }
+
+        # TODO - inform fe to use report_id instead of id
+        # "id": 2,
+        # TODO - not needed anymore, report is loaded dynamically in preview
+        # "preview_image_dark_url": None,
 
         return metadata

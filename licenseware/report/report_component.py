@@ -32,6 +32,7 @@ class NewReportComponent:
     description: str = None
     order: int = None
     filters: ReportFilter = None
+    registrable: bool = True
 
     def __post_init__(self):
 
@@ -61,11 +62,14 @@ class NewReportComponent:
 
     def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
+        if not self.registrable:
+            return
+
         # TODO - provide related tenant data if needed
         # if self._parrent_app is not None:
         #     parrent_app_metadata = self._parrent_app.get_metadata()
 
-        metadata_payload = {
+        metadata = {
             "app_id": self.app_id,
             "component_id": self.component_id,
             "description": self.description,
@@ -80,4 +84,4 @@ class NewReportComponent:
             "filters": self.filters,
         }
 
-        return metadata_payload
+        return metadata
