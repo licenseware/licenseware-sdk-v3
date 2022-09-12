@@ -1,31 +1,22 @@
 import os
 import time
 from datetime import datetime
+
+from licenseware.config.config import Config
 from licenseware.dependencies import requests
 from licenseware.utils.logger import log
-from licenseware.config.config import Config
 
 
 class Authenticator:  # pragma no cover
-    """
-
-    ```py
-
-    from licenseware import Authenticator
-    response, status_code = Authenticator.connect(max_retries='infinite', wait_seconds=2)
-
-    ```
-    """
-
-    def __init__(self, config: Config):
-        self.config = config
-
     @classmethod
-    def connect(cls, max_retries: int = 0, wait_seconds: int = 1):
+    def connect(cls, config: Config, max_retries: int = 0, wait_seconds: int = 1):
         """
         param: max_retries  - 'infinite' or a number,
         param: wait_seconds - wait time in seconds if authentification fails
         """
+
+        assert config.MACHINE_LOGIN_URL is not None
+        cls.config = config
 
         status_code = 500
 
@@ -75,3 +66,12 @@ class Authenticator:  # pragma no cover
 
         log.error(f"Could not login with {self.config.MACHINE_NAME}")
         exit(1)
+
+
+def login_machine(
+    config: Config, max_retries: int = 10_000, wait_seconds: int = 1
+):  # pragma no cover
+
+    return Authenticator.connect(
+        config, max_retries=max_retries, wait_seconds=wait_seconds
+    )

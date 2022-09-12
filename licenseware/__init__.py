@@ -1,4 +1,5 @@
 from licenseware.app import *
+from licenseware.auth import *
 from licenseware.config import *
 from licenseware.constants import *
 from licenseware.datatable import *
