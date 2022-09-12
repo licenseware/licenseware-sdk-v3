@@ -37,6 +37,7 @@ class Authenticator:  # pragma no cover
             )
             os.environ["MACHINE_TOKEN_DATETIME"] = datetime.utcnow().isoformat()
             os.environ["APP_AUTHENTICATED"] = "true"
+            log.success("Machine login successful")
         else:
             os.environ["APP_AUTHENTICATED"] = "false"
             log.error("Can't authentificate this machine")

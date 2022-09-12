@@ -27,8 +27,6 @@ except:
 
 """
 
-import sys
-
 from loguru import logger as log
 
-# log.add(sys.stderr)
+__all__ = ["log"]
