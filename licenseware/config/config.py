@@ -1,5 +1,7 @@
 import uuid
 
+from pymongo import MongoClient
+
 from licenseware.constants.base_enum import BaseEnum
 from licenseware.dependencies import BaseSettings
 from licenseware.utils.alter_string import get_altered_strings
@@ -106,6 +108,11 @@ class Config(BaseSettings):  # pragma no cover
                 "db": self.REDIS_DB,
             },
         }[self.CURRENT_ENVIRONMENT]
+
+    def get_mongo_db_connection(self):
+        MONGO_CONNECTION_STRING = f"mongodb://{self.MONGO_USER}:{self.MONGO_PASSWORD}@{self.MONGO_HOST}:{self.MONGO_PORT}"
+        mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[self.MONGO_DBNAME]
+        return mongo_connection
 
     def get_machine_token(self):
         return "machine token"

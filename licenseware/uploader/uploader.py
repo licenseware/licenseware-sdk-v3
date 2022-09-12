@@ -11,6 +11,7 @@ from licenseware.constants.uploader_types import (
 )
 from licenseware.constants.web_response import WebResponse
 from licenseware.constants.worker_event_type import WorkerEvent
+from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
     default_check_status_handler,
@@ -95,6 +96,7 @@ class NewUploader:
         self.quota_validation_url = f"/{ns}/uploads/{uploaderid}/quota"
         self.status_check_url = f"/{ns}/uploads/{uploaderid}/status"
         self._parrent_app = None
+        self.db_connection = self.config.get_mongo_db_connection()
 
     def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
@@ -103,6 +105,19 @@ class NewUploader:
 
         if self._parrent_app is not None:
             parrent_app_metadata = self._parrent_app.get_metadata()
+
+        uploader_id_status = States.IDLE
+
+        if tenant_id is not None:
+
+            status_repo = MongoRepository(
+                self.db_connection,
+                collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
+            )
+
+            uploader_id_status = self.check_status_handler(
+                tenant_id, None, self.uploader_id, status_repo
+            )
 
         metadata = {
             "app_id": self.app_id,
@@ -119,10 +134,12 @@ class NewUploader:
             "updated_at": datetime.datetime.utcnow().isoformat(),
             "validation_parameters": self.validation_parameters,
             "encryption_parameters": self.encryption_parameters,
-            "status": States.IDLE,  # TODO - we need a way to check status based on tenant_id (Improve/fix status_check_url)
-            "app": parrent_app_metadata,
+            "status": uploader_id_status,
+            "parrent_app": parrent_app_metadata,
         }
 
+        # TODO - inform fe that app is now parrent_app
+        # "app": parrent_app_metadata,
         # TODO - get uploader status if tenant_id present
         # TODO - updated_at will be used instead of created_at
         # "created_at": "2022-04-04T09:17:22.000000Z",

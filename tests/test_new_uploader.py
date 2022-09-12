@@ -1,4 +1,5 @@
 from licenseware import (
+    Config,
     FileTypes,
     NewUploader,
     UploaderEncryptionParameters,
@@ -19,16 +20,7 @@ def test_new_uploader(mocker):
 
     mocker.patch("requests.post", return_value=RequestsResponse)
 
-    # External configuration
-    class Config:
-        APP_ID = "ifmp"
-        REGISTER_UPLOADER_URL = ""
-
-        @staticmethod
-        def get_machine_token():
-            return "machine token from envs"
-
-    config = Config()
+    config = Config(APP_ID="ifmp")
 
     filenames = ["notok.csv", "rv_tools.xlsx"]
 
@@ -89,15 +81,6 @@ def test_new_uploader_custom_handlers(mocker):
         status_code = 200
 
     mocker.patch("requests.post", return_value=RequestsResponse)
-
-    # External configuration
-    class Config:
-        APP_ID = "ifmp"
-        REGISTER_UPLOADER_URL = ""
-
-        @staticmethod
-        def get_machine_token():
-            return "machine token from envs"
 
     config = Config()
 
