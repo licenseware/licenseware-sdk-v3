@@ -6,7 +6,8 @@ from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.utils.alter_string import get_altered_strings
-
+from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from .default_handlers import get_report_processing_status
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
 
@@ -59,6 +60,7 @@ class NewReport:
         self.snapshot_url = f"/{ns}/snapshot-reports/{reportid}"
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
         self._parrent_app = None
+        self.db_connection = self.config.get_mongo_db_connection()
 
     def _get_component_by_id(self, component_id: str):
         assert self.components is not None
@@ -90,10 +92,13 @@ class NewReport:
         if not self.registrable:
             return
 
-        # TODO - provide data related to given tenant_id
-
         if self._parrent_app is not None:
             parrent_app_metadata = self._parrent_app.get_metadata()
+
+        processing_status = self._get_report_processing_status(tenant_id)
+        report_status = (
+            States.DISABLED if processing_status == States.RUNNING else States.ENABLED
+        )
 
         metadata = {
             "app_id": self.app_id,
@@ -104,31 +109,41 @@ class NewReport:
             "connected_apps": self.connected_apps,
             "flags": self.flags,
             "registrable": self.registrable,
-            # TODO - updated_at will be used instead
-            # "created_at": "2022-04-04T09:17:21.000000Z",
             "updated_at": datetime.datetime.utcnow().isoformat(),
-            # TODO - not sure what this is it's on app, uploader also
-            # "private_for_tenants": [],
             "report_components": _parse_report_components(self.report_components),
-            # TODO - not needed, preview report is loaded dynamically in fe
-            # "preview_image_url": "https:\/\/api-dev.licenseware.io\/ifmp\/reports\/infrastructure_mapping_report\/preview_image",
             "public_url": self.public_url,
             "snapshot_url": self.snapshot_url,
-            # TODO - enable this if tenant_id has data for this report
-            "status": States.DISABLED,
-            # TODO - get status from uploaders
-            "processing_status": States.IDLE,
-            # TODO - change this each time a new processing has been done
+            "status": report_status,
+            "processing_status": processing_status,
             "last_update_date": None,
-            "main_app": parrent_app_metadata,
-            # TODO - get list of connected apps metadata
-            "apps": [],
+            "parrent_app": parrent_app_metadata,
+            "apps": [],  # TODO - get list of connected apps metadata
             "filters": self.filters,
         }
 
+        # TODO - inform fe main_app is parrent_app
         # TODO - inform fe to use report_id instead of id
         # "id": 2,
         # TODO - not needed anymore, report is loaded dynamically in preview
         # "preview_image_dark_url": None,
+        # TODO - updated_at will be used instead
+        # "created_at": "2022-04-04T09:17:21.000000Z",
+        # TODO - not sure what this is it's on app, uploader also
+        # "private_for_tenants": [],
+        # TODO - not needed, preview report is loaded dynamically in fe
+        # "preview_image_url": "https:\/\/api-dev.licenseware.io\/ifmp\/reports\/infrastructure_mapping_report\/preview_image",
+        # TODO - enable this if tenant_id has data for this report
 
         return metadata
+
+    def _get_report_processing_status(self, tenant_id: str):
+
+        if tenant_id is None:
+            return States.IDLE
+
+        status_repo = MongoRepository(
+            self.db_connection,
+            collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
+        )
+        report_status = get_report_processing_status(tenant_id, status_repo)
+        return report_status

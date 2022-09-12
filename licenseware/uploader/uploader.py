@@ -106,19 +106,6 @@ class NewUploader:
         if self._parrent_app is not None:
             parrent_app_metadata = self._parrent_app.get_metadata()
 
-        uploader_id_status = States.IDLE
-
-        if tenant_id is not None:
-
-            status_repo = MongoRepository(
-                self.db_connection,
-                collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
-            )
-
-            uploader_id_status = self.check_status_handler(
-                tenant_id, None, self.uploader_id, status_repo
-            )
-
         metadata = {
             "app_id": self.app_id,
             "name": self.name,
@@ -134,7 +121,7 @@ class NewUploader:
             "updated_at": datetime.datetime.utcnow().isoformat(),
             "validation_parameters": self.validation_parameters,
             "encryption_parameters": self.encryption_parameters,
-            "status": uploader_id_status,
+            "status": self._get_uploader_id_status(tenant_id),
             "parrent_app": parrent_app_metadata,
         }
 
@@ -159,3 +146,18 @@ class NewUploader:
         # },
 
         return metadata
+
+    def _get_uploader_id_status(self, tenant_id: str):
+
+        if tenant_id is None:
+            return States.IDLE
+
+        status_repo = MongoRepository(
+            self.db_connection,
+            collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
+        )
+        uploader_id_status = self.check_status_handler(
+            tenant_id, None, self.uploader_id, status_repo
+        )["status"]
+
+        return uploader_id_status
