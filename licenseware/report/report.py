@@ -4,23 +4,15 @@ from typing import Dict, List
 
 from licenseware.config.config import Config
 from licenseware.constants.states import States
+from licenseware.dependencies import requests
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
-from licenseware.utils.alter_string import get_altered_strings
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.utils.alter_string import get_altered_strings
+from licenseware.utils.logger import log
+
 from .default_handlers import get_report_processing_status
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
-
-
-def _update_connected_apps(connected_apps, config):
-
-    if connected_apps is None:
-        connected_apps = [config.APP_ID]
-    elif config.APP_ID not in connected_apps:
-        connected_apps = list(connected_apps)
-        connected_apps.append(config.APP_ID)
-
-    return connected_apps
 
 
 def _parse_report_components(report_components: Dict[str, NewReportComponent]):
@@ -45,7 +37,7 @@ class NewReport:
         assert self.config.FRONTEND_URL is not None
         assert self.config.PUBLIC_TOKEN_REPORT_URL is not None
         assert self.config.APP_SECRET is not None
-        assert self.config.get_machine_token is not None
+        assert self.config.machine_auth_headers is not None
 
         self.app_id = self.config.APP_ID
         ns = get_altered_strings(self.app_id).dash
@@ -58,9 +50,7 @@ class NewReport:
         self.url = f"/{ns}/reports/{reportid}"
         self.public_url = f"/{ns}/public-reports/{reportid}"
         self.snapshot_url = f"/{ns}/snapshot-reports/{reportid}"
-        self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
         self._parrent_app = None
-        self.db_connection = self.config.get_mongo_db_connection()
 
     def _get_component_by_id(self, component_id: str):
         assert self.components is not None
@@ -93,11 +83,18 @@ class NewReport:
             return
 
         if self._parrent_app is not None:
-            parrent_app_metadata = self._parrent_app.get_metadata()
+            parrent_app_metadata = self._parrent_app.get_metadata(tenant_id)
 
-        processing_status = self._get_report_processing_status(tenant_id)
+        processing_state = self._get_report_processing_state(tenant_id)
         report_status = (
-            States.DISABLED if processing_status == States.RUNNING else States.ENABLED
+            States.DISABLED
+            if processing_state["status"] == States.RUNNING
+            else States.ENABLED
+        )
+
+        report_components = _parse_report_components(self.report_components)
+        apps = self._get_connected_apps_metadata(
+            tenant_id, parrent_app_metadata, self.connected_apps
         )
 
         metadata = {
@@ -110,14 +107,14 @@ class NewReport:
             "flags": self.flags,
             "registrable": self.registrable,
             "updated_at": datetime.datetime.utcnow().isoformat(),
-            "report_components": _parse_report_components(self.report_components),
+            "report_components": report_components,
             "public_url": self.public_url,
             "snapshot_url": self.snapshot_url,
             "status": report_status,
-            "processing_status": processing_status,
-            "last_update_date": None,
+            "processing_status": processing_state["status"],
+            "last_update_date": processing_state["updated_at"],
             "parrent_app": parrent_app_metadata,
-            "apps": [],  # TODO - get list of connected apps metadata
+            "apps": apps,
             "filters": self.filters,
         }
 
@@ -136,13 +133,38 @@ class NewReport:
 
         return metadata
 
-    def _get_report_processing_status(self, tenant_id: str):
+    def _get_connected_apps_metadata(
+        self, tenant_id: str, parrent_app_metadata: dict, connected_apps: List[str]
+    ):
+
+        connected_apps_metadata = [parrent_app_metadata]
+
+        if connected_apps is None:
+            return connected_apps_metadata
+
+        for metadata_url in connected_apps:
+            response = requests.get(
+                metadata_url, headers=self.config.machine_auth_headers
+            )
+            if response.status_code != 200:
+                log.error(response.content)
+                raise Exception(
+                    f"Can't get connected app metadata from url {metadata_url}"
+                )
+            connected_apps_metadata.append(response.json())
+
+        return connected_apps_metadata
+
+    def _get_report_processing_state(self, tenant_id: str):
 
         if tenant_id is None:
-            return States.IDLE
+            return {
+                "status": States.IDLE,
+                "updated_at": None,
+            }
 
         status_repo = MongoRepository(
-            self.db_connection,
+            self.config.mongo_db_connection,
             collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
         )
         report_status = get_report_processing_status(tenant_id, status_repo)

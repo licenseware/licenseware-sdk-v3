@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from pymongo import MongoClient
@@ -109,13 +110,19 @@ class Config(BaseSettings):  # pragma no cover
             },
         }[self.CURRENT_ENVIRONMENT]
 
-    def get_mongo_db_connection(self):
+    @property
+    def mongo_db_connection(self):
         MONGO_CONNECTION_STRING = f"mongodb://{self.MONGO_USER}:{self.MONGO_PASSWORD}@{self.MONGO_HOST}:{self.MONGO_PORT}"
         mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[self.MONGO_DBNAME]
         return mongo_connection
 
-    def get_machine_token(self):
-        return "machine token"
+    @property
+    def machine_token(self):
+        return os.environ["AUTH_TOKEN"]
+
+    @property
+    def machine_auth_headers(self):
+        return {"Authorization": os.environ["AUTH_TOKEN"]}
 
     class Config:
         env_file = ".env"

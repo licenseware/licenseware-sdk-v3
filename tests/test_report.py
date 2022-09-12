@@ -10,11 +10,7 @@ from licenseware import (
     StyleAttrs,
     SummaryAttrs,
 )
-from licenseware.report.report import (
-    Config,
-    _parse_report_components,
-    _update_connected_apps,
-)
+from licenseware.report.report import Config, _parse_report_components
 
 # pytest -s -v tests/test_report.py
 
@@ -60,25 +56,6 @@ def test_parse_report_components():
     assert isinstance(res[0]["attributes"], dict)
 
     # print(json.dumps(res, sort_keys=True, indent=4, default=str))
-
-
-# pytest -s -v tests/test_report.py::test_update_connected_apps
-def test_update_connected_apps():
-
-    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
-
-    connected_apps = None
-    updated_connected_apps = _update_connected_apps(connected_apps, config)
-
-    # print(updated_connected_apps)
-    assert "fmw" in updated_connected_apps
-
-    connected_apps = ["ifmp"]
-    updated_connected_apps = _update_connected_apps(connected_apps, config)
-
-    # print(updated_connected_apps)
-    assert "fmw" in updated_connected_apps
-    assert "ifmp" in updated_connected_apps
 
 
 # pytest -s -v tests/test_report.py::test_report_creation

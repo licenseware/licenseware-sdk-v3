@@ -96,7 +96,6 @@ class NewUploader:
         self.quota_validation_url = f"/{ns}/uploads/{uploaderid}/quota"
         self.status_check_url = f"/{ns}/uploads/{uploaderid}/status"
         self._parrent_app = None
-        self.db_connection = self.config.get_mongo_db_connection()
 
     def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
@@ -153,11 +152,11 @@ class NewUploader:
             return States.IDLE
 
         status_repo = MongoRepository(
-            self.db_connection,
+            self.config.mongo_db_connection,
             collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
         )
         uploader_id_status = self.check_status_handler(
             tenant_id, None, self.uploader_id, status_repo
-        )["status"]
+        ).content
 
         return uploader_id_status

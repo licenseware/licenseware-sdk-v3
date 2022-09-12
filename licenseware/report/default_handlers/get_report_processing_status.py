@@ -8,5 +8,9 @@ def get_report_processing_status(
 
     result = repo.find_one(filters={"tenant_id": tenant_id, "status": States.RUNNING})
     if not result:
-        return States.IDLE
-    return States.RUNNING
+        return {"status": States.IDLE, "updated_at": None}
+
+    result.pop("_id")
+    result.pop("uploader_id")
+    result.pop("tenant_id")
+    return result
