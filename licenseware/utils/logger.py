@@ -31,4 +31,4 @@ import sys
 
 from loguru import logger as log
 
-log.add(sys.stderr)
+# log.add(sys.stderr)
