@@ -68,14 +68,14 @@ class NewApp:
 
         return self.attached_components
 
-    def get_metadata(self):
+    def get_metadata(self, tenant_id: str = None):
 
         metadata_payload = {
             # TODO - this id is not required, in fe needs to be updated with app_id
             # "id": 14,
             "app_id": self.app_id,
             # TODO - this will be always enabled - fe needs to remove handling for this field
-            # "status": "enabled",
+            "status": "enabled",
             "name": self.name,
             "description": self.description,
             "icon": self.icon,
@@ -106,16 +106,32 @@ class NewApp:
 
     def get_full_metadata(self, tenant_id: str = None):
 
-        app_metadata = self.get_metadata()
+        metadata = {
+            "app": self.get_metadata(),
+            "uploaders": self.get_uploaders_metadata(tenant_id),
+            "reports": self.get_reports_metadata(tenant_id),
+            "report_components": self.get_components_metadata(tenant_id),
+        }
+
+        return metadata
+
+    def get_uploaders_metadata(self, tenant_id: str = None):
+
+        for uploader_id in self.attached_uploaders.keys():
+            self.attached_uploaders[uploader_id]._parrent_app = self
 
         uploaders_metadata = (
-            [
-                i.get_metadata(app_metadata, tenant_id)
-                for i in self.attached_uploaders.values()
-            ]
+            [i.get_metadata(tenant_id) for i in self.attached_uploaders.values()]
             if self.attached_uploaders
             else []
         )
+
+        return uploaders_metadata
+
+    def get_reports_metadata(self, tenant_id: str = None):
+
+        for report_id in self.attached_reports.keys():
+            self.attached_reports[report_id]._parrent_app = self
 
         reports_metadata = (
             [i.get_metadata(tenant_id) for i in self.attached_reports.values()]
@@ -123,17 +139,17 @@ class NewApp:
             else []
         )
 
+        return reports_metadata
+
+    def get_components_metadata(self, tenant_id: str = None):
+
+        for comp_id in self.attached_components.keys():
+            self.attached_components[comp_id]._parrent_app = self
+
         report_components_metadata = (
             [i.get_metadata(tenant_id) for i in self.attached_components.values()]
             if self.attached_components
             else []
         )
 
-        metadata = {
-            "app": app_metadata,
-            "reports": reports_metadata,
-            "uploaders": uploaders_metadata,
-            "report_components": report_components_metadata,
-        }
-
-        return metadata
+        return report_components_metadata

@@ -93,10 +93,14 @@ class NewUploader:
         self.upload_url = f"/{ns}/uploads/{uploaderid}/files"
         self.quota_validation_url = f"/{ns}/uploads/{uploaderid}/quota"
         self.status_check_url = f"/{ns}/uploads/{uploaderid}/status"
+        self._parrent_app = None
 
-    def get_metadata(self, parrent_app_metadata: dict, tenant_id: str = None):
+    def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
         # TODO - get uploader status if tenant_id present
+
+        if self._parrent_app is not None:
+            parrent_app_metadata = self._parrent_app.get_metadata()
 
         metadata_payload = {
             # TODO - id is not used anymore, inform fe to use uploader_id

@@ -57,10 +57,13 @@ class NewReportComponent:
         self.url = f"/{appid}/report-components/{compid}"
         self.public_url = f"/{appid}/public-report-components/{compid}"
         self.snapshot_url = f"/{appid}/snapshot-report-components/{compid}"
+        self._parrent_app = None
 
-    def get_metadata(self, tenant_id: str = None):
+    def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
         # TODO - provide related tenant data if needed
+        # if self._parrent_app is not None:
+        #     parrent_app_metadata = self._parrent_app.get_metadata()
 
         metadata_payload = {
             "app_id": self.app_id,

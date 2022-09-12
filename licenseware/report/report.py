@@ -58,6 +58,7 @@ class NewReport:
         self.public_url = f"/{ns}/public-reports/{reportid}"
         self.snapshot_url = f"/{ns}/snapshot-reports/{reportid}"
         self.connected_apps = _update_connected_apps(self.connected_apps, self.config)
+        self._parrent_app = None
 
     def _get_component_by_id(self, component_id: str):
         assert self.components is not None
@@ -84,9 +85,12 @@ class NewReport:
 
         self.report_components[component.component_id] = component
 
-    def get_metadata(self, parrent_app_metadata: dict, tenant_id: str = None):
+    def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
 
         # TODO - provide data related to given tenant_id
+
+        if self._parrent_app is not None:
+            parrent_app_metadata = self._parrent_app.get_metadata()
 
         metadata = {
             # TODO - inform fe to use report_id instead of id
