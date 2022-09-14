@@ -1,5 +1,4 @@
-from licenseware import RedisCache, Config
-
+from licenseware import Config, RedisCache
 
 # pytest -s -v tests/test_redis_cache.py
 
@@ -34,3 +33,9 @@ def test_redis_cache():
     result = rc.get_key("apps:odb-service")
 
     assert isinstance(result, dict)
+
+    rc.delete("apps:odb-service")
+
+    result = rc.get_key("apps:odb-service")
+
+    assert result is None

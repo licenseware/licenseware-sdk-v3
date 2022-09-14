@@ -1,7 +1,9 @@
 import pickle
 from datetime import timedelta
-from typing import Any, List
+from typing import Any
+
 from redis import Redis
+
 from licenseware.config.config import Config
 
 

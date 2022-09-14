@@ -72,6 +72,7 @@ class Config(BaseSettings):  # pragma no cover
     REDIS_DB: int = 0
     REDIS_RESULT_CACHE_DB: int = 1
     REDIS_PASSWORD: int = None
+    EXPIRE_REGISTRATION: int = None
 
     KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
 
