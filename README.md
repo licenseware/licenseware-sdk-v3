@@ -737,12 +737,16 @@ topic.delete(TopicType.APP_EVENTS)
 On the app side define stream producer (publisher)
 
 ```py
-from licenseware import Producer, TopicType, EventType
+from licenseware import Config, Producer
 from confluent_kafka import Producer as KafkaProducer
+from settings import config 
 
-producer_client = KafkaProducer({"bootstrap.servers": "PLAINTEXT://localhost:9092"})
+def producer_client_factory(config: Config):
+    producer_client = KafkaProducer({"bootstrap.servers": config.KAFKA_BROKER_URL})
+    return producer_client
 
-producer = Producer(producer_client)
+
+producer = Producer(producer_client_factory, config)
 
 data_stream = {
     "event_type": EventType.ACCOUNT_CREATED,
@@ -753,28 +757,34 @@ data_stream = {
 producer.publish(TopicType.USER_EVENTS, data_stream)
 
 ```
+The factory function is up to you to create it with the configurations you need.
+We are using a factory function for getting the confluent kafka producer to reconnect in case the connection fails.
+
 
 You can also define a consumer (subscriber)
 
 ```py
-
-from licenseware import Consumer, EventType, TopicType
+from licenseware import Config, Consumer
 from confluent_kafka import Consumer as KafkaConsumer
+from settings import config
 
 
-consumer_client = KafkaConsumer(
-    {
-        "bootstrap.servers": "PLAINTEXT://localhost:9092",
-        "group.id": "subscriber-consumer",
-    }
-)
+def consumer_client_factory(config: Config):
+    consumer_client = KafkaConsumer(
+        {
+            "bootstrap.servers": config.KAFKA_BROKER_URL,
+            "group.id": config.APP_ID,
+        }
+    )
+    return consumer_client
 
-consumer = Consumer(consumer_client)
+
+consumer = Consumer(consumer_client_factory, config)
 
 consumer.subscribe(TopicType.USER_EVENTS)
 
 
-def account_created_handler(*args, **kwargs):
+def account_created_handler(event):
     return "some processed data"
 
 
@@ -785,3 +795,5 @@ if __name__ == "__main__":
     consumer.listen()
 
 ```
+The factory function is up to you to create it with the configurations you need.
+We are using a factory function for getting the confluent kafka consumer to reconnect in case the connection fails.
