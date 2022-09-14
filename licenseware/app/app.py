@@ -20,6 +20,7 @@ class NewApp:
     app_meta: List[dict] = None
     features: List[dict] = None
     integration_details: List[dict] = None
+    registrable: bool = True
 
     def __post_init__(self):
 
@@ -74,7 +75,7 @@ class NewApp:
 
         return self.attached_components
 
-    def get_metadata(self, tenant_id: str = None):
+    def get_metadata(self):
 
         metadata = {
             "app_id": self.app_id,
@@ -92,69 +93,52 @@ class NewApp:
             "integration_details": self.integration_details,
         }
 
-        # TODO - this id is not required, in fe needs to be updated with app_id
-        # "id": 14,
-        # TODO - this will be always enabled - fe needs to remove handling for this field
-        # TODO - app_activation_url is no longer needed
-        # "app_activation_url": "https:\/\/api-dev.licenseware.io\/oem\/activate_app",
-        # TODO - refresh_registration_url is no longer needed - notify will send all needed info
-        # "refresh_registration_url": "https:\/\/api-dev.licenseware.io\/oem\/refresh_registration",
-        # TODO - same as refresh_registration_url
-        # "tenant_registration_url": "https:\/\/api-dev.licenseware.io\/oem\/register_tenant",
-        # TODO - created at not needed, only updated_at will keep track of then this was updated
-        # "created_at": "2022-08-22T13:38:02.000000Z",
-        # TODO - inform fe to update `editable_tables_url` field name to `datatables_url`
-        # TODO - not sure what this field returns, probably share reports only for some tenants?
-        # "private_for_tenants": [],
-        # TODO - now without app activation for each app there is only one terms and cond on first login
-        # "terms_and_conditions_url": "https:\/\/api-dev.licenseware.io\/oem\/terms_and_conditions",
-
         return metadata
 
-    def get_full_metadata(self, tenant_id: str = None):
+    def get_full_metadata(self):
 
         metadata = {
             "app": self.get_metadata(),
-            "uploaders": self.get_uploaders_metadata(tenant_id),
-            "reports": self.get_reports_metadata(tenant_id),
-            "report_components": self.get_components_metadata(tenant_id),
+            "uploaders": self.get_uploaders_metadata(),
+            "reports": self.get_reports_metadata(),
+            "report_components": self.get_components_metadata(),
         }
 
         return metadata
 
-    def get_uploaders_metadata(self, tenant_id: str = None):
+    def get_uploaders_metadata(self):
 
         for uploader_id in self.attached_uploaders.keys():
             self.attached_uploaders[uploader_id]._parrent_app = self
 
         uploaders_metadata = (
-            [i.get_metadata(tenant_id) for i in self.attached_uploaders.values()]
+            [i.get_metadata() for i in self.attached_uploaders.values()]
             if self.attached_uploaders
             else []
         )
 
         return uploaders_metadata
 
-    def get_reports_metadata(self, tenant_id: str = None):
+    def get_reports_metadata(self):
 
         for report_id in self.attached_reports.keys():
             self.attached_reports[report_id]._parrent_app = self
 
         reports_metadata = (
-            [i.get_metadata(tenant_id) for i in self.attached_reports.values()]
+            [i.get_metadata() for i in self.attached_reports.values()]
             if self.attached_reports
             else []
         )
 
         return reports_metadata
 
-    def get_components_metadata(self, tenant_id: str = None):
+    def get_components_metadata(self):
 
         for comp_id in self.attached_components.keys():
             self.attached_components[comp_id]._parrent_app = self
 
         report_components_metadata = (
-            [i.get_metadata(tenant_id) for i in self.attached_components.values()]
+            [i.get_metadata() for i in self.attached_components.values()]
             if self.attached_components
             else []
         )

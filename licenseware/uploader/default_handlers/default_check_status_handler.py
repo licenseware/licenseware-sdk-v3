@@ -1,22 +1,21 @@
 from licenseware.constants.states import States
 from licenseware.constants.web_response import WebResponse
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.redis_cache.redis_cache import RedisCache
 
 
 def default_check_status_handler(
-    tenant_id: str, authorization: str, uploader_id: str, repo: MongoRepository
+    tenant_id: str, authorization: str, uploader_id: str, redisdb: RedisCache
 ):  # pragma no cover
 
-    result = repo.find_one(filters={"tenant_id": tenant_id, "uploader_id": uploader_id})
+    result = redisdb.get_key(f"{tenant_id}:{uploader_id}")
+
     if not result:
         return WebResponse(
             content={"status": States.IDLE},
             status_code=200,
         )
-    result.pop("_id")
-    result.pop("uploader_id")
-    result.pop("tenant_id")
+
     return WebResponse(
-        content=result,
+        content={"status": result["status"]},
         status_code=200,
     )

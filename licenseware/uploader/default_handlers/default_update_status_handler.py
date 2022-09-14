@@ -1,6 +1,7 @@
 import datetime
 
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.config.config import Config
+from licenseware.redis_cache.redis_cache import RedisCache
 
 
 def default_update_status_handler(
@@ -8,15 +9,19 @@ def default_update_status_handler(
     authorization: str,
     uploader_id: str,
     status: str,
-    repo: MongoRepository,
+    redisdb: RedisCache,
+    config: Config,
 ):  # pragma no cover
-    result = repo.update_one(
-        filters={"tenant_id": tenant_id, "uploader_id": uploader_id},
-        data={
-            "tenant_id": tenant_id,
-            "uploader_id": uploader_id,
-            "status": status,
-            "updated_at": datetime.datetime.utcnow().isoformat(),
-        },
+
+    data = {
+        "tenant_id": tenant_id,
+        "uploader_id": uploader_id,
+        "status": status,
+        "updated_at": datetime.datetime.utcnow().isoformat(),
+    }
+
+    return redisdb.set(
+        key=f"{tenant_id}:{uploader_id}",
+        value=data,
+        expiry=config.EXPIRE_UPLOADER_STATUS,
     )
-    return result

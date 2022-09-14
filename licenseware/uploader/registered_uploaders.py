@@ -6,6 +6,7 @@ from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.constants.uploader_types import FileValidationResponse
 from licenseware.history.history_class import History
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
@@ -136,11 +137,11 @@ class RegisteredUploaders:  # pragma no cover
         status: str,
         db_connection: Any,
     ):
-        repo = self._get_uploader_status_repo(db_connection)
+        redisdb = RedisCache(self.config)
         uploader = self._get_current_uploader(uploader_id)
 
         return uploader.update_status_handler(
-            tenant_id, authorization, uploader_id, status, repo
+            tenant_id, authorization, uploader_id, status, redisdb, self.config
         )
 
     @failsafe
@@ -151,11 +152,11 @@ class RegisteredUploaders:  # pragma no cover
         uploader_id: Enum,
         db_connection: Any,
     ):
-        repo = self._get_uploader_status_repo(db_connection)
+        redisdb = RedisCache(self.config)
         uploader = self._get_current_uploader(uploader_id)
 
         return uploader.check_status_handler(
-            tenant_id, authorization, uploader.uploader_id, repo
+            tenant_id, authorization, uploader.uploader_id, redisdb
         )
 
     @failsafe
@@ -201,13 +202,6 @@ class RegisteredUploaders:  # pragma no cover
         return MongoRepository(
             db_connection,
             collection=self.config.MONGO_COLLECTION.QUOTA,
-            data_validator="ignore",
-        )
-
-    def _get_uploader_status_repo(self, db_connection: Any):
-        return MongoRepository(
-            db_connection,
-            collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
             data_validator="ignore",
         )
 

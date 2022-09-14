@@ -4,14 +4,13 @@ from typing import Callable, List, Tuple, Union
 
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
-from licenseware.constants.states import States
 from licenseware.constants.uploader_types import (
     FileValidationResponse,
     UploaderStatusResponse,
 )
 from licenseware.constants.web_response import WebResponse
 from licenseware.constants.worker_event_type import WorkerEvent
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
     default_check_status_handler,
@@ -57,7 +56,7 @@ class NewUploader:
         WebResponse,
     ] = default_check_quota_handler
     check_status_handler: Callable[
-        [alias.TenantId, alias.Authorization, alias.UploaderId, alias.Repository],
+        [alias.TenantId, alias.Authorization, alias.UploaderId, alias.RedisCache],
         WebResponse,
     ] = default_check_status_handler
     update_status_handler: Callable[
@@ -66,7 +65,8 @@ class NewUploader:
             alias.Authorization,
             alias.UploaderId,
             alias.Status,
-            alias.Repository,
+            alias.RedisCache,
+            Config,
         ],
         UploaderStatusResponse,
     ] = default_update_status_handler
@@ -97,13 +97,10 @@ class NewUploader:
         self.status_check_url = f"/{ns}/uploads/{uploaderid}/status"
         self._parrent_app = None
 
-    def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
+    def get_metadata(self):
 
         if not self.registrable:
             return
-
-        if self._parrent_app is not None:
-            parrent_app_metadata = self._parrent_app.get_metadata()
 
         metadata = {
             "app_id": self.app_id,
@@ -113,50 +110,20 @@ class NewUploader:
             "upload_url": self.upload_url,
             "upload_validation_url": self.upload_validation_url,
             "quota_validation_url": self.quota_validation_url,
-            "status_check_url": self.status_check_url,  # TODO - see if this works properly with workers
+            "status_check_url": self.status_check_url,
             "accepted_file_types": self.accepted_file_types,
             "icon": self.icon,
             "flags": self.flags,
             "updated_at": datetime.datetime.utcnow().isoformat(),
             "validation_parameters": self.validation_parameters,
             "encryption_parameters": self.encryption_parameters,
-            "status": self._get_uploader_id_status(tenant_id),
-            "parrent_app": parrent_app_metadata,
+            "status": self._get_tenant_uploader_id_statuses(),
+            "parrent_app": self._parrent_app.get_metadata(),
         }
-
-        # TODO - inform fe that app is now parrent_app
-        # "app": parrent_app_metadata,
-        # TODO - get uploader status if tenant_id present
-        # TODO - updated_at will be used instead of created_at
-        # "created_at": "2022-04-04T09:17:22.000000Z",
-        # TODO - not sure what this is, is on both app and uploader?
-        # "private_for_tenants": [],
-        # TODO - this is not needed anymore
-        # "query_params_on_upload": [],
-        # TODO - id is not used anymore, inform fe to use uploader_id
-        # "id": 4,
-        # TODO - keeps track for each tenant_id, app_id, uploader_id of the processing status (not needed anymore)
-        # "tenant_status": {
-        #     "id": 121,
-        #     "uploader_id": 4,
-        #     "status": "idle",
-        #     "created_at": "2022-05-04T09:42:17.000000Z",
-        #     "updated_at": "2022-09-09T06:19:22.000000Z",
-        # },
 
         return metadata
 
-    def _get_uploader_id_status(self, tenant_id: str):
-
-        if tenant_id is None:
-            return States.IDLE
-
-        status_repo = MongoRepository(
-            self.config.mongo_db_connection,
-            collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
-        )
-        uploader_id_status = self.check_status_handler(
-            tenant_id, None, self.uploader_id, status_repo
-        ).content
-
-        return uploader_id_status
+    def _get_tenant_uploader_id_statuses(self):
+        redisdb = RedisCache(self.config)
+        results = redisdb.get(f"*:{self.uploader_id}")
+        return results
