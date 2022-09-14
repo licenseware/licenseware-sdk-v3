@@ -1,14 +1,23 @@
 import json
+import traceback
 from typing import Callable
 
-from confluent_kafka import Producer as KafkaProducer
+from licenseware.config.config import Config
+from licenseware.utils.logger import log
 
 from .types import EventType, TopicType
 
 
 class Producer:
-    def __init__(self, producer: KafkaProducer, delivery_report: Callable = None):
-        self.producer = producer
+    def __init__(
+        self,
+        producer_factory: Callable,
+        config: Config,
+        delivery_report: Callable = None,
+    ):
+        self.config = config
+        self.producer_factory = producer_factory
+        self.producer = producer_factory(config)
         self.delivery_report = delivery_report
         self._allowed_events = EventType().dict().values()
         self._allowed_topics = TopicType().dict().values()
@@ -18,24 +27,32 @@ class Producer:
         assert topic in self._allowed_topics
         assert isinstance(data, dict)
         assert data["event_type"] in self._allowed_events
-        assert "event_type" in data.keys()
-        assert "tenant_id" in data.keys()
 
     def publish(self, topic: TopicType, data: dict, delivery_report: Callable = None):
 
         self._checks(topic, data)
         databytes = json.dumps(data).encode("utf-8")
 
-        self.producer.poll(0)
-        self.producer.produce(
-            topic, databytes, callback=delivery_report or self.delivery_report
-        )
-        self.producer.flush()
+        try:
+            self.producer.poll(0)
+            self.producer.produce(
+                topic, databytes, callback=delivery_report or self.delivery_report
+            )
+            self.producer.flush()
+        except Exception as err:
+            log.warning(traceback.format_exc())
+            log.error(
+                f"Got the following error on producer: \n {err} \n\n Reconecting..."
+            )
+            self.producer = self.producer_factory(self.config)
+            self.publish(topic, data, delivery_report)
 
     def delivery_report(self, err, msg):
         """Called once for each message produced to indicate delivery result.
         Triggered by poll() or flush()."""
         if err is not None:
-            print("Message delivery failed: {}".format(err))
+            log.error("Message delivery failed: {}".format(err))
         else:
-            print("Message delivered to {} [{}]".format(msg.topic(), msg.partition()))
+            log.success(
+                "Message delivered to {} [{}]".format(msg.topic(), msg.partition())
+            )

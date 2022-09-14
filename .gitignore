@@ -3,6 +3,7 @@ bin
 *.log
 *.ipynb
 pyvenv.cfg
+update_local_dev_apps.py
 
 
 # Byte-compiled / optimized / DLL files

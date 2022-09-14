@@ -1,14 +1,18 @@
 import json
+import traceback
 from typing import Callable
 
-from confluent_kafka import Consumer as KafkaConsumer
+from licenseware.config.config import Config
+from licenseware.utils.logger import log
 
 from .types import EventType, TopicType
 
 
 class Consumer:
-    def __init__(self, consumer: KafkaConsumer):
-        self.consumer = consumer
+    def __init__(self, consumer_factory: Callable, config: Config):
+        self.config = config
+        self.consumer_factory = consumer_factory
+        self.consumer = consumer_factory(config)
         self.event_dispacher = dict()
         self._allowed_topics = TopicType().dict().values()
         self._subscribed = False
@@ -29,30 +33,32 @@ class Consumer:
 
         try:
 
+            log.info("Listening to stream...")
+
             while True:
                 msg = self.consumer.poll(0.5)
 
                 if msg is None:
                     continue
                 if msg.error():
-                    print("Consumer error: {}".format(msg.error()))
+                    log.error("Consumer error: {}".format(msg.error()))
                     continue
 
-                print("Received message: {}".format(msg.value()))
+                event = json.loads(msg.value().decode("utf-8"))
 
-                data = json.loads(msg.value().decode("utf-8"))
-
-                event_type_found = "event_type" in data.keys()
-                tenant_id_found = "tenant_id" in data.keys()
-
-                if event_type_found and tenant_id_found:
-                    print(
-                        "Consumer error: `event_type` and `tenant_id` not found on message."
+                if "event_type" not in event.keys():
+                    log.error(
+                        f"Can't dispach message without any `event_type` set \n Ignoring message: {msg.value()}"
                     )
                     continue
 
-                self.event_dispacher[data["event_type"]](**data)
+                self.event_dispacher[event["event_type"]](event)
 
         except Exception as err:
-            print(err)
+            log.warning(traceback.format_exc())
+            log.error(
+                f"Got the following error on consumer: \n {err} \n\n Reconecting..."
+            )
             self.consumer.close()
+            self.consumer = self.consumer_factory(self.config)
+            self.listen()

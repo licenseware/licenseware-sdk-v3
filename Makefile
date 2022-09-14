@@ -22,3 +22,5 @@ uninstall:
 	pip3 uninstall -y licenseware
 
 
+update-local:
+	python3 update_local_dev_apps.py
