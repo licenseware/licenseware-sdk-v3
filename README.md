@@ -13,7 +13,7 @@
 6. [Mongo Repository](#Mongo-Repository)
 7. [History](#History)
 8. [Kafka Streams](#pubsub) 
-
+9. [Redis Get/Set](#redis) 
 
 
 <a name="Developing"></a>
@@ -797,3 +797,32 @@ if __name__ == "__main__":
 ```
 The factory function is up to you to create it with the configurations you need.
 We are using a factory function for getting the confluent kafka consumer to reconnect in case the connection fails.
+
+
+
+
+<a name="redis"></a>
+# Redis Get/Set
+
+For various reasons we may need to set and get small temporary chunks of data from redis.
+
+
+```py
+from settings import config
+from licenseware import RedisCache
+
+
+rc = RedisCache(config)
+
+# expiry in seconds - put None for no expire date
+rc.set(key="apps:ifmp-service", value={"app": {"app_id": "ifmp-service"}}, expiry=10)
+rc.set(key="apps:odb-service", value={"app": {"app_id": "odb-service"}}, expiry=10)
+
+# get will return a list of matched keys results
+rc.get("apps:*")
+rc.get("apps:odb-service")
+
+# get key will return the value stored on that specific key
+rc.get_key("apps:odb-service")
+
+```
