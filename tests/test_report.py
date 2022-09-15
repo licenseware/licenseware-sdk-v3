@@ -10,7 +10,7 @@ from licenseware import (
     StyleAttrs,
     SummaryAttrs,
 )
-from licenseware.report.report import Config, _parse_report_components
+from licenseware.report.report import Config
 
 # pytest -s -v tests/test_report.py
 
@@ -20,7 +20,7 @@ t = unittest.TestCase()
 # pytest -s -v tests/test_report.py::test_parse_report_components
 def test_parse_report_components():
 
-    config = Config(FRONTEND_URL="")
+    config = Config(FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
 
     # Declaring some attributes
     summary = (
@@ -48,9 +48,20 @@ def test_parse_report_components():
         config=config,
     )
 
-    res = _parse_report_components(
-        {fmw_summary_component.component_id: fmw_summary_component}
+    fmw_deployment_report = NewReport(
+        name="Oracle Fusion Middleware Deployment",
+        report_id="fmw_deployment_report",
+        description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.",
+        filters=[],
+        components=[fmw_summary_component],
+        config=config,
     )
+
+    # fmw_deployment_report.attach("fmw_summary")
+
+    res = fmw_deployment_report._get_report_components_metadata()
+
+    print(res)
 
     assert isinstance(res[0]["style_attributes"], dict)
     assert isinstance(res[0]["attributes"], dict)
@@ -160,7 +171,7 @@ def test_report_creation(mocker):
     assert fmw_summary_component.get_component_data_handler() == "mock_component_data"
     assert "component_id" in fmw_summary_component.get_metadata()
 
-    d = fmw_deployment_report.get_metadata({})
+    d = fmw_deployment_report.get_metadata()
     print(d)
     firstfilter = d["filters"][0]["allowed_filters"][0]
     assert isinstance(firstfilter, str)

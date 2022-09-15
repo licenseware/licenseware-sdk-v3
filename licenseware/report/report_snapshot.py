@@ -168,7 +168,7 @@ class ReportSnapshot:
 
     def insert_report_metadata(self):
 
-        report_metadata = self.report.get_metadata({})
+        report_metadata = self.report.get_metadata()
         report_metadata["report_components"] = []
         report_metadata["tenant_id"] = self.tenant_id
         report_metadata["version"] = self.version

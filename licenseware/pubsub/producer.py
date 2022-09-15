@@ -40,6 +40,8 @@ class Producer:
             )
             self.producer.flush()
         except Exception as err:
+            # Can't catch any errors...
+            # https://stackoverflow.com/questions/40866634/kafka-producer-how-to-handle-java-net-connectexception-connection-refused
             log.warning(traceback.format_exc())
             log.error(
                 f"Got the following error on producer: \n {err} \n\n Reconecting..."
@@ -52,6 +54,7 @@ class Producer:
         Triggered by poll() or flush()."""
         if err is not None:
             log.error("Message delivery failed: {}".format(err))
+            raise Exception("Lost connection to kafka...")
         else:
             log.success(
                 "Message delivered to {} [{}]".format(msg.topic(), msg.partition())

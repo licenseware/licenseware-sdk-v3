@@ -6,7 +6,6 @@ from licenseware.datatable import *
 from licenseware.dependencies import *
 from licenseware.exceptions import *
 from licenseware.history.history_class import History
-from licenseware.notifications import *
 from licenseware.pubsub import *
 from licenseware.quota import *
 from licenseware.redis_cache import RedisCache

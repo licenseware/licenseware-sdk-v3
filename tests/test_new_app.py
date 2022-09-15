@@ -31,7 +31,13 @@ def test_new_app():
         config=config,
     )
 
-    print(fmw)
+    metadata = fmw.get_full_metadata()
+
+    assert isinstance(metadata, dict)
+    assert "app" in metadata
+    assert "uploaders" in metadata
+    assert "reports" in metadata
+    assert "report_components" in metadata
 
 
 # pytest -s -v tests/test_new_app.py::test_adding_objects

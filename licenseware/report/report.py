@@ -6,17 +6,13 @@ from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.dependencies import requests
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
-from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
+from licenseware.redis_cache.redis_cache import RedisCache
+from licenseware.uploader.default_handlers.helpers import get_uploader_status_key
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
 
-from .default_handlers import get_report_processing_status
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
-
-
-def _parse_report_components(report_components: Dict[str, NewReportComponent]):
-    return [comp.get_metadata() for _, comp in report_components.items()]
 
 
 @dataclass
@@ -77,25 +73,12 @@ class NewReport:
 
         self.report_components[component.component_id] = component
 
-    def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
+    def get_metadata(self):
 
         if not self.registrable:
             return
 
-        if self._parrent_app is not None:
-            parrent_app_metadata = self._parrent_app.get_metadata(tenant_id)
-
-        processing_state = self._get_report_processing_state(tenant_id)
-        report_status = (
-            States.DISABLED
-            if processing_state["status"] == States.RUNNING
-            else States.ENABLED
-        )
-
-        report_components = _parse_report_components(self.report_components)
-        apps = self._get_connected_apps_metadata(
-            tenant_id, parrent_app_metadata, self.connected_apps
-        )
+        stats = self._get_statuses_and_apps_metadata()
 
         metadata = {
             "app_id": self.app_id,
@@ -107,65 +90,82 @@ class NewReport:
             "flags": self.flags,
             "registrable": self.registrable,
             "updated_at": datetime.datetime.utcnow().isoformat(),
-            "report_components": report_components,
+            "report_components": self._get_report_components_metadata(),
             "public_url": self.public_url,
             "snapshot_url": self.snapshot_url,
-            "status": report_status,
-            "processing_status": processing_state["status"],
-            "last_update_date": processing_state["updated_at"],
-            "parrent_app": parrent_app_metadata,
-            "apps": apps,
+            "status": stats.report_statuses,
+            "processing_status": stats.uploader_statuses,
+            "last_update_date": stats.uploader_statuses,
+            "parrent_app": stats.parrent_app_metadata,
+            "apps": stats.apps,
             "filters": self.filters,
         }
 
-        # TODO - inform fe main_app is parrent_app
-        # TODO - inform fe to use report_id instead of id
-        # "id": 2,
-        # TODO - not needed anymore, report is loaded dynamically in preview
-        # "preview_image_dark_url": None,
-        # TODO - updated_at will be used instead
-        # "created_at": "2022-04-04T09:17:21.000000Z",
-        # TODO - not sure what this is it's on app, uploader also
-        # "private_for_tenants": [],
-        # TODO - not needed, preview report is loaded dynamically in fe
-        # "preview_image_url": "https:\/\/api-dev.licenseware.io\/ifmp\/reports\/infrastructure_mapping_report\/preview_image",
-        # TODO - enable this if tenant_id has data for this report
-
         return metadata
 
-    def _get_connected_apps_metadata(
-        self, tenant_id: str, parrent_app_metadata: dict, connected_apps: List[str]
-    ):
+    def _get_statuses_and_apps_metadata(self):
+        class StatsAndMeta:
+            parrent_app_metadata = None
+            uploader_statuses = None
+            report_statuses = None
+            apps = None
+
+        if self._parrent_app is not None:
+            StatsAndMeta.parrent_app_metadata = self._parrent_app.get_metadata()
+            StatsAndMeta.uploader_statuses = self._get_tenant_uploader_statuses(
+                self._parrent_app.app_id
+            )
+            StatsAndMeta.report_statuses = self._get_tenant_report_statuses(
+                StatsAndMeta.uploader_statuses
+            )
+            StatsAndMeta.apps = self._get_connected_apps_metadata(
+                StatsAndMeta.parrent_app_metadata
+            )
+
+        return StatsAndMeta
+
+    def _get_tenant_uploader_statuses(self, app_id: str):
+        redisdb = RedisCache(self.config)
+        results = redisdb.get(get_uploader_status_key(None, app_id, None))
+        return results
+
+    def _get_tenant_report_statuses(self, uploader_statuses):
+        report_status = lambda r: {
+            "status": States.DISABLED
+            if r["status"] == States.RUNNING
+            else States.ENABLED
+        }
+        report_statuses = [{**r, **report_status(r)} for r in uploader_statuses]
+        return report_statuses
+
+    def _get_connected_apps_metadata(self, parrent_app_metadata: dict):
 
         connected_apps_metadata = [parrent_app_metadata]
 
-        if connected_apps is None:
+        if self.connected_apps is None:
             return connected_apps_metadata
 
-        for metadata_url in connected_apps:
-            response = requests.get(
-                metadata_url, headers=self.config.machine_auth_headers
-            )
+        for urlorpath in self.connected_apps:
+            if not urlorpath.startswith("http"):
+                urlorpath = self.config.BASE_URL + "/" + urlorpath
+
+            response = requests.get(urlorpath, headers=self.config.machine_auth_headers)
             if response.status_code != 200:
                 log.error(response.content)
                 raise Exception(
-                    f"Can't get connected app metadata from url {metadata_url}"
+                    f"Can't get connected app metadata from url {urlorpath}"
                 )
             connected_apps_metadata.append(response.json())
 
         return connected_apps_metadata
 
-    def _get_report_processing_state(self, tenant_id: str):
+    def _attach_all(self):
+        if not self.components:
+            return
+        for component in self.components:
+            self.attach(component.component_id)
 
-        if tenant_id is None:
-            return {
-                "status": States.IDLE,
-                "updated_at": None,
-            }
-
-        status_repo = MongoRepository(
-            self.config.mongo_db_connection,
-            collection=self.config.MONGO_COLLECTION.UPLOADER_STATUS,
-        )
-        report_status = get_report_processing_status(tenant_id, status_repo)
-        return report_status
+    def _get_report_components_metadata(self):
+        if not self.report_components:
+            self._attach_all()
+        return [comp.get_metadata() for _, comp in self.report_components.items()]

@@ -68,7 +68,7 @@ def test_new_uploader(mocker):
         if resp.filename == "rv_tools.xlsx":
             assert resp.status == "success"
 
-    assert "uploader_id" in rv_tools_uploader.get_metadata({})
+    assert "uploader_id" in rv_tools_uploader.get_metadata()
 
     # TODO
     # response = rv_tools_uploader.check_quota_handler()
@@ -144,4 +144,4 @@ def test_new_uploader_custom_handlers(mocker):
         if resp.filename == "rv_tools.xlsx":
             assert resp.status == "success"
 
-    assert "uploader_id" in rv_tools_uploader.get_metadata({})
+    assert "uploader_id" in rv_tools_uploader.get_metadata()

@@ -50,6 +50,8 @@ class Config(BaseSettings):  # pragma no cover
     LOG_LEVEL: LogLevel = LogLevel.INFO
     PORT: int = 8000
 
+    BASE_URL: str = "http://localhost"
+    APP_URL: str = BASE_URL + "/" + APP_ID
     USER_INFO_URL: str = None
     PUBLIC_TOKEN_REPORT_URL: str = None
     FRONTEND_URL: str = None

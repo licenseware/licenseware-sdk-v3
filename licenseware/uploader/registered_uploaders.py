@@ -6,7 +6,6 @@ from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.constants.uploader_types import FileValidationResponse
 from licenseware.history.history_class import History
-from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
@@ -137,11 +136,9 @@ class RegisteredUploaders:  # pragma no cover
         status: str,
         db_connection: Any,
     ):
-        redisdb = RedisCache(self.config)
         uploader = self._get_current_uploader(uploader_id)
-
         return uploader.update_status_handler(
-            tenant_id, authorization, uploader_id, status, redisdb, self.config
+            tenant_id, uploader.uploader_id, status, self.config
         )
 
     @failsafe
@@ -152,11 +149,9 @@ class RegisteredUploaders:  # pragma no cover
         uploader_id: Enum,
         db_connection: Any,
     ):
-        redisdb = RedisCache(self.config)
         uploader = self._get_current_uploader(uploader_id)
-
         return uploader.check_status_handler(
-            tenant_id, authorization, uploader.uploader_id, redisdb
+            tenant_id, uploader.uploader_id, self.config
         )
 
     @failsafe

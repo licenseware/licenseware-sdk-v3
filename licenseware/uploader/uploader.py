@@ -56,16 +56,14 @@ class NewUploader:
         WebResponse,
     ] = default_check_quota_handler
     check_status_handler: Callable[
-        [alias.TenantId, alias.Authorization, alias.UploaderId, alias.RedisCache],
+        [alias.TenantId, alias.UploaderId, Config],
         WebResponse,
     ] = default_check_status_handler
     update_status_handler: Callable[
         [
             alias.TenantId,
-            alias.Authorization,
             alias.UploaderId,
             alias.Status,
-            alias.RedisCache,
             Config,
         ],
         UploaderStatusResponse,
@@ -118,12 +116,14 @@ class NewUploader:
             "validation_parameters": self.validation_parameters,
             "encryption_parameters": self.encryption_parameters,
             "status": self._get_tenant_uploader_id_statuses(),
-            "parrent_app": self._parrent_app.get_metadata(),
+            "parrent_app": self._parrent_app.get_metadata()
+            if self._parrent_app
+            else None,
         }
 
         return metadata
 
     def _get_tenant_uploader_id_statuses(self):
         redisdb = RedisCache(self.config)
-        results = redisdb.get(f"*:{self.uploader_id}")
+        results = redisdb.get(f"uploader_status:{self.uploader_id}")
         return results
