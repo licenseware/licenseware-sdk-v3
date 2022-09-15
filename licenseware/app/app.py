@@ -47,9 +47,6 @@ class NewApp:
                 )
             self.attached_uploaders[uploader.uploader_id] = uploader
 
-        for uploader_id in self.attached_uploaders.keys():
-            self.attached_uploaders[uploader_id]._parrent_app = self
-
         return self.attached_uploaders
 
     def attach_reports(self, reports: List[NewReport]):
@@ -63,9 +60,6 @@ class NewApp:
                 )
             self.attached_reports[report.report_id] = report
 
-        for report_id in self.attached_reports.keys():
-            self.attached_reports[report_id]._parrent_app = self
-
         return self.attached_reports
 
     def attach_components(self, components: List[NewReportComponent]):
@@ -78,9 +72,6 @@ class NewApp:
                     f"Report component '{component.component_id}' already attached to this app"
                 )
             self.attached_components[component.component_id] = component
-
-        for comp_id in self.attached_components.keys():
-            self.attached_components[comp_id]._parrent_app = self
 
         return self.attached_components
 
@@ -106,26 +97,37 @@ class NewApp:
 
     def get_full_metadata(self):
 
+        app_metadata = self.get_metadata()
+        uploaders_metadata = self.get_uploaders_metadata(app_metadata)
+
         metadata = {
-            "app": self.get_metadata(),
-            "uploaders": self.get_uploaders_metadata(),
-            "reports": self.get_reports_metadata(),
+            "app": app_metadata,
+            "uploaders": uploaders_metadata,
+            "reports": self.get_reports_metadata(app_metadata, uploaders_metadata),
             "report_components": self.get_components_metadata(),
         }
 
         return metadata
 
-    def get_uploaders_metadata(self):
+    def get_uploaders_metadata(self, parrent_app_metadata: dict):
         uploaders_metadata = (
-            [i.get_metadata() for i in self.attached_uploaders.values()]
+            [
+                i.get_metadata(parrent_app_metadata)
+                for i in self.attached_uploaders.values()
+            ]
             if self.attached_uploaders
             else []
         )
         return uploaders_metadata
 
-    def get_reports_metadata(self):
+    def get_reports_metadata(
+        self, parrent_app_metadata: dict, uploaders_metadata: List[dict]
+    ):
         reports_metadata = (
-            [i.get_metadata() for i in self.attached_reports.values()]
+            [
+                i.get_metadata(parrent_app_metadata, uploaders_metadata)
+                for i in self.attached_reports.values()
+            ]
             if self.attached_reports
             else []
         )
