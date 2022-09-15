@@ -77,6 +77,7 @@ class Config(BaseSettings):  # pragma no cover
     EXPIRE_UPLOADER_STATUS: int = 7200  # 2 hours
 
     KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
+    KAFKA_CONSUMER_POLL: int = 0.5
 
     RABBITMQ_HOST: str = "localhost"
     RABBITMQ_PORT: int = 5672

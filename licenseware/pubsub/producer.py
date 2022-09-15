@@ -1,5 +1,4 @@
 import json
-import traceback
 from typing import Callable
 
 from licenseware.config.config import Config
@@ -33,21 +32,14 @@ class Producer:
         self._checks(topic, data)
         databytes = json.dumps(data).encode("utf-8")
 
-        try:
-            self.producer.poll(0)
-            self.producer.produce(
-                topic, databytes, callback=delivery_report or self.delivery_report
-            )
-            self.producer.flush()
-        except Exception as err:
-            # Can't catch any errors...
-            # https://stackoverflow.com/questions/40866634/kafka-producer-how-to-handle-java-net-connectexception-connection-refused
-            log.warning(traceback.format_exc())
-            log.error(
-                f"Got the following error on producer: \n {err} \n\n Reconecting..."
-            )
-            self.producer = self.producer_factory(self.config)
-            self.publish(topic, data, delivery_report)
+        # Can't catch any errors from producer... if something goes wrong it will get stuck in producer thread...
+        # https://stackoverflow.com/questions/40866634/kafka-producer-how-to-handle-java-net-connectexception-connection-refused
+
+        self.producer.poll(0)
+        self.producer.produce(
+            topic, databytes, callback=delivery_report or self.delivery_report
+        )
+        self.producer.flush()
 
     def delivery_report(self, err, msg):
         """Called once for each message produced to indicate delivery result.

@@ -36,7 +36,8 @@ class Consumer:
             log.info("Listening to stream...")
 
             while True:
-                msg = self.consumer.poll(0.5)
+
+                msg = self.consumer.poll(self.config.KAFKA_CONSUMER_POLL)
 
                 if msg is None:
                     continue
