@@ -176,6 +176,13 @@ class RegisteredUploaders:  # pragma no cover
             self.config,
         )
 
+    def notify_upload_status(self, tenant_id: str, uploader_id: str, status: str):
+        return self.update_status(
+            tenant_id=tenant_id,
+            uploader_id=uploader_id,
+            status=status,
+        )
+
     # PRIVATE
 
     def _get_current_uploader(self, uploader_id: Enum):
