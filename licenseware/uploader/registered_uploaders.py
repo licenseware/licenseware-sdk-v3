@@ -131,20 +131,6 @@ class RegisteredUploaders:  # pragma no cover
         return validation_response
 
     @failsafe
-    def update_status(
-        self,
-        tenant_id: str,
-        uploader_id: Enum,
-        status: str,
-    ):
-        uploader = self._get_current_uploader(uploader_id)
-        response = uploader.update_status_handler(
-            tenant_id, uploader.uploader_id, status, self.config
-        )
-        self.registry_updater.delay()
-        return response
-
-    @failsafe
     def check_status(
         self,
         tenant_id: str,
@@ -176,12 +162,18 @@ class RegisteredUploaders:  # pragma no cover
             self.config,
         )
 
-    def notify_upload_status(self, tenant_id: str, uploader_id: str, status: str):
-        return self.update_status(
-            tenant_id=tenant_id,
-            uploader_id=uploader_id,
-            status=status,
+    def notify_upload_status(
+        self,
+        tenant_id: str,
+        uploader_id: Enum,
+        status: str,
+    ):
+        uploader = self._get_current_uploader(uploader_id)
+        response = uploader.update_status_handler(
+            tenant_id, uploader.uploader_id, status, self.config
         )
+        self.registry_updater.delay()
+        return response
 
     # PRIVATE
 

@@ -47,7 +47,6 @@ class NewReport:
         self.url = f"/{ns}/reports/{reportid}"
         self.public_url = f"/{ns}/public-reports/{reportid}"
         self.snapshot_url = f"/{ns}/snapshot-reports/{reportid}"
-        self._parrent_app = None
 
     def attach(self, component_id: str):
 
@@ -64,16 +63,16 @@ class NewReport:
         self.report_components[component.component_id] = component
         self.report_components_metadata = self._get_report_components_metadata()
 
-    def get_metadata(self):
+    def get_metadata(
+        self, parrent_app_metadata: dict = None, uploaders_metadata: dict = None
+    ):
 
         if not self.registrable:
             return
 
-        conn_apps_metadata = self._get_connected_apps_metadata()
-        parrent_app = conn_apps_metadata[0]["app"] if conn_apps_metadata else []
-        uploader_statuses = self._get_tenant_uploader_statuses(conn_apps_metadata)
+        apps_metadata = self._get_connected_apps_metadata(parrent_app_metadata)
+        uploader_statuses = self._get_tenant_uploader_statuses(uploaders_metadata)
         report_statuses = self._get_tenant_report_statuses(uploader_statuses)
-        apps_metadata = [ca["app"] for ca in conn_apps_metadata]
 
         metadata = {
             "app_id": self.app_id,
@@ -91,7 +90,7 @@ class NewReport:
             "status": report_statuses,
             "processing_status": uploader_statuses,
             "last_update_date": uploader_statuses,
-            "parrent_app": parrent_app,
+            "parrent_app": parrent_app_metadata,
             "apps": apps_metadata,
             "filters": self.filters,
         }
@@ -120,12 +119,10 @@ class NewReport:
             self._attach_all()
         return [comp.get_metadata() for _, comp in self.report_components.items()]
 
-    def _get_connected_apps_metadata(self):
+    def _get_connected_apps_metadata(self, parrent_app_metadata: dict):
 
         conn_apps_metadata = []
-        parrent_app_metadata = None
-        if self._parrent_app:
-            parrent_app_metadata = self._parrent_app.get_full_metadata()
+        if parrent_app_metadata:
             conn_apps_metadata = [parrent_app_metadata]
 
         if self.connected_apps is None:
@@ -140,19 +137,18 @@ class NewReport:
             if response.status_code != 200:
                 log.error(response.content)
                 raise Exception(f"Can't get connected app metadata from url {url}")
-            conn_apps_metadata.append(response.json())
+            conn_apps_metadata.append(response.json()["app"])
 
         return conn_apps_metadata
 
-    def _get_tenant_uploader_statuses(self, conn_apps_metadata: List[dict]):
+    def _get_tenant_uploader_statuses(self, uploaders_metadata: List[dict]):
 
-        if not self._parrent_app:
+        if not uploaders_metadata:
             return self._get_tenant_uploader_statuses_from_cache()
 
         results = []
-        for meta in conn_apps_metadata:
-            for uploader in meta["uploaders"]:
-                results.extend(uploader["status"])
+        for uploader in uploaders_metadata:
+            results.extend(uploader["status"])
 
         return results
 

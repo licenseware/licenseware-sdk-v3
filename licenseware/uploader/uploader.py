@@ -95,16 +95,11 @@ class NewUploader:
         self.upload_url = f"/{ns}/uploads/{uploaderid}/files"
         self.quota_validation_url = f"/{ns}/uploads/{uploaderid}/quota"
         self.status_check_url = f"/{ns}/uploads/{uploaderid}/status"
-        self._parrent_app = None
 
-    def get_metadata(self):
+    def get_metadata(self, parrent_app_metadata: dict = None):
 
         if not self.registrable:
             return
-
-        parrent_app_metadata = (
-            self._parrent_app.get_metadata() if self._parrent_app else None
-        )
 
         metadata = {
             "app_id": self.app_id,

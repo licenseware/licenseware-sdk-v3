@@ -58,7 +58,6 @@ class NewReportComponent:
         self.url = f"/{appid}/report-components/{compid}"
         self.public_url = f"/{appid}/public-report-components/{compid}"
         self.snapshot_url = f"/{appid}/snapshot-report-components/{compid}"
-        self._parrent_app = None
 
     def get_metadata(self):
 
