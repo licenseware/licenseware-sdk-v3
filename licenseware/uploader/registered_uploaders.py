@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Any, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union
 
 from licenseware.config.config import Config
 from licenseware.constants.states import States
@@ -18,9 +18,12 @@ class RegisteredUploaders:  # pragma no cover
     This class acts as a proxy between the web framework and the implementation
     """
 
-    def __init__(self, uploaders: List[NewUploader], config: Config) -> None:
+    def __init__(
+        self, uploaders: List[NewUploader], registry_updater: Callable, config: Config
+    ) -> None:
         self.config = config
         self.uploaders = uploaders
+        self.registry_updater = registry_updater
         self.uploader_enum = Enum(
             "UploaderEnum",
             {
@@ -131,23 +134,21 @@ class RegisteredUploaders:  # pragma no cover
     def update_status(
         self,
         tenant_id: str,
-        authorization: str,
         uploader_id: Enum,
         status: str,
-        db_connection: Any,
     ):
         uploader = self._get_current_uploader(uploader_id)
-        return uploader.update_status_handler(
+        response = uploader.update_status_handler(
             tenant_id, uploader.uploader_id, status, self.config
         )
+        self.registry_updater.delay()
+        return response
 
     @failsafe
     def check_status(
         self,
         tenant_id: str,
-        authorization: str,
         uploader_id: Enum,
-        db_connection: Any,
     ):
         uploader = self._get_current_uploader(uploader_id)
         return uploader.check_status_handler(
