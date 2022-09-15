@@ -43,21 +43,11 @@ class NewReport:
             self.filters = self.filters.metadata
 
         self.report_components: Dict[str, NewReportComponent] = dict()
+        self.report_components_metadata = None
         self.url = f"/{ns}/reports/{reportid}"
         self.public_url = f"/{ns}/public-reports/{reportid}"
         self.snapshot_url = f"/{ns}/snapshot-reports/{reportid}"
         self._parrent_app = None
-
-    def _get_component_by_id(self, component_id: str):
-        assert self.components is not None
-
-        for comp in self.components:
-            if comp.component_id == component_id:
-                return comp
-
-        raise Exception(
-            f"Component '{component_id}' not found on given report components"
-        )  # pragma no cover
 
     def attach(self, component_id: str):
 
@@ -72,13 +62,18 @@ class NewReport:
             component.order = len(self.report_components.keys()) + 1
 
         self.report_components[component.component_id] = component
+        self.report_components_metadata = self._get_report_components_metadata()
 
     def get_metadata(self):
 
         if not self.registrable:
             return
 
-        stats = self._get_statuses_and_apps_metadata()
+        conn_apps_metadata = self._get_connected_apps_metadata()
+        parrent_app = conn_apps_metadata[0]["app"] if conn_apps_metadata else []
+        uploader_statuses = self._get_tenant_uploader_statuses(conn_apps_metadata)
+        report_statuses = self._get_tenant_report_statuses(uploader_statuses)
+        apps_metadata = [ca["app"] for ca in conn_apps_metadata]
 
         metadata = {
             "app_id": self.app_id,
@@ -90,74 +85,29 @@ class NewReport:
             "flags": self.flags,
             "registrable": self.registrable,
             "updated_at": datetime.datetime.utcnow().isoformat(),
-            "report_components": self._get_report_components_metadata(),
+            "report_components": self.report_components_metadata,
             "public_url": self.public_url,
             "snapshot_url": self.snapshot_url,
-            "status": stats.report_statuses,
-            "processing_status": stats.uploader_statuses,
-            "last_update_date": stats.uploader_statuses,
-            "parrent_app": stats.parrent_app_metadata,
-            "apps": stats.apps,
+            "status": report_statuses,
+            "processing_status": uploader_statuses,
+            "last_update_date": uploader_statuses,
+            "parrent_app": parrent_app,
+            "apps": apps_metadata,
             "filters": self.filters,
         }
 
         return metadata
 
-    def _get_statuses_and_apps_metadata(self):
-        class StatsAndMeta:
-            parrent_app_metadata = None
-            uploader_statuses = None
-            report_statuses = None
-            apps = None
+    def _get_component_by_id(self, component_id: str):
+        assert self.components is not None
 
-        if self._parrent_app is not None:
-            StatsAndMeta.parrent_app_metadata = self._parrent_app.get_metadata()
-            StatsAndMeta.uploader_statuses = self._get_tenant_uploader_statuses(
-                self._parrent_app.app_id
-            )
-            StatsAndMeta.report_statuses = self._get_tenant_report_statuses(
-                StatsAndMeta.uploader_statuses
-            )
-            StatsAndMeta.apps = self._get_connected_apps_metadata(
-                StatsAndMeta.parrent_app_metadata
-            )
+        for comp in self.components:
+            if comp.component_id == component_id:
+                return comp
 
-        return StatsAndMeta
-
-    def _get_tenant_uploader_statuses(self, app_id: str):
-        redisdb = RedisCache(self.config)
-        results = redisdb.get(get_uploader_status_key(None, app_id, None))
-        return results
-
-    def _get_tenant_report_statuses(self, uploader_statuses):
-        report_status = lambda r: {
-            "status": States.DISABLED
-            if r["status"] == States.RUNNING
-            else States.ENABLED
-        }
-        report_statuses = [{**r, **report_status(r)} for r in uploader_statuses]
-        return report_statuses
-
-    def _get_connected_apps_metadata(self, parrent_app_metadata: dict):
-
-        connected_apps_metadata = [parrent_app_metadata]
-
-        if self.connected_apps is None:
-            return connected_apps_metadata
-
-        for urlorpath in self.connected_apps:
-            if not urlorpath.startswith("http"):
-                urlorpath = self.config.BASE_URL + "/" + urlorpath
-
-            response = requests.get(urlorpath, headers=self.config.machine_auth_headers)
-            if response.status_code != 200:
-                log.error(response.content)
-                raise Exception(
-                    f"Can't get connected app metadata from url {urlorpath}"
-                )
-            connected_apps_metadata.append(response.json())
-
-        return connected_apps_metadata
+        raise Exception(
+            f"Component '{component_id}' not found on given report components"
+        )  # pragma no cover
 
     def _attach_all(self):
         if not self.components:
@@ -169,3 +119,53 @@ class NewReport:
         if not self.report_components:
             self._attach_all()
         return [comp.get_metadata() for _, comp in self.report_components.items()]
+
+    def _get_connected_apps_metadata(self):
+
+        conn_apps_metadata = []
+        parrent_app_metadata = None
+        if self._parrent_app:
+            parrent_app_metadata = self._parrent_app.get_full_metadata()
+            conn_apps_metadata = [parrent_app_metadata]
+
+        if self.connected_apps is None:
+            return conn_apps_metadata
+
+        for app_id in self.connected_apps:
+            if parrent_app_metadata:
+                if app_id == parrent_app_metadata["app_id"]:
+                    continue  # already got parrent app metadata
+            url = self.config.BASE_URL + f"/{app_id}/metadata"
+            response = requests.get(url, headers=self.config.machine_auth_headers)
+            if response.status_code != 200:
+                log.error(response.content)
+                raise Exception(f"Can't get connected app metadata from url {url}")
+            conn_apps_metadata.append(response.json())
+
+        return conn_apps_metadata
+
+    def _get_tenant_uploader_statuses(self, conn_apps_metadata: List[dict]):
+
+        if not self._parrent_app:
+            return self._get_tenant_uploader_statuses_from_cache()
+
+        results = []
+        for meta in conn_apps_metadata:
+            for uploader in meta["uploaders"]:
+                results.extend(uploader["status"])
+
+        return results
+
+    def _get_tenant_uploader_statuses_from_cache(self):
+        redisdb = RedisCache(self.config)
+        results = redisdb.get(get_uploader_status_key(None, self.app_id, None))
+        return results
+
+    def _get_tenant_report_statuses(self, uploader_statuses):
+        report_status = lambda r: {
+            "status": States.DISABLED
+            if r["status"] == States.RUNNING
+            else States.ENABLED
+        }
+        report_statuses = [{**r, **report_status(r)} for r in uploader_statuses]
+        return report_statuses

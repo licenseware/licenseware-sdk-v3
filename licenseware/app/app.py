@@ -47,6 +47,9 @@ class NewApp:
                 )
             self.attached_uploaders[uploader.uploader_id] = uploader
 
+        for uploader_id in self.attached_uploaders.keys():
+            self.attached_uploaders[uploader_id]._parrent_app = self
+
         return self.attached_uploaders
 
     def attach_reports(self, reports: List[NewReport]):
@@ -60,6 +63,9 @@ class NewApp:
                 )
             self.attached_reports[report.report_id] = report
 
+        for report_id in self.attached_reports.keys():
+            self.attached_reports[report_id]._parrent_app = self
+
         return self.attached_reports
 
     def attach_components(self, components: List[NewReportComponent]):
@@ -72,6 +78,9 @@ class NewApp:
                     f"Report component '{component.component_id}' already attached to this app"
                 )
             self.attached_components[component.component_id] = component
+
+        for comp_id in self.attached_components.keys():
+            self.attached_components[comp_id]._parrent_app = self
 
         return self.attached_components
 
@@ -107,40 +116,25 @@ class NewApp:
         return metadata
 
     def get_uploaders_metadata(self):
-
-        for uploader_id in self.attached_uploaders.keys():
-            self.attached_uploaders[uploader_id]._parrent_app = self
-
         uploaders_metadata = (
             [i.get_metadata() for i in self.attached_uploaders.values()]
             if self.attached_uploaders
             else []
         )
-
         return uploaders_metadata
 
     def get_reports_metadata(self):
-
-        for report_id in self.attached_reports.keys():
-            self.attached_reports[report_id]._parrent_app = self
-
         reports_metadata = (
             [i.get_metadata() for i in self.attached_reports.values()]
             if self.attached_reports
             else []
         )
-
         return reports_metadata
 
     def get_components_metadata(self):
-
-        for comp_id in self.attached_components.keys():
-            self.attached_components[comp_id]._parrent_app = self
-
         report_components_metadata = (
             [i.get_metadata() for i in self.attached_components.values()]
             if self.attached_components
             else []
         )
-
         return report_components_metadata

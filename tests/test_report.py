@@ -2,6 +2,7 @@ import unittest
 
 from licenseware import (
     BarHorizontalAttrs,
+    Config,
     ErrorAlreadyAttached,
     Icons,
     NewReport,
@@ -10,7 +11,6 @@ from licenseware import (
     StyleAttrs,
     SummaryAttrs,
 )
-from licenseware.report.report import Config
 
 # pytest -s -v tests/test_report.py
 
@@ -187,3 +187,32 @@ def test_report_creation(mocker):
     #         fmw_deployment_report.metadata, sort_keys=True, indent=4, default=str
     #     )
     # )
+
+
+# pytest -s -v tests/test_report.py::test_report_metadata_connected_apps
+def test_report_metadata_connected_apps():
+
+    config = Config(APP_ID="odb-service", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
+
+    fmw_deployment_report = NewReport(
+        name="Oracle Fusion Middleware Deployment",
+        report_id="fmw_deployment_report",
+        description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.",
+        filters=[],
+        config=config,
+        connected_apps=["odb-service", "ifmp-service"],
+    )
+
+    # app = NewApp(
+    #     name="Oracle Middleware Manager",
+    #     description="""OMWM Automate the analysis and determination of Oracle Middleware usage.""",
+    #     config=config,
+    # )
+
+    # app.attach_reports([fmw_deployment_report])
+
+    # assert app.attached_reports
+
+    metadata = fmw_deployment_report.get_metadata()
+
+    print(metadata)

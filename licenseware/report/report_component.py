@@ -60,14 +60,10 @@ class NewReportComponent:
         self.snapshot_url = f"/{appid}/snapshot-report-components/{compid}"
         self._parrent_app = None
 
-    def get_metadata(self, tenant_id: str = None, parrent_app_metadata: dict = None):
+    def get_metadata(self):
 
         if not self.registrable:
             return
-
-        # TODO - provide related tenant data if needed
-        # if self._parrent_app is not None:
-        #     parrent_app_metadata = self._parrent_app.get_metadata()
 
         metadata = {
             "app_id": self.app_id,

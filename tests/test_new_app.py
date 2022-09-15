@@ -75,6 +75,7 @@ def test_adding_objects():
         description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.",
         filters=[],
         config=config,
+        connected_apps=["odb-service", "ifmp-service"],
     )
 
     def workerfunc(event):
