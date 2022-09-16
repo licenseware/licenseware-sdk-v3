@@ -1,78 +1,58 @@
 import os
 import time
 from datetime import datetime
+from threading import Thread
 
 from licenseware.config.config import Config
 from licenseware.dependencies import requests
 from licenseware.utils.logger import log
 
 
-class Authenticator:  # pragma no cover
-    @classmethod
-    def connect(cls, config: Config, max_retries: int = 0, wait_seconds: int = 1):
-        """
-        param: max_retries  - 'infinite' or a number,
-        param: wait_seconds - wait time in seconds if authentification fails
-        """
+def login_machine(name: str, password: str, login_url: str):
 
-        assert config.MACHINE_LOGIN_URL is not None
-        cls.config = config
+    try:
+        response = requests.post(
+            login_url,
+            json={
+                "machine_name": name,
+                "password": password,
+            },
+        )
 
-        status_code = 500
+        if response.status_code != 200:
+            log.error(f"Could not login with {name}")
+            time.sleep(2)
+            login_machine(name, password, login_url)
+    except:
+        log.error(f"Could not login with {name}")
+        time.sleep(2)
+        login_machine(name, password, login_url)
 
-        if max_retries == "infinite":
-            while status_code != 200:
-                response, status_code = cls()._retry_login()
-                time.sleep(wait_seconds)
-        else:
-            for _ in range(max_retries + 1):
-                response, status_code = cls()._retry_login()
-                if status_code == 200:
-                    break
-                time.sleep(wait_seconds)
-
-        if status_code == 200:
-            os.environ["MACHINE_TOKEN"] = response.get(
-                "Authorization", "Authorization not found"
-            )
-            os.environ["MACHINE_TOKEN_DATETIME"] = datetime.utcnow().isoformat()
-            os.environ["APP_AUTHENTICATED"] = "true"
-            log.success("Machine login successful")
-        else:
-            os.environ["APP_AUTHENTICATED"] = "false"
-            log.error("Can't authentificate this machine")
-
-        return response, status_code
-
-    def _retry_login(self):
-        response, status_code = {"status": "failed"}, 500
-        try:
-            response, status_code = self._login()
-        except Exception as err:
-            log.error(f"{str(err)}\n\nAuthentification failed... retrying... ")
-            pass  # ConnectionError
-        return response, status_code
-
-    def _login(self):
-
-        payload = {
-            "machine_name": self.config.MACHINE_NAME,
-            "password": self.config.MACHINE_PASSWORD,
-        }
-
-        response = requests.post(self.config.MACHINE_LOGIN_URL, json=payload)
-
-        if response.status_code == 200:
-            return response.json(), 200
-
-        log.error(f"Could not login with {self.config.MACHINE_NAME}")
-        exit(1)
+    os.environ["MACHINE_TOKEN"] = response.json()["Authorization"]
+    os.environ["MACHINE_TOKEN_DATETIME"] = datetime.utcnow().isoformat()
+    log.success("Machine login successful!")
 
 
-def login_machine(
-    config: Config, max_retries: int = 10_000, wait_seconds: int = 1
-):  # pragma no cover
+def _login_machine(name: str, password: str, login_url: str, refresh_interval: int):
+    while True:
+        time.sleep(refresh_interval)
+        login_machine(name, password, login_url)
+        log.info(f"Refreshed machine token")
 
-    return Authenticator.connect(
-        config, max_retries=max_retries, wait_seconds=wait_seconds
+
+def login_machine_in_thread(config: Config):
+
+    login_machine(
+        config.MACHINE_NAME, config.MACHINE_PASSWORD, config.MACHINE_LOGIN_URL
     )
+
+    Thread(
+        target=_login_machine,
+        args=(
+            config.MACHINE_NAME,
+            config.MACHINE_PASSWORD,
+            config.MACHINE_LOGIN_URL,
+            config.REFRESH_MACHINE_TOKEN_INTERVAL,
+        ),
+        daemon=True,
+    ).start()

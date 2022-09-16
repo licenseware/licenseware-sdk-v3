@@ -1,4 +1,5 @@
 import datetime
+import time
 from dataclasses import dataclass
 from typing import Dict, List
 
@@ -119,6 +120,22 @@ class NewReport:
             self._attach_all()
         return [comp.get_metadata() for _, comp in self.report_components.items()]
 
+    def _get_app_metadata(self, app_id: str):
+        try:
+            auth_headers = {"auth_jwt": self.config.machine_token}
+            response = requests.get(
+                self.config.REGISTRY_SERVICE_APPS_URL,
+                params={"app_id": app_id},
+                headers=auth_headers,
+            )
+            if response.status_code != 200:
+                log.warning(response.content)
+                return None
+            return response.json()
+        except Exception as err:
+            log.warning(err)
+            return None
+
     def _get_connected_apps_metadata(self, parrent_app_metadata: dict):
 
         conn_apps_metadata = []
@@ -128,24 +145,22 @@ class NewReport:
         if self.connected_apps is None:
             return conn_apps_metadata
 
-        for urlorappid in self.connected_apps:
+        for app_id in self.connected_apps:
             if parrent_app_metadata:
-                if parrent_app_metadata["app_id"] in urlorappid:
+                if parrent_app_metadata["app_id"] in app_id:
                     continue  # already got parrent app metadata
 
-            if not urlorappid.startswith("http"):
-                urlorappid = self.config.BASE_URL + f"/{urlorappid}/metadata"
-
-            response = requests.get(
-                urlorappid, headers=self.config.machine_auth_headers
-            )
-            if response.status_code != 200:
-                log.error(response.content)
-                raise Exception(
-                    f"Can't get connected app metadata from url {urlorappid}"
+            app_metadata = self._get_app_metadata(app_id)
+            if app_metadata is None:
+                log.error(
+                    f"Can't get connected app metadata for app id: {app_id}... Retrying..."
                 )
-            conn_apps_metadata.append(response.json()["app"])
+                time.sleep(2)
+                self._get_connected_apps_metadata(parrent_app_metadata)
 
+            conn_apps_metadata.append(app_metadata)
+
+        log.success("Got conected apps metadata from registry service successfully")
         return conn_apps_metadata
 
     def _get_tenant_uploader_statuses(self, uploaders_metadata: List[dict]):

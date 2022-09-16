@@ -71,7 +71,7 @@ class RegisteredComponents:  # pragma no cover
 
         response = component.get_component_data_handler(
             data["tenant_id"],
-            self.config.get_machine_token(),
+            self.config.machine_token,
             repo,
             filters,
             limit,

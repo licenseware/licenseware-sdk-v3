@@ -1,4 +1,3 @@
-import json
 import unittest
 
 from licenseware import (
@@ -117,7 +116,7 @@ def test_adding_objects():
     assert isinstance(app.get_metadata(), dict)
     assert "app_id" in app.get_metadata()
 
-    print(json.dumps(app.get_full_metadata(), sort_keys=True, indent=4, default=str))
+    # print(json.dumps(app.get_full_metadata(), sort_keys=True, indent=4, default=str))
 
-    assert isinstance(app.get_full_metadata(), dict)
-    assert "reports" in app.get_full_metadata()
+    # assert isinstance(app.get_full_metadata(), dict)
+    # assert "reports" in app.get_full_metadata()

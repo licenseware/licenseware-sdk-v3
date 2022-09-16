@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from licenseware.constants.base_enum import BaseEnum
@@ -57,9 +58,18 @@ class Config(BaseSettings):  # pragma no cover
     FRONTEND_URL: str = None
 
     MACHINE_LOGIN_URL: str = None
-    MACHINE_TOKEN: str = None
     MACHINE_NAME: str = None
     MACHINE_PASSWORD: str = None
+
+    AUTH_SERVICE_URL: str = "http://localhost/auth"
+    AUTH_MACHINE_CHECK_URL: str = AUTH_SERVICE_URL + "/machine_authorization"
+    AUTH_USER_CHECK_URL: str = AUTH_SERVICE_URL + "/verify"
+
+    REGISTRY_SERVICE_URL: str = "http://localhost:3001/registry-service"
+    REGISTRY_SERVICE_APPS_URL: str = REGISTRY_SERVICE_URL + "/apps"
+    REGISTRY_SERVICE_UPLOADERS_URL: str = REGISTRY_SERVICE_URL + "/uploaders"
+    REGISTRY_SERVICE_REPORTS_URL: str = REGISTRY_SERVICE_URL + "/reports"
+    REGISTRY_SERVICE_COMPONENTS_URL: str = REGISTRY_SERVICE_URL + "/report-components"
 
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
@@ -75,6 +85,8 @@ class Config(BaseSettings):  # pragma no cover
     REDIS_PASSWORD: int = None
     EXPIRE_REGISTRATION: int = 900  # 15 mins
     EXPIRE_UPLOADER_STATUS: int = 7200  # 2 hours
+    EXPIRE_USER_CHECK: int = 60  # 1 minute
+    EXPIRE_MACHINE_CHECK: int = 60  # 1 minute
 
     KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
     KAFKA_CONSUMER_POLL: int = 0.5
@@ -88,7 +100,8 @@ class Config(BaseSettings):  # pragma no cover
 
     CELERY_BROKER_REDIS_DB: int = 1
     CELERY_BACKEND_REDIS_DB: int = 2
-    CELERY_BEATS_REGISTRATION_INTERVAL: int = 600
+    CELERY_BEATS_REGISTRATION_INTERVAL: int = 600  # 10 minutes
+    REFRESH_MACHINE_TOKEN_INTERVAL: int = 86_400  # 24 hours
 
     CELERY_BROKER_TYPE: CeleryBrokerType = CeleryBrokerType.REDIS
     WEBAPP_FRAMEWORK: WebAppFramework = WebAppFramework.FASTAPI
@@ -131,7 +144,11 @@ class Config(BaseSettings):  # pragma no cover
 
     @property
     def machine_auth_headers(self):
-        return {"auth_jwt": self.MACHINE_TOKEN}
+        return {"auth_jwt": os.getenv("MACHINE_TOKEN")}
+
+    @property
+    def machine_token(self):
+        return os.getenv("MACHINE_TOKEN")
 
     class Config:
         env_file = ".env"

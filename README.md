@@ -182,8 +182,7 @@ In the `NewUploader` object we gather all information about this uploader
 - `icon` - the icon of this uploader which will be displayed in frontend;
 - `config` - the configuration class instance will will need to make available the following information:
     * `config.APP_ID` - each service must have an unique ID;
-    * `config.get_machine_token()` - a function which will return the service's authentification token. This token is available after the services authentificates that's way we need a dynamic way of retreiving it;
-
+    
 
 We can remove the fields we don't fill and reduce the above to this:
 

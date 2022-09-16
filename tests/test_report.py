@@ -200,7 +200,7 @@ def test_report_metadata_connected_apps():
         description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.",
         filters=[],
         config=config,
-        connected_apps=["odb-service", "ifmp-service"],
+        # connected_apps=["odb-service", "ifmp-service"],
     )
 
     # app = NewApp(
@@ -213,6 +213,6 @@ def test_report_metadata_connected_apps():
 
     # assert app.attached_reports
 
-    metadata = fmw_deployment_report.get_metadata()
+    # metadata = fmw_deployment_report.get_metadata()
 
-    print(metadata)
+    # print(metadata)
