@@ -742,7 +742,10 @@ from confluent_kafka import Producer as KafkaProducer
 from settings import config 
 
 def producer_client_factory(config: Config):
-    producer_client = KafkaProducer({"bootstrap.servers": config.KAFKA_BROKER_URL})
+    producer_client = KafkaProducer({
+        "bootstrap.servers": config.KAFKA_BROKER_URL, 
+        "security.protocol": config.KAFKA_SECURITY_PROTOCOL,
+    })
     return producer_client
 
 
@@ -774,6 +777,7 @@ def consumer_client_factory(config: Config):
         {
             "bootstrap.servers": config.KAFKA_BROKER_URL,
             "group.id": config.APP_ID,
+            "security.protocol": config.KAFKA_SECURITY_PROTOCOL,
         }
     )
     return consumer_client

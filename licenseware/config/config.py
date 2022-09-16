@@ -78,6 +78,7 @@ class Config(BaseSettings):  # pragma no cover
 
     KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
     KAFKA_CONSUMER_POLL: int = 0.5
+    KAFKA_SECURITY_PROTOCOL: str = "PLAINTEXT"
 
     RABBITMQ_HOST: str = "localhost"
     RABBITMQ_PORT: int = 5672
