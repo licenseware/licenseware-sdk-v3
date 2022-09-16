@@ -131,8 +131,10 @@ class NewReport:
             if response.status_code != 200:
                 log.warning(response.content)
                 return None
-            if not response.json():
-                return None
+
+            assert isinstance(response.json(), list)
+            assert len(response.json()) > 0
+
             return response.json()
         except Exception as err:
             log.warning(err)
@@ -159,8 +161,10 @@ class NewReport:
                 )
                 time.sleep(2)
                 self._get_connected_apps_metadata(parrent_app_metadata)
-
-            conn_apps_metadata.extend(app_metadata)
+            else:
+                # Not sure why `app_metadata` sometimes keeps coming None here
+                # Even if is checked for None...
+                conn_apps_metadata.extend(app_metadata)
 
         log.success("Got conected apps metadata from registry service successfully")
         return conn_apps_metadata
