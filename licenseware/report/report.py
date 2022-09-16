@@ -128,15 +128,22 @@ class NewReport:
         if self.connected_apps is None:
             return conn_apps_metadata
 
-        for app_id in self.connected_apps:
+        for urlorappid in self.connected_apps:
             if parrent_app_metadata:
-                if app_id == parrent_app_metadata["app_id"]:
+                if parrent_app_metadata["app_id"] in urlorappid:
                     continue  # already got parrent app metadata
-            url = self.config.BASE_URL + f"/{app_id}/metadata"
-            response = requests.get(url, headers=self.config.machine_auth_headers)
+
+            if not urlorappid.startswith("http"):
+                urlorappid = self.config.BASE_URL + f"/{urlorappid}/metadata"
+
+            response = requests.get(
+                urlorappid, headers=self.config.machine_auth_headers
+            )
             if response.status_code != 200:
                 log.error(response.content)
-                raise Exception(f"Can't get connected app metadata from url {url}")
+                raise Exception(
+                    f"Can't get connected app metadata from url {urlorappid}"
+                )
             conn_apps_metadata.append(response.json()["app"])
 
         return conn_apps_metadata

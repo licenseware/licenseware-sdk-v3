@@ -32,9 +32,6 @@ class Producer:
         self._checks(topic, data)
         databytes = json.dumps(data).encode("utf-8")
 
-        # Can't catch any errors from producer... if something goes wrong it will get stuck in producer thread...
-        # https://stackoverflow.com/questions/40866634/kafka-producer-how-to-handle-java-net-connectexception-connection-refused
-
         self.producer.poll(0)
         self.producer.produce(
             topic, databytes, callback=delivery_report or self.delivery_report

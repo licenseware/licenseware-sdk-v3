@@ -131,7 +131,7 @@ class Config(BaseSettings):  # pragma no cover
 
     @property
     def machine_auth_headers(self):
-        return {"Authorization": self.MACHINE_TOKEN}
+        return {"auth_jwt": self.MACHINE_TOKEN}
 
     class Config:
         env_file = ".env"
