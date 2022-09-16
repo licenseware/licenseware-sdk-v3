@@ -131,6 +131,8 @@ class NewReport:
             if response.status_code != 200:
                 log.warning(response.content)
                 return None
+            if not response.json():
+                return None
             return response.json()
         except Exception as err:
             log.warning(err)
@@ -158,7 +160,7 @@ class NewReport:
                 time.sleep(2)
                 self._get_connected_apps_metadata(parrent_app_metadata)
 
-            conn_apps_metadata.append(app_metadata)
+            conn_apps_metadata.extend(app_metadata)
 
         log.success("Got conected apps metadata from registry service successfully")
         return conn_apps_metadata

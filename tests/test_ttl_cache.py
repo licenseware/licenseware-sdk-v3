@@ -1,4 +1,5 @@
 import time
+
 from licenseware import ttl_cache
 
 # pytest -s -v tests/test_ttl_cache.py
