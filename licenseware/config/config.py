@@ -97,16 +97,16 @@ class Config(BaseSettings):  # pragma no cover
     CELERY_BACKEND_REDIS_DB: int = 2
     CELERY_BEATS_REGISTRATION_INTERVAL: int = 600  # 10 minutes
     REFRESH_MACHINE_TOKEN_INTERVAL: int = 86_400  # 24 hours
+    QUEUE: str = get_altered_strings(APP_ID).underscore
 
     CELERY_BROKER_TYPE: CeleryBrokerType = CeleryBrokerType.REDIS
     WEBAPP_FRAMEWORK: WebAppFramework = WebAppFramework.FASTAPI
 
     @property
     def celery_broker_uri(self):
-        return {
-            CeleryBrokerType.REDIS: f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.CELERY_BROKER_REDIS_DB}",
-            CeleryBrokerType.RABBITMQ: f"amqp://{self.RABBITMQ_USER}:{self.RABBITMQ_PASSWORD}@{self.RABBITMQ_HOST}:{self.RABBITMQ_PORT}/{self.RABBITMQ_VHOST}",
-        }[self.CELERY_BROKER_TYPE]
+        return (
+            f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.CELERY_BROKER_REDIS_DB}"
+        )
 
     @property
     def celery_result_backend_uri(self):
