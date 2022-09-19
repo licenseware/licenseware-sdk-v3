@@ -8,6 +8,12 @@ from licenseware.dependencies import requests
 from licenseware.utils.logger import log
 
 
+def login_user(email: str, password: str, login_url: str):
+    creds = {"email": email, "password": password}
+    response = requests.post(url=login_url, json=creds)
+    return response.json()
+
+
 def login_machine(name: str, password: str, login_url: str):
 
     try:
@@ -43,7 +49,7 @@ def _login_machine(name: str, password: str, login_url: str, refresh_interval: i
 def login_machine_in_thread(config: Config):
 
     login_machine(
-        config.MACHINE_NAME, config.MACHINE_PASSWORD, config.MACHINE_LOGIN_URL
+        config.MACHINE_NAME, config.MACHINE_PASSWORD, config.AUTH_MACHINE_LOGIN_URL
     )
 
     Thread(
@@ -51,7 +57,7 @@ def login_machine_in_thread(config: Config):
         args=(
             config.MACHINE_NAME,
             config.MACHINE_PASSWORD,
-            config.MACHINE_LOGIN_URL,
+            config.AUTH_MACHINE_LOGIN_URL,
             config.REFRESH_MACHINE_TOKEN_INTERVAL,
         ),
         daemon=True,

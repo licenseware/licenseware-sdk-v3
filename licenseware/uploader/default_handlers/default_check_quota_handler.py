@@ -13,7 +13,7 @@ def default_check_quota_handler(
     validation_response: FileValidationResponse,
     repo: MongoRepository,
     config: Config,
-):  # pragma no cover
+):
 
     quota = Quota(
         tenant_id=tenant_id,

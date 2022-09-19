@@ -53,15 +53,16 @@ class Config(BaseSettings):  # pragma no cover
 
     BASE_URL: str = "http://localhost"
     APP_URL: str = BASE_URL + "/" + APP_ID
-    USER_INFO_URL: str = None
     PUBLIC_TOKEN_REPORT_URL: str = None
-    FRONTEND_URL: str = None
+    FRONTEND_URL: str = "http://frontend.localhost"
 
-    MACHINE_LOGIN_URL: str = None
     MACHINE_NAME: str = None
     MACHINE_PASSWORD: str = None
 
     AUTH_SERVICE_URL: str = "http://localhost/auth"
+    AUTH_MACHINE_LOGIN_URL: str = AUTH_SERVICE_URL + "/machines/login"
+    AUTH_USER_LOGIN_URL: str = AUTH_SERVICE_URL + "/login"
+    AUTH_USER_INFO_URL: str = AUTH_SERVICE_URL + "/users/tables"
     AUTH_MACHINE_CHECK_URL: str = AUTH_SERVICE_URL + "/machine_authorization"
     AUTH_USER_CHECK_URL: str = AUTH_SERVICE_URL + "/verify"
 

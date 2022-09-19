@@ -32,14 +32,15 @@ class Quota:
         self.app_id = config.APP_ID
         self.repo = repo
 
-        if config.CURRENT_ENVIRONMENT != config.ENVIRONMENTS.DESKTOP:  # pragma no cover
-            user_info = get_user_info(tenant_id, authorization, config)
-        else:
-            user_info = {"user_id": tenant_id, "plan_type": "UNLIMITED"}
+        raw_user_info = get_user_info(tenant_id, authorization, config)
+        user_info = {
+            "user_id": raw_user_info["user"]["id"],
+            "plan_type": raw_user_info["user"]["plan_type"].upper(),
+        }
 
         self.user_id = user_info["user_id"]
         self.monthly_quota = (
-            sys.maxsize if user_info["plan_type"].upper() == "UNLIMITED" else free_units
+            sys.maxsize if user_info["plan_type"] == "UNLIMITED" else free_units
         )
 
         self.quota_filters = {
@@ -70,7 +71,7 @@ class Quota:
 
         utilization_data = {
             "app_id": self.app_id,
-            "user_id": self.tenant_id,
+            "user_id": self.user_id,
             "uploader_id": self.uploader_id,
             "monthly_quota": self.monthly_quota,
             "monthly_quota_consumed": 0,

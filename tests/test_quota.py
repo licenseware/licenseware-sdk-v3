@@ -1,9 +1,7 @@
-import uuid
-
 import pytest
 from pymongo import MongoClient
 
-from licenseware import Config, MongoRepository, Quota
+from licenseware import Config, MongoRepository, Quota, login_user
 from licenseware.config import config as cfg
 
 
@@ -25,15 +23,18 @@ def mongo_connection():
 # pytest -s -v tests/test_quota.py
 
 
+# pytest -s -v tests/test_quota.py::test_quota
 def test_quota(mongo_connection):
 
     repo = MongoRepository(mongo_connection, collection=config.MONGO_COLLECTION.QUOTA)
 
+    user = login_user("alin@licenseware.io", "super-secret", config.AUTH_USER_LOGIN_URL)
+
     quota = Quota(
-        tenant_id=str(uuid.uuid4()),
-        authorization=str(uuid.uuid4()),
+        tenant_id=user["TenantId"],
+        authorization=user["Authorization"],
         uploader_id="rv_tools",
-        free_units=1,
+        free_units=1000,
         repo=repo,
         config=config,
     )
