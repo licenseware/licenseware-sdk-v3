@@ -56,8 +56,8 @@ class Config(BaseSettings):  # pragma no cover
     PUBLIC_TOKEN_REPORT_URL: str = None
     FRONTEND_URL: str = "http://frontend.localhost"
 
-    MACHINE_NAME: str = None
-    MACHINE_PASSWORD: str = None
+    MACHINE_NAME: str = "testing-service"
+    MACHINE_PASSWORD: str = "lware-secret"
 
     AUTH_SERVICE_URL: str = "http://localhost/auth"
     AUTH_MACHINE_LOGIN_URL: str = AUTH_SERVICE_URL + "/machines/login"
@@ -92,12 +92,6 @@ class Config(BaseSettings):  # pragma no cover
     KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
     KAFKA_CONSUMER_POLL: float = 1.0
     KAFKA_SECURITY_PROTOCOL: str = "PLAINTEXT"
-
-    RABBITMQ_HOST: str = "localhost"
-    RABBITMQ_PORT: int = 5672
-    RABBITMQ_USER: str = "guest"
-    RABBITMQ_PASSWORD: str = "guest"
-    RABBITMQ_VHOST: str = "/"
 
     CELERY_BROKER_REDIS_DB: int = 1
     CELERY_BACKEND_REDIS_DB: int = 2
