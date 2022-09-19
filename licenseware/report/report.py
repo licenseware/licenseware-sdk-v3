@@ -133,7 +133,7 @@ class NewReport:
                 return None
 
             assert isinstance(response.json(), list)
-            assert len(response.json()) > 0
+            assert len(response.json()) == 1
 
             return response.json()
         except Exception as err:
@@ -159,7 +159,7 @@ class NewReport:
                 log.error(
                     f"Can't get connected app metadata for app id: {app_id}... Retrying..."
                 )
-                time.sleep(2)
+                time.sleep(5)
                 self._get_connected_apps_metadata(parrent_app_metadata)
             else:
                 # Not sure why `app_metadata` sometimes keeps coming None here

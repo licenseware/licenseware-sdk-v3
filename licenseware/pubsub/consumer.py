@@ -53,6 +53,13 @@ class Consumer:
                     )
                     continue
 
+                if event["event_type"] not in self.event_dispacher:
+                    log.error(
+                        f"Can't dispach `event_type`:{event['event_type']}. \
+                        Please `dispatch` a handler for this event type.  \n Ignoring message: {msg.value()}"
+                    )
+                    continue
+
                 self.event_dispacher[event["event_type"]](event)
 
         except Exception as err:
