@@ -8,7 +8,6 @@ from licenseware.constants.states import States
 from licenseware.dependencies import requests
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.redis_cache.redis_cache import RedisCache
-from licenseware.uploader.default_handlers.helpers import get_uploader_status_key
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
 
@@ -182,7 +181,7 @@ class NewReport:
 
     def _get_tenant_uploader_statuses_from_cache(self):
         redisdb = RedisCache(self.config)
-        results = redisdb.get(get_uploader_status_key(None, self.app_id, None))
+        results = redisdb.get("uploader_status:*:*")
         return results
 
     def _get_tenant_report_statuses(self, uploader_statuses):

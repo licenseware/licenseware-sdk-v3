@@ -22,8 +22,6 @@ from licenseware.uploader.encryption_parameters import UploaderEncryptionParamet
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.alter_string import get_altered_strings
 
-from .default_handlers.helpers import get_uploader_status_key
-
 
 @dataclass
 class NewUploader:
@@ -124,7 +122,5 @@ class NewUploader:
 
     def _get_tenant_uploader_id_statuses(self):
         redisdb = RedisCache(self.config)
-        results = redisdb.get(
-            get_uploader_status_key(self.uploader_id, self.config.APP_ID, None)
-        )
+        results = redisdb.get(f"uploader_status:{self.uploader_id}:*")
         return results
