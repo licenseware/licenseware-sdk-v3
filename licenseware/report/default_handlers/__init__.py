@@ -1,1 +1,1 @@
-from .get_tenants_with_public_reports import get_tenants_with_public_reports
+from .default_get_tenants_with_data_handler import default_get_tenants_with_data_handler

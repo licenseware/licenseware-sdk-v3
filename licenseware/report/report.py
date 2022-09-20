@@ -1,9 +1,10 @@
 import datetime
 import time
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Callable, Dict, List
 
 from licenseware.config.config import Config
+from licenseware.constants import alias_types as alias
 from licenseware.constants.states import States
 from licenseware.dependencies import requests
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
@@ -11,6 +12,7 @@ from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.logger import log
 
+from .default_handlers import default_get_tenants_with_data_handler
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
 
@@ -26,6 +28,10 @@ class NewReport:
     filters: ReportFilter = None
     components: List[NewReportComponent] = None
     registrable: bool = True
+    tenants_with_data_handler: Callable[
+        [alias.Repository, alias.TenantId],
+        List[Dict[alias.TenantId, alias.UpdatedAt]],
+    ] = default_get_tenants_with_data_handler
 
     def __post_init__(self):
 
@@ -185,10 +191,21 @@ class NewReport:
         return results
 
     def _get_tenant_report_statuses(self, uploader_statuses):
-        report_status = lambda r: {
-            "status": States.DISABLED
-            if r["status"] == States.RUNNING
-            else States.ENABLED
-        }
-        report_statuses = [{**r, **report_status(r)} for r in uploader_statuses]
+
+        tenants_with_data = self.tenants_with_data_handler(self.config)
+
+        report_statuses = []
+        for ustatus in uploader_statuses:
+            for twd in tenants_with_data:
+                if ustatus["tenant_id"] != twd["tenant_id"]:
+                    continue  # tenant doesn't have data
+
+                rstatus = {
+                    **ustatus,
+                    "status": States.ENABLED
+                    if ustatus["status"] == States.IDLE
+                    else States.DISABLED,
+                }
+                report_statuses.append(rstatus)
+
         return report_statuses
