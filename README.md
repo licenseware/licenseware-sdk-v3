@@ -156,7 +156,7 @@ from settings import config
 from .rv_tools_data_worker import file_workflow_rvtools
 
 
-@worker.task(name="rv_tools_worker")
+@worker.task(name="rv_tools_worker", queue=config.QUEUE)
 def rv_tools_worker(event: dict):
 
     from app.uploaders import registered_uploaders
