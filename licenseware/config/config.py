@@ -74,7 +74,11 @@ class Config(BaseSettings):  # pragma no cover
 
     MONGO_HOST: str = "localhost"
     MONGO_PORT: int = 27017
-    MONGO_DBNAME: str = get_altered_strings(APP_ID).title_joined + "DB"
+
+    @property
+    def MONGO_DBNAME(self):
+        return get_altered_strings(self.APP_ID).title_joined + "DB"
+
     MONGO_USER: str = "lware"
     MONGO_PASSWORD: str = "lware-secret"
     MONGO_COLLECTION: Collections = Collections
@@ -97,7 +101,10 @@ class Config(BaseSettings):  # pragma no cover
     CELERY_BACKEND_REDIS_DB: int = 2
     CELERY_BEATS_REGISTRATION_INTERVAL: int = 600  # 10 minutes
     REFRESH_MACHINE_TOKEN_INTERVAL: int = 86_400  # 24 hours
-    QUEUE: str = get_altered_strings(APP_ID).underscore
+
+    @property
+    def QUEUE(self):
+        return get_altered_strings(self.APP_ID).underscore
 
     CELERY_BROKER_TYPE: CeleryBrokerType = CeleryBrokerType.REDIS
     WEBAPP_FRAMEWORK: WebAppFramework = WebAppFramework.FASTAPI

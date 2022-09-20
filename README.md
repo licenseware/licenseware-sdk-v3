@@ -146,23 +146,92 @@ rv_tools_validation_parameters = UploaderValidationParameters(
 )
 ```
 
+Creating the worker function which will handle the `event`
+
+```py
+from app.dependencies.workers import worker
+from licenseware import States, log
+from settings import config
+
+from .rv_tools_data_worker import file_workflow_rvtools
+
+
+@worker.task(name="rv_tools_worker")
+def rv_tools_worker(event: dict):
+
+    from app.uploaders import registered_uploaders
+
+    log.info("Starting working")
+    log.debug(event)
+
+    registered_uploaders.notify_processing_status(
+        event["tenant_id"], event["uploader_id"], States.RUNNING
+    )
+
+    try:
+        for filepath in event["filepaths"]:
+            _event = {**{"filepath": filepath}, **event}
+            file_workflow_rvtools(
+                _event,
+                filepath=filepath,
+            )
+    except:
+        registered_uploaders.notify_processing_status(
+            event["tenant_id"], event["uploader_id"], States.IDLE
+        )
+
+    registered_uploaders.notify_processing_status(
+        event["tenant_id"], event["uploader_id"], States.IDLE
+    )
+
+    log.info("Finished working")
+
+```
+
+The worker function is responsibile for providing the processing information to you processing class and notify processing status to `registry-service`. 
+
+The `event` received will be a dictionary like this:
+
+```json
+event = {
+    "tenant_id": tenant_id,
+    "authorization": authorization,
+    "uploader_id": uploader.uploader_id,
+    "filepaths": filepaths,
+    "clear_data": clear_data,
+    "event_id": event_id or validation_response.content.event_id,
+    "app_id": self.config.APP_ID,
+}
+```
+- `tenant_id` - the project id on which this upload was made;
+- `authorization` - in some cases you may need to request data from other apps, this will help making those requests on behalf of a user;
+- `uploader_id` - this `uploader_id` is unique the same as `app_id`;
+- `filepaths` - a list of filepaths which will need to be processed;
+- `clear_data` - bool which if is true you must delete previous processed data;
+- `event_id` - uuid unique to this processing request;
+- `app_id` - the unique app id which holds this uploader;
+
 
 Define uploader full metadata
 
 ```py
 
+from licenseware import FileTypes, NewUploader
+from settings import config
+
+from .encryptor import rv_tools_encryption_parameters
+from .validator import rv_tools_validation_parameters
+from .worker import rv_tools_worker
+
 rv_tools_uploader = NewUploader(
     name="RVTools",
-    description="XLSX export from RVTools after scanning your Vmware infrastructure.",
     uploader_id="rv_tools",
+    description="XLSX export from RVTools after scanning your Vmware infrastructure.",
     accepted_file_types=FileTypes.GENERIC_EXCEL,
+    worker=rv_tools_worker,
     validation_parameters=rv_tools_validation_parameters,
     encryption_parameters=rv_tools_encryption_parameters,
-    filenames_validation_handler=None,
-    filecontents_validation_handler=None,
-    flags=None,
-    icon=None,
-    config=config
+    config=config,
 )
 
 ```
@@ -204,25 +273,27 @@ This `rv_tools_uploader` instance will make available the following needed metho
 - `validate_filenames` - method which will be used to validate file names received from frontend in the filename validation step;
 - `validate_filecontents` - method which will be used to validate file contents received from frontend in the upload files step;
 - `metadata` - property which contains all the needed information to register a new uploader to discovery/registry-service;
-- `register` - method which will send uploader's metadata to discovery/registry-service;
 
 
 Each uploader created needs to be `registered`in the `uploaders/__init__.py` file:
 
 ```py
-from settings import config
+
+from app.services.defaults.registry_updater import registry_updater
 from licenseware import RegisteredUploaders
+from settings import config
 
 from .rv_tools.uploader import rv_tools_uploader
 
 uploaders = [rv_tools_uploader]
 
-
-registered_uploaders = RegisteredUploaders(uploaders, config)
+registered_uploaders = RegisteredUploaders(uploaders, registry_updater, config)
 
 ```
 
 The `registered_uploaders` will be imported on app startup in the `app/api/defaults/uploader_router.py` and will be used to auto generate api routes for each uploader.
+
+If you want more control on how the upload is handled you can inherit from `RegisteredUploaders` and modify the methods you need. Make sure to update `app/api/defaults/uploader_router.py` if method names or params are changed.
 
 
 <a name="Reports"></a>
@@ -255,43 +326,42 @@ Below we contruct report filters. This step can be done after you have defined a
 
 ```py
 
-FMW_FILTERS = (
+report_filters = (
         ReportFilter()
         .add(
             column="result",
             allowed_filters=[
-                ReportFilter.FILTER.EQUALS, 
-                ReportFilter.FILTER.CONTAINS, 
-                ReportFilter.FILTER.IN_LIST
+                ReportFilter.FILTER.EQUALS,
+                ReportFilter.FILTER.CONTAINS,
+                ReportFilter.FILTER.IN_LIST,
             ],
-            # column_type=ReportFilter.TYPE.STRING, # string type is the default
             allowed_values=["Verify", "Used", "Licensable", "Restricted"],
-            # visible_name="Result" # Optional
         )
         .add(
             column="total_number_of_cores",
             allowed_filters=[
-                ReportFilter.FILTER.EQUALS, 
-                ReportFilter.FILTER.GREATER_THAN, 
+                ReportFilter.FILTER.EQUALS,
+                ReportFilter.FILTER.GREATER_THAN,
                 ReportFilter.FILTER.GREATER_OR_EQUAL_TO,
                 ReportFilter.FILTER.LESS_THAN,
-                ReportFilter.FILTER.LESS_OR_EQUAL_TO
+                ReportFilter.FILTER.LESS_OR_EQUAL_TO,
             ],
             column_type=ReportFilter.TYPE.STRING,
+            allowed_values=["Verify", "Used", "Licensable", "Restricted"],
+        )
+        .add(
+            column="total_number_of_cores_intel",
             allowed_values=["Verify", "Used", "Licensable", "Restricted"],
         )
     )
 
 ```
 
-FMW_FILTERS will be an instance of `ReportFilter` which will make available the list of filters on `metadata` object.
-
+Variable `report_filters` will be an instance of `ReportFilter` which will make available the list of filters on `metadata` object.
 For each column type if `allowed_filters` parameter is not filled the default filters for that column type will be added.
-
 If `column_type` is not specified either, then `ReportFilter` will try to detect the type based on the other parameters.
-
-You can take a look on the `ReportFilter` implementation to see how the defaults are applied.
-
+You can take a look on the `ReportFilter` implementation to see how the defaults are applied. 
+In most cases you can get away by just providing the column name and allowed_values if needed.
 
 
 
@@ -301,22 +371,46 @@ Using the `NewReport` class we fill the below parameters (filters can be filled 
 
 ```py
 
-fmw_deployment_report = NewReport(
-    name="Oracle Fusion Middleware Deployment",
-    report_id="fmw_deployment_report",
-    description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.", 
-    filters=FMW_FILTERS,
-    config=config
+from app.report_components import report_components
+from licenseware import NewReport
+from settings import config
+
+from .filters import report_filters
+
+devices_overview_report = NewReport(
+    name="Device Details",
+    description="This report collects all the device information captured during processing.",
+    report_id="device_details_report",
+    filters=report_filters,
+    components=report_components,
+    config=config,
+    connected_apps=[
+        "ifmp-service",
+        "odb-service",
+    ],
 )
 
+
+devices_overview_report.attach(component_id="all_devices")
+
+
 ```
+
+- `connected_apps` - here provide app_id's on which this report depends. Data will be taken from both connected_apps to create the reports.
+
+
 On this instance of the new report we will `attach` all the needed report components. 
+If `attach` is not used all provided `report_components` will be attached.
 
-This report instance provides the following objects for use:
-- `attach` - method which will be used to attach instances of `NewReportComponent`;
-- `register` - method which will be used to make a post request with this report data;
-- `metadata` - property which contains the json payload for registry service;
+You can create custom filters on which report components you need to attach:
 
+```py
+
+for rc in report_components:
+    if rc.component_id in ["some_component_id1", "some_component_id2"]:
+        devices_overview_report.attach(rc.component_id)
+
+```
 
 Each report created needs to be `registered`in the `reports/__init__.py` file:
 
@@ -334,6 +428,8 @@ registered_reports = RegisteredReports(reports, config)
 ```
 
 The `registered_reports` will be imported on app startup in the `app/api/defaults/*_report_router.py` and will be used to auto generate api routes for each report.
+
+If you want more control on how the reports are handled you can inherit from `RegisteredReports` and modify the methods you need. Make sure to update `app/api/defaults/*_report_router.py` if method names or params are changed.
 
 
 <a name="Report-Components"></a>
@@ -423,52 +519,152 @@ registered_components = RegisteredComponents(report_components, config)
 
 The `registered_components` will be imported on app startup in the `app/api/defaults/*_report_component_router.py` and will be used to auto generate api routes for each report component.
 
+If you want more control on how the report components are handled you can inherit from `RegisteredComponents` and modify the methods you need. Make sure to update `app/api/defaults/*_report_component_router.py` if method names or params are changed.
+
+
 <a name="Datatable"></a>
 # Datatable
 
 We have `uploaders` which handle files uploaded and sent to procesing, `reports` which take the data processed and show it to the user in a insightful way we also can provide a way for the user to manipulate/update the data processed using `datatable`. With Datatable we can provide `excel like` features on the web.
 
 
+Ovewrite the `CrudHandler` methods if needed (in most cases you hopefully don't need to do that):
+
+```py
+from .crud_handler import CrudDeviceTable
+
+from app.common.infrastructure_service import InfraService
+from licenseware import (
+    Config,
+    CrudHandler,
+    MongoRepository,
+    insert_mongo_limit_skip_filters,
+)
+from settings import config
+
+
+def get_data_without_foreign_key(
+    tenant_id: str,
+    repo: MongoRepository,
+    limit: int,
+    skip: int,
+    config: Config,
+):
+
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {
+            "$lookup": {
+                "from": config.MONGO_COLLECTION.DATA,
+                "localField": "is_dr_with",
+                "foreignField": "_id",
+                "as": "dr_members",
+            }
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "is_child_to": {
+                    "$ifNull": [{"$arrayElemAt": ["$parents.name", 0]}, None]
+                },
+                "is_parent_to": "$children.name",
+                "is_dr_with": "$dr_members.name",
+                "is_part_of_cluster_with": "$cluster_members.name",
+                "capped": 1,
+            }
+        },
+    ]
+
+    pipeline = insert_mongo_limit_skip_filters(skip, limit, pipeline)
+    return repo.execute_query(pipeline)
+
+
+class CrudDeviceTable(CrudHandler):
+    def get(
+        self,
+        tenant_id: str,
+        authorization: str,
+        id: str,
+        foreign_key: str,
+        distinct_key: str,
+        limit: int,
+        skip: int,
+        repo: MongoRepository,
+    ):
+
+        if id is not None:
+            return repo.find_one(filters={"_id": id, "tenant_id": tenant_id})
+
+        if foreign_key is None:
+            return get_data_without_foreign_key(tenant_id, repo, limit, skip, config)
+
+        if distinct_key is not None:
+            return repo.distinct(distinct_key, filters={"tenant_id": tenant_id})
+
+        return repo.find_many(filters={"tenant_id": tenant_id}, limit=limit, skip=skip)
+
+    def put(
+        self,
+        tenant_id: str,
+        authorization: str,
+        id: str,
+        new_data: dict,
+        repo: MongoRepository,
+    ):
+
+        id = new_data.pop("_id", None)
+        infra_service = InfraService(
+            data={**new_data, **{"tenant_id": tenant_id}},
+            event={
+                "tenant_id": tenant_id,
+                "uploader_id": "editable_controller",
+                "event_id": id,
+                "filepath": "N/A",
+                "app_id": config.APP_ID,
+            },
+            collection=repo.collection,
+        )
+        return infra_service.replace()
+
+    def delete(
+        self,
+        tenant_id: str,
+        authorization: str,
+        id: str,
+        repo: MongoRepository,
+    ):
+        return repo.delete_one(filters={"_id": id, "tenant_id": tenant_id})
+
+
+```
+
+Define data table:
+
 ```py
 from settings import config
 from licenseware import DataTable, ColumnTypes, CrudHandler
+from licenseware import ColumnTypes, DataTable
+from settings import config
 
-
-class CrudDeviceTable(CrudHandler): 
-    # In most cases you don't need to provide `crud_handler` to `DataTable`.
-    # In the case that you need to do that just overwrite the methods you need (get, put or delete)
-    ...
-
-
-devices = (
-
-DataTable(
-    title="Devices", 
-    component_id="device_table",
-    crud_handler=CrudDeviceTable, 
-    config=config,
+devices_table = (
+    DataTable(
+        title="All Devices",
+        component_id="device_table",
+        crud_handler=CrudDeviceTable, # not needed if you didn't overwrite CrudHandler class
+        config=config,
+    )
+    .column("_id", editable=False, visible=False)
+    .column("tenant_id", editable=False, visible=False)
+    .column("name", required=True)
+    .column("is_parent_to", distinct_key="name", foreign_key="name")
+    .column("capped", type=ColumnTypes.BOOL)
+    .column("device_type", values=["Virtual", "Pool",])
+    .column("total_number_of_processors") # this will be type number because it has number in the field name
+    .column("oracle_core_factor", type=ColumnTypes.NUMBER)
+    .column("model") # default will be type string
+    .column("updated_at", editable=False, type=ColumnTypes.DATE)
+    .column("raw_data", editable=False, type=ColumnTypes.JSON)
 )
-
-.column("_id", editable=False, visible=False)
-.column("tenant_id", editable=False, visible=False)
-.column("name", required=True)
-.column("is_parent_to", distinct_key="name", foreign_key="name")
-.column("capped", required=True, type=ColumnTypes.BOOL)
-.column(
-    "device_type", 
-    required=True, 
-    values=["Virtual", "Pool", "Domain", "Physical", "Cluster", "Unknown"]
-)
-.column(
-    "operating_system_type", 
-    values=["Solaris", "ESX", "Linux", "AIX", "HP-UX", "Windows", "Other"]
-)
-.column("total_number_of_processors", type=ColumnTypes.NUMBER)
-.column("updated_at", editable=False, type=ColumnTypes.DATE)
-.column("raw_data", editable=False, type=ColumnTypes.JSON)
-
-)
-
 
 ```
 

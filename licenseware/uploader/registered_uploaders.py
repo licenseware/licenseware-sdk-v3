@@ -162,7 +162,7 @@ class RegisteredUploaders:  # pragma no cover
             self.config,
         )
 
-    def notify_upload_status(
+    def notify_processing_status(
         self,
         tenant_id: str,
         uploader_id: Enum,
