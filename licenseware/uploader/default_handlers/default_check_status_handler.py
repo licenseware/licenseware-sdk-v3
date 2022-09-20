@@ -3,8 +3,6 @@ from licenseware.constants.states import States
 from licenseware.constants.web_response import WebResponse
 from licenseware.redis_cache.redis_cache import RedisCache
 
-from .helpers import get_uploader_status_key
-
 
 def default_check_status_handler(
     tenant_id: str,
@@ -14,9 +12,7 @@ def default_check_status_handler(
 
     redisdb = RedisCache(config)
 
-    result = redisdb.get_key(
-        get_uploader_status_key(uploader_id, config.APP_ID, tenant_id)
-    )
+    result = redisdb.get_key(f"uploader_status:{uploader_id or '*'}:{tenant_id or '*'}")
 
     if not result:
         return WebResponse(

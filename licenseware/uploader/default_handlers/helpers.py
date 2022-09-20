@@ -315,7 +315,3 @@ def get_failed_validations(
     failed_validations = [v for v in validations.values() if isinstance(v, str)]
 
     return failed_validations
-
-
-def get_uploader_status_key(uploader_id: str, app_id: str, tenant_id: str):
-    return f"uploader_status:{uploader_id or '*'}:{app_id or '*'}:{tenant_id or '*'}"
