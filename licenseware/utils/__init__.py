@@ -3,7 +3,6 @@ from .create_csv_file import create_csv_file
 from .create_file import create_file
 from .create_json_file import create_json_file
 from .create_xlsx_file import create_xlsx_file
-from .custom_dataclass import customdataclass
 from .failsafe_decorator import failsafe
 from .file_upload_handler import FileUploadHandler
 from .file_utils import is_archive, list_files_from_path, recursive_unzip, unzip
