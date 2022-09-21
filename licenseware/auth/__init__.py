@@ -1,1 +1,1 @@
-from .auth import login_machine, login_machine_in_thread, login_user
+from .auth import cron_login_machine, login_machine, login_user

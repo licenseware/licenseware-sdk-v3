@@ -3,6 +3,7 @@ import uuid
 
 from licenseware.constants.base_enum import BaseEnum
 from licenseware.dependencies import BaseSettings
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.utils.alter_string import get_altered_strings
 
 
@@ -144,11 +145,15 @@ class Config(BaseSettings):  # pragma no cover
         mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[self.MONGO_DBNAME]
         return mongo_connection
 
+    @property
+    def redisdb(self):
+        return RedisCache(self)
+
     def get_machine_headers(self, key: str = "auth_jwt"):
-        return {key: os.getenv("MACHINE_TOKEN")}
+        return {key: os.getenv("MACHINE_TOKEN", self.redisdb.get_key("MACHINE_TOKEN"))}
 
     def get_machine_token(self):
-        return os.getenv("MACHINE_TOKEN")
+        return os.getenv("MACHINE_TOKEN", self.redisdb.get_key("MACHINE_TOKEN"))
 
     class Config:
         env_file = ".env"

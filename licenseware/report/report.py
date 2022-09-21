@@ -145,7 +145,7 @@ class NewReport:
             return None
 
     def _get_connected_apps_metadata(
-        self, parrent_app_metadata: dict, _retry_back_in: int = 0
+        self, parrent_app_metadata: dict, _retry_in: int = 0
     ):
 
         conn_apps_metadata = []
@@ -163,14 +163,14 @@ class NewReport:
             app_metadata = self._get_app_metadata(app_id)
             if app_metadata is None:
                 try:
-                    _retry_back_in = _retry_back_in + 5
+                    if _retry_in > 120:
+                        _retry_in = 0
+                    _retry_in = _retry_in + 5
                     log.error(
-                        f"Can't get connected app metadata for app id: {app_id}... Retrying in {_retry_back_in} seconds..."
+                        f"Can't get connected app metadata for app id: {app_id}... Retrying in {_retry_in} seconds..."
                     )
-                    time.sleep(_retry_back_in)
-                    self._get_connected_apps_metadata(
-                        parrent_app_metadata, _retry_back_in
-                    )
+                    time.sleep(_retry_in)
+                    self._get_connected_apps_metadata(parrent_app_metadata, _retry_in)
                 except KeyboardInterrupt:
                     log.info("Stopping getting connected apps metadata")
                     sys.exit(0)

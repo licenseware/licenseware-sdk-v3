@@ -1,8 +1,6 @@
 import os
 import sys
 import time
-from datetime import datetime
-from threading import Thread
 
 from licenseware.config.config import Config
 from licenseware.dependencies import requests
@@ -15,58 +13,45 @@ def login_user(email: str, password: str, login_url: str):
     return response.json()
 
 
-def login_machine(name: str, password: str, login_url: str):
+def login_machine(config: Config, _retry_in: int = 0):
+
+    if _retry_in > 120:
+        _retry_in = 0
+
+    _retry_in = _retry_in + 5
 
     try:
+
         response = requests.post(
-            login_url,
+            config.AUTH_MACHINE_LOGIN_URL,
             json={
-                "machine_name": name,
-                "password": password,
+                "machine_name": config.MACHINE_NAME,
+                "password": config.MACHINE_PASSWORD,
             },
         )
 
         if response.status_code != 200:
-            log.error(f"Could not login with {name}")
-            time.sleep(2)
-            login_machine(name, password, login_url)
+            log.error(f"Could not login '{config.MACHINE_NAME}'")
+            time.sleep(_retry_in)
+            login_machine(config, _retry_in)
     except:
-        log.error(f"Could not login with {name}")
-        time.sleep(2)
-        login_machine(name, password, login_url)
+        log.error(f"Could not login '{config.MACHINE_NAME}'")
+        time.sleep(_retry_in)
+        login_machine(config, _retry_in)
 
-    os.environ["MACHINE_TOKEN"] = response.json()["Authorization"]
-    os.environ["MACHINE_TOKEN_DATETIME"] = datetime.utcnow().isoformat()
+    machine_token = response.json()["Authorization"]
+    os.environ["MACHINE_TOKEN"] = machine_token
+    config.redisdb.set("MACHINE_TOKEN", machine_token, expiry=None)
     log.success("Machine login successful!")
 
 
-def _login_machine(name: str, password: str, login_url: str, refresh_interval: int):
-
+def cron_login_machine(config: Config):
     try:
-        login_machine(name, password, login_url)
-
+        login_machine(config)
         while True:
-            time.sleep(refresh_interval)
-            login_machine(name, password, login_url)
+            time.sleep(config.REFRESH_MACHINE_TOKEN_INTERVAL)
+            login_machine(config)
             log.info(f"Refreshed machine token")
     except KeyboardInterrupt:
         log.info("Shutting down login_machine...")
         sys.exit(0)
-
-
-def login_machine_in_thread(config: Config, start_thread: bool = True):
-
-    t = Thread(
-        target=_login_machine,
-        args=(
-            config.MACHINE_NAME,
-            config.MACHINE_PASSWORD,
-            config.AUTH_MACHINE_LOGIN_URL,
-            config.REFRESH_MACHINE_TOKEN_INTERVAL,
-        ),
-        daemon=True,
-    )
-
-    if start_thread:
-        t.start()
-    return t

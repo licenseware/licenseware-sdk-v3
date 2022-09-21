@@ -1,10 +1,16 @@
+# In python 3.11+ this will not be necessary (typing hack)
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma no cover
+    from licenseware.config.config import Config
+
 import pickle
 from datetime import timedelta
 from typing import Any
 
 from redis import Redis
-
-from licenseware.config.config import Config
 
 
 class RedisCache:
