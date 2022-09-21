@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 from datetime import datetime
 from threading import Thread
@@ -40,19 +41,22 @@ def login_machine(name: str, password: str, login_url: str):
 
 
 def _login_machine(name: str, password: str, login_url: str, refresh_interval: int):
-    while True:
-        time.sleep(refresh_interval)
+
+    try:
         login_machine(name, password, login_url)
-        log.info(f"Refreshed machine token")
+
+        while True:
+            time.sleep(refresh_interval)
+            login_machine(name, password, login_url)
+            log.info(f"Refreshed machine token")
+    except KeyboardInterrupt:
+        log.info("Shutting down login_machine...")
+        sys.exit(0)
 
 
-def login_machine_in_thread(config: Config):
+def login_machine_in_thread(config: Config, start_thread: bool = True):
 
-    login_machine(
-        config.MACHINE_NAME, config.MACHINE_PASSWORD, config.AUTH_MACHINE_LOGIN_URL
-    )
-
-    Thread(
+    t = Thread(
         target=_login_machine,
         args=(
             config.MACHINE_NAME,
@@ -61,4 +65,8 @@ def login_machine_in_thread(config: Config):
             config.REFRESH_MACHINE_TOKEN_INTERVAL,
         ),
         daemon=True,
-    ).start()
+    )
+
+    if start_thread:
+        t.start()
+    return t

@@ -1,4 +1,5 @@
 import datetime
+import sys
 import time
 from dataclasses import dataclass
 from typing import Callable, Dict, List
@@ -145,7 +146,9 @@ class NewReport:
             log.warning(err)
             return None
 
-    def _get_connected_apps_metadata(self, parrent_app_metadata: dict):
+    def _get_connected_apps_metadata(
+        self, parrent_app_metadata: dict, _retry_back_in: int = 0
+    ):
 
         conn_apps_metadata = []
         if parrent_app_metadata:
@@ -161,11 +164,18 @@ class NewReport:
 
             app_metadata = self._get_app_metadata(app_id)
             if app_metadata is None:
-                log.error(
-                    f"Can't get connected app metadata for app id: {app_id}... Retrying..."
-                )
-                time.sleep(5)
-                self._get_connected_apps_metadata(parrent_app_metadata)
+                try:
+                    _retry_back_in = _retry_back_in + 5
+                    log.error(
+                        f"Can't get connected app metadata for app id: {app_id}... Retrying in {_retry_back_in} seconds..."
+                    )
+                    time.sleep(_retry_back_in)
+                    self._get_connected_apps_metadata(
+                        parrent_app_metadata, _retry_back_in
+                    )
+                except KeyboardInterrupt:
+                    log.info("Stopping getting connected apps metadata")
+                    sys.exit(0)
             else:
                 # Not sure why `app_metadata` sometimes keeps coming None here
                 # Even if is checked for None...
