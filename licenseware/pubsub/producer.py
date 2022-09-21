@@ -27,7 +27,16 @@ class Producer:
         assert isinstance(data, dict)
         assert data["event_type"] in self._allowed_events
 
-    def publish(self, topic: TopicType, data: dict, delivery_report: Callable = None):
+    def publish(
+        self,
+        topic: TopicType,
+        data: dict,
+        delivery_report: Callable = None,
+        fresh_connect: bool = False,
+    ):
+
+        if fresh_connect:
+            self.producer = self.producer_factory(self.config)
 
         self._checks(topic, data)
         databytes = json.dumps(data).encode("utf-8")

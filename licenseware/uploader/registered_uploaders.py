@@ -172,7 +172,7 @@ class RegisteredUploaders:  # pragma no cover
         response = uploader.update_status_handler(
             tenant_id, uploader.uploader_id, status, self.config
         )
-        self.registry_updater()
+        self.registry_updater(fresh_connect=True)
         return response
 
     # PRIVATE
