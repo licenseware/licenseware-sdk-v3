@@ -144,12 +144,10 @@ class Config(BaseSettings):  # pragma no cover
         mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[self.MONGO_DBNAME]
         return mongo_connection
 
-    @property
-    def machine_auth_headers(self):
-        return {"auth_jwt": os.getenv("MACHINE_TOKEN")}
+    def get_machine_headers(self, key: str = "auth_jwt"):
+        return {key: os.getenv("MACHINE_TOKEN")}
 
-    @property
-    def machine_token(self):
+    def get_machine_token(self):
         return os.getenv("MACHINE_TOKEN")
 
     class Config:

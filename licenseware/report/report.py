@@ -40,7 +40,6 @@ class NewReport:
         assert self.config.FRONTEND_URL is not None
         assert self.config.PUBLIC_TOKEN_REPORT_URL is not None
         assert self.config.APP_SECRET is not None
-        assert self.config.machine_auth_headers is not None
 
         self.app_id = self.config.APP_ID
         ns = get_altered_strings(self.app_id).dash
@@ -128,11 +127,10 @@ class NewReport:
 
     def _get_app_metadata(self, app_id: str):
         try:
-            auth_headers = {"auth_jwt": self.config.machine_token}
             response = requests.get(
                 self.config.REGISTRY_SERVICE_APPS_URL,
                 params={"app_id": app_id},
-                headers=auth_headers,
+                headers=self.config.get_machine_headers(),
             )
             if response.status_code != 200:
                 log.warning(response.content)
