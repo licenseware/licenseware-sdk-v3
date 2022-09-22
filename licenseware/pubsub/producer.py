@@ -1,7 +1,9 @@
 import json
 from typing import Callable
-from licenseware.utils.logger import log
+
 from licenseware.config.config import Config
+from licenseware.utils.logger import log
+
 from .types import EventType, TopicType
 
 

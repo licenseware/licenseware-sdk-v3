@@ -6,14 +6,14 @@ from licenseware.config.config import Config
 from licenseware.constants.states import States
 from licenseware.constants.uploader_types import FileValidationResponse
 from licenseware.history.history_class import History
+from licenseware.notifications.publish_notification import publish_notification
+from licenseware.pubsub.producer import Producer
+from licenseware.pubsub.types import EventType
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.failsafe_decorator import failsafe
 from licenseware.utils.file_upload_handler import FileUploadHandler
-from licenseware.notifications.publish_notification import publish_notification
-from licenseware.pubsub.types import EventType
-from licenseware.pubsub.producer import Producer
 
 
 class RegisteredUploaders:  # pragma no cover

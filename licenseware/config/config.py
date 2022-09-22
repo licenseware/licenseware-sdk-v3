@@ -1,4 +1,5 @@
 import uuid
+
 from licenseware.constants.base_enum import BaseEnum
 from licenseware.dependencies import BaseSettings
 from licenseware.redis_cache.redis_cache import RedisCache
@@ -49,6 +50,8 @@ class Config(BaseSettings):  # pragma no cover
     ENVIRONMENTS: Environment = Environment
     LOG_LEVEL: LogLevel = LogLevel.INFO
     PORT: int = 8000
+    DASHBOARD_WORKERS_HOST: str = "127.0.0.1"
+    DASHBOARD_WORKERS_PORT: int = 5567
 
     BASE_URL: str = "http://localhost"
     APP_URL: str = BASE_URL + "/" + APP_ID

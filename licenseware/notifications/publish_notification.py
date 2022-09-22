@@ -1,7 +1,8 @@
-import uuid
 import datetime
+import uuid
+
 from licenseware.pubsub.producer import Producer
-from licenseware.pubsub.types import TopicType, EventType
+from licenseware.pubsub.types import EventType, TopicType
 
 
 def publish_notification(
