@@ -279,15 +279,21 @@ Each uploader created needs to be `registered`in the `uploaders/__init__.py` fil
 
 ```py
 
-from app.services.defaults.registry_updater import registry_updater
 from licenseware import RegisteredUploaders
+
+from app.dependencies.pubsub import producer
+from app.services.defaults.registry_updater import registry_updater
 from settings import config
 
 from .rv_tools.uploader import rv_tools_uploader
 
 uploaders = [rv_tools_uploader]
 
-registered_uploaders = RegisteredUploaders(uploaders, registry_updater, config)
+
+registered_uploaders = RegisteredUploaders(
+    uploaders, registry_updater, producer, config
+)
+
 
 ```
 
@@ -936,15 +942,17 @@ from licenseware import Config, Producer
 from confluent_kafka import Producer as KafkaProducer
 from settings import config 
 
-def producer_client_factory(config: Config):
-    producer_client = KafkaProducer({
-        "bootstrap.servers": config.KAFKA_BROKER_URL, 
-        "security.protocol": config.KAFKA_SECURITY_PROTOCOL,
-    })
-    return producer_client
+def get_producer(config: Config):
+    producer_client_factory = lambda cfg: KafkaProducer(
+        {
+            "bootstrap.servers": cfg.KAFKA_BROKER_URL,
+            "security.protocol": cfg.KAFKA_SECURITY_PROTOCOL,
+        }
+    )
+    kafka_producer = Producer(producer_client_factory, config)
+    return kafka_producer
 
-
-producer = Producer(producer_client_factory, config)
+producer = get_producer(config)
 
 data_stream = {
     "event_type": EventType.ACCOUNT_CREATED,
@@ -967,18 +975,19 @@ from confluent_kafka import Consumer as KafkaConsumer
 from settings import config
 
 
-def consumer_client_factory(config: Config):
-    consumer_client = KafkaConsumer(
+def get_consumer(config: Config):
+    consumer_client_factory = lambda cfg: KafkaConsumer(
         {
-            "bootstrap.servers": config.KAFKA_BROKER_URL,
-            "group.id": config.APP_ID,
-            "security.protocol": config.KAFKA_SECURITY_PROTOCOL,
+            "bootstrap.servers": cfg.KAFKA_BROKER_URL,
+            "group.id": cfg.APP_ID,
+            "security.protocol": cfg.KAFKA_SECURITY_PROTOCOL,
         }
     )
-    return consumer_client
+    kafka_consumer = Consumer(consumer_client_factory, config)
+    return kafka_consumer
 
 
-consumer = Consumer(consumer_client_factory, config)
+consumer = get_consumer(config)
 
 consumer.subscribe(TopicType.USER_EVENTS)
 

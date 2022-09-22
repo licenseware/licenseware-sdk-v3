@@ -11,6 +11,9 @@ from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.failsafe_decorator import failsafe
 from licenseware.utils.file_upload_handler import FileUploadHandler
+from licenseware.notifications.publish_notification import publish_notification
+from licenseware.pubsub.types import EventType
+from licenseware.pubsub.producer import Producer
 
 
 class RegisteredUploaders:  # pragma no cover
@@ -19,9 +22,14 @@ class RegisteredUploaders:  # pragma no cover
     """
 
     def __init__(
-        self, uploaders: List[NewUploader], registry_updater: Callable, config: Config
+        self,
+        uploaders: List[NewUploader],
+        registry_updater: Callable,
+        producer: Producer,
+        config: Config,
     ) -> None:
         self.config = config
+        self.producer = producer
         self.uploaders = uploaders
         self.registry_updater = registry_updater
         self.uploader_enum = Enum(
@@ -173,6 +181,27 @@ class RegisteredUploaders:  # pragma no cover
             tenant_id, uploader.uploader_id, status, self.config
         )
         self.registry_updater(fresh_connect=True)
+
+        completed_status = "completed" if status == States.IDLE else "started"
+        notification_title = (
+            f"Data processing {completed_status} for uploader {uploader.name}"
+        )
+        publish_notification(
+            producer=self.producer,
+            tenant_id=tenant_id,
+            title=notification_title,
+            event_type=EventType.UPLOADER_STATUS_UPDATED,
+            icon="Uploader",
+            url=self.config.FRONTEND_URL
+            + f"/uploaders?app_id={uploader.app_id}&uploader_id={uploader.uploader_id}",
+            fresh_connect=True,
+            extra={
+                "app_id": uploader.app_id,
+                "uploader_id": uploader.uploader_id,
+                "status": status,
+                "tenant_id": tenant_id,
+            },
+        )
         return response
 
     # PRIVATE

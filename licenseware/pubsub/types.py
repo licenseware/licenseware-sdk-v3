@@ -41,7 +41,9 @@ class EventType:
     REPORT_METADATA: str = "ReportMetadata"
     REPORT_COMPONENT_METADATA: str = "ReportMetadata"
 
+    NEW_NOTIFICATION: str = "NewNotification"
     UPLOADER_STATUS_UPDATED: str = "UploaderStatusUpdated"
+    REPORT_DATA_AVAILABLE: str = "ReportDataAvailable"
     APP_DATA_UPDATED: str = "AppDataUpdated"
     DATA_SYNC_EVENTS: str = "DataSyncEvents"
     APP_HEALTHCHECK: str = "AppHealthCheck"

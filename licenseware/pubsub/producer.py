@@ -1,9 +1,7 @@
 import json
 from typing import Callable
-
-from licenseware.config.config import Config
 from licenseware.utils.logger import log
-
+from licenseware.config.config import Config
 from .types import EventType, TopicType
 
 
@@ -23,9 +21,13 @@ class Producer:
 
     def _checks(self, topic, data):
 
-        assert topic in self._allowed_topics
-        assert isinstance(data, dict)
-        assert data["event_type"] in self._allowed_events
+        assert topic in self._allowed_topics, "This is not an allowed topic/channel."
+        assert isinstance(data, dict), "Must be a `dict` type"
+        assert "event_type" in data, "Field `event_type` not found"
+        if data["event_type"] not in self._allowed_events:
+            log.info(
+                f"Unkown EventType: '{data['event_type']}'. Make sure to add it to `licenseware.pubsub.types`"
+            )
 
     def publish(
         self,
