@@ -18,7 +18,7 @@ def test_get_user_info(mocker):
 
     mocker.patch("requests.get", return_value=MockResponse)
 
-    config = Config(USER_INFO_URL="http://localhost:4000/user-info")
+    config = Config(AUTH_USER_INFO_URL="http://localhost:4000/user-info")
 
     result = get_user_info(tenant_id=tenant_id, authorization="some-jwt", config=config)
 

@@ -106,3 +106,5 @@ def test_quota(mongo_connection):
     response = quota.update(units=0)
     assert response.status_code == 402
     assert response.content.monthly_quota_consumed == 5
+
+    repo.delete_many({})
