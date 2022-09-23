@@ -10,7 +10,6 @@ from licenseware.constants.uploader_types import (
 )
 from licenseware.constants.web_response import WebResponse
 from licenseware.constants.worker_event_type import WorkerEvent
-from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
     default_check_status_handler,
@@ -114,13 +113,12 @@ class NewUploader:
             "updated_at": datetime.datetime.utcnow().isoformat(),
             "validation_parameters": self.validation_parameters,
             "encryption_parameters": self.encryption_parameters,
-            "status": self._get_tenant_uploader_id_statuses(),
+            "status": self._get_uploader_statuses(),
             "parrent_app": parrent_app_metadata,
         }
 
         return metadata
 
-    def _get_tenant_uploader_id_statuses(self):
-        redisdb = RedisCache(self.config)
-        results = redisdb.get(f"uploader_status:{self.uploader_id}:*")
+    def _get_uploader_statuses(self):
+        results = self.config.redisdb.get(f"uploader_status:{self.uploader_id}:*")
         return results

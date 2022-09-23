@@ -1,5 +1,6 @@
 from typing import NewType
 
+AppId = NewType("AppId", str)
 UploaderId = NewType("UploaderId", str)
 ReportId = NewType("ReportId", str)
 ReportComponentId = NewType("ReportComponentId", str)

@@ -6,6 +6,7 @@ from .create_xlsx_file import create_xlsx_file
 from .failsafe_decorator import failsafe
 from .file_upload_handler import FileUploadHandler
 from .file_utils import is_archive, list_files_from_path, recursive_unzip, unzip
+from .get_registry_metadata import get_registry_metadata
 from .get_user_info import get_user_info
 from .logger import log
 from .mongo_limit_skip_filters import insert_mongo_limit_skip_filters

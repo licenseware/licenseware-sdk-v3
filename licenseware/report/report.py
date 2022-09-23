@@ -1,19 +1,16 @@
 import datetime
-import sys
-import time
 from dataclasses import dataclass
 from typing import Callable, Dict, List
 
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
-from licenseware.constants.states import States
-from licenseware.dependencies import requests
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
-from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.utils.logger import log
 
-from .default_handlers import default_get_tenants_with_data_handler
+from .default_handlers import (
+    DefaultMetadataHandler,
+    default_get_tenants_with_data_handler,
+)
 from .report_component import NewReportComponent
 from .report_filter import ReportFilter
 
@@ -24,7 +21,7 @@ class NewReport:
     description: str
     report_id: str
     config: Config
-    connected_apps: List[str] = None
+    connected_apps: List[alias.AppId] = None
     flags: List[str] = None
     filters: ReportFilter = None
     components: List[NewReportComponent] = None
@@ -33,6 +30,7 @@ class NewReport:
         [alias.Repository, alias.TenantId],
         List[Dict[alias.TenantId, alias.UpdatedAt]],
     ] = default_get_tenants_with_data_handler
+    external_metadata_handler: DefaultMetadataHandler = DefaultMetadataHandler
 
     def __post_init__(self):
 
@@ -47,6 +45,12 @@ class NewReport:
 
         if isinstance(self.filters, ReportFilter):
             self.filters = self.filters.metadata
+
+        if self.connected_apps is None:
+            self.connected_apps = [self.app_id]
+
+        if self.app_id not in self.connected_apps:
+            self.connected_apps.append(self.app_id)
 
         self.report_components: Dict[str, NewReportComponent] = dict()
         self.report_components_metadata = None
@@ -76,9 +80,20 @@ class NewReport:
         if not self.registrable:
             return
 
-        apps_metadata = self._get_connected_apps_metadata(parrent_app_metadata)
-        uploader_statuses = self._get_tenant_uploader_statuses(uploaders_metadata)
-        report_statuses = self._get_tenant_report_statuses(uploader_statuses)
+        tenants_with_data = self.tenants_with_data_handler(
+            self.config.mongo_db_connection
+        )
+        metadata: DefaultMetadataHandler = self.external_metadata_handler(
+            self.connected_apps, self.config
+        )
+        apps_metadata = metadata.get_connected_apps_metadata(parrent_app_metadata)
+        uploaders_metadata = metadata.get_connected_uploaders_metadata(
+            uploaders_metadata
+        )
+        uploader_statuses = metadata.extract_uploader_statuses(uploaders_metadata)
+        report_statuses = metadata.extract_report_statuses(
+            uploader_statuses, tenants_with_data
+        )
 
         metadata = {
             "app_id": self.app_id,
@@ -87,18 +102,18 @@ class NewReport:
             "description": self.description,
             "url": self.url,
             "connected_apps": self.connected_apps,
+            "report_components": self.report_components_metadata,
             "flags": self.flags,
+            "filters": self.filters,
             "registrable": self.registrable,
             "updated_at": datetime.datetime.utcnow().isoformat(),
-            "report_components": self.report_components_metadata,
             "public_url": self.public_url,
             "snapshot_url": self.snapshot_url,
+            "parrent_app": parrent_app_metadata,
+            "apps": apps_metadata,
             "status": report_statuses,
             "processing_status": uploader_statuses,
             "last_update_date": uploader_statuses,
-            "parrent_app": parrent_app_metadata,
-            "apps": apps_metadata,
-            "filters": self.filters,
         }
 
         return metadata
@@ -124,96 +139,3 @@ class NewReport:
         if not self.report_components:
             self._attach_all()
         return [comp.get_metadata() for _, comp in self.report_components.items()]
-
-    def _get_app_metadata(self, app_id: str):
-        try:
-            response = requests.get(
-                self.config.REGISTRY_SERVICE_APPS_URL,
-                params={"app_id": app_id},
-                headers=self.config.get_machine_headers(),
-            )
-            if response.status_code != 200:
-                log.warning(response.content)
-                return None
-
-            assert isinstance(response.json(), list)
-            assert len(response.json()) == 1
-
-            return response.json()
-        except Exception as err:
-            log.warning(err)
-            return None
-
-    def _get_connected_apps_metadata(
-        self, parrent_app_metadata: dict, _retry_in: int = 0
-    ):
-
-        conn_apps_metadata = []
-        if parrent_app_metadata:
-            conn_apps_metadata = [parrent_app_metadata]
-
-        if self.connected_apps is None:
-            return conn_apps_metadata
-
-        for app_id in self.connected_apps:
-            if parrent_app_metadata:
-                if parrent_app_metadata["app_id"] in app_id:
-                    continue  # already got parrent app metadata
-
-            app_metadata = self._get_app_metadata(app_id)
-            if app_metadata is None:
-                try:
-                    if _retry_in > 120:
-                        _retry_in = 0
-                    _retry_in = _retry_in + 5
-                    log.error(
-                        f"Can't get connected app metadata for app id: {app_id}... Retrying in {_retry_in} seconds..."
-                    )
-                    time.sleep(_retry_in)
-                    self._get_connected_apps_metadata(parrent_app_metadata, _retry_in)
-                except KeyboardInterrupt:
-                    log.info("Stopping getting connected apps metadata")
-                    sys.exit(0)
-            else:
-                # Not sure why `app_metadata` sometimes keeps coming None here
-                # Even if is checked for None...
-                conn_apps_metadata.extend(app_metadata)
-
-        log.success("Got conected apps metadata from registry service successfully")
-        return conn_apps_metadata
-
-    def _get_tenant_uploader_statuses(self, uploaders_metadata: List[dict]):
-
-        if not uploaders_metadata:
-            return self._get_tenant_uploader_statuses_from_cache()
-
-        results = []
-        for uploader in uploaders_metadata:
-            results.extend(uploader["status"])
-
-        return results
-
-    def _get_tenant_uploader_statuses_from_cache(self):
-        redisdb = RedisCache(self.config)
-        results = redisdb.get("uploader_status:*:*")
-        return results
-
-    def _get_tenant_report_statuses(self, uploader_statuses):
-
-        tenants_with_data = self.tenants_with_data_handler(self.config)
-
-        report_statuses = []
-        for ustatus in uploader_statuses:
-            for twd in tenants_with_data:
-                if ustatus["tenant_id"] != twd["tenant_id"]:
-                    continue  # tenant doesn't have data
-
-                rstatus = {
-                    **ustatus,
-                    "status": States.ENABLED
-                    if ustatus["status"] == States.IDLE
-                    else States.DISABLED,
-                }
-                report_statuses.append(rstatus)
-
-        return report_statuses

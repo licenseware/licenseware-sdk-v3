@@ -1,1 +1,2 @@
 from .default_get_tenants_with_data_handler import default_get_tenants_with_data_handler
+from .default_metadata_handler import DefaultMetadataHandler
