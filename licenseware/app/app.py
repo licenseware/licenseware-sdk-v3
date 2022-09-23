@@ -4,6 +4,7 @@ from typing import Dict, List
 
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
+from licenseware.constants.states import States
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
@@ -79,7 +80,7 @@ class NewApp:
 
         metadata = {
             "app_id": self.app_id,
-            "status": "enabled",
+            "status": States.AVAILABLE,
             "name": self.name,
             "description": self.description,
             "icon": self.icon,

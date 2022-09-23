@@ -10,6 +10,8 @@ class States(BaseEnum):
     SKIPPED = "skipped"
     ENABLED = "enabled"
     DISABLED = "disabled"
+    AVAILABLE = "available"
+    UNAVAILABLE = "unavailable"
     ACTION_REQUIRED = "action_required"
     REQUEST_ACCEPTED = "accepted"
     REQUEST_REJECTED = "rejected"

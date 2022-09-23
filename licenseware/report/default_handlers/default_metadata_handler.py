@@ -1,4 +1,3 @@
-import sys
 import time
 from typing import List
 
@@ -17,30 +16,99 @@ class DefaultMetadataHandler:
     ):
         self.config = config
         self.connected_apps = connected_apps
-        self.metadata_handler = {
-            "uploader": self._get_connected_uploader_metadata,
-            "app": self._get_connected_app_metadata,
-        }
 
     def _get_connected_uploader_metadata(self, app_id: str):
-        return get_registry_metadata(
-            url=self.config.REGISTRY_SERVICE_UPLOADERS_URL,
-            headers=self.config.get_machine_headers(),
-            app_id=app_id,
-        )
+        try:
+            metadata = get_registry_metadata(
+                url=self.config.REGISTRY_SERVICE_UPLOADERS_URL,
+                headers=self.config.get_machine_headers(),
+                app_id=app_id,
+            )
+            assert metadata is not None
+            assert isinstance(metadata, list)
+            assert len(metadata) > 0
+            return metadata
+        except Exception as err:
+            log.error(err)
+            return None
 
     def _get_connected_app_metadata(self, app_id: str):
-        return get_registry_metadata(
-            url=self.config.REGISTRY_SERVICE_APPS_URL,
-            headers=self.config.get_machine_headers(),
-            app_id=app_id,
-        )
+        try:
+            metadata = get_registry_metadata(
+                url=self.config.REGISTRY_SERVICE_APPS_URL,
+                headers=self.config.get_machine_headers(),
+                app_id=app_id,
+            )
+            assert metadata is not None
+            assert isinstance(metadata, list)
+            assert len(metadata) > 0
+            return metadata
+        except Exception as err:
+            log.error(err)
+            return None
 
-    def get_connected_apps_metadata(self, parrent_app_metadata: dict):
-        return self._get_connected_metadata("app", parrent_app_metadata)
+    def get_connected_apps_metadata(
+        self, parrent_app_metadata: dict, _retry_in: int = 0
+    ):
+        if len(self.connected_apps) == 1 and parrent_app_metadata is not None:
+            return [parrent_app_metadata]
 
-    def get_connected_uploaders_metadata(self, uploaders_metadata: dict = None):
-        return self._get_connected_metadata("uploader", uploaders_metadata)
+        connected_apps_metadata = []
+        for idx, app_id in enumerate(self.connected_apps):
+
+            if idx == 0 and parrent_app_metadata is not None:
+                continue
+
+            metadata = self._get_connected_app_metadata(app_id)
+
+            if metadata is None:
+                if _retry_in > 120:
+                    _retry_in = 0
+                _retry_in = _retry_in + 5
+                log.error(
+                    f"Can't get connected app metadata for app id: {app_id}... Retrying in {_retry_in} seconds..."
+                )
+                time.sleep(_retry_in)
+                self.get_connected_apps_metadata(parrent_app_metadata, _retry_in)
+
+            connected_apps_metadata.extend(metadata)
+
+        log.success(f"Succesfully got apps metadata for {self.connected_apps}")
+        return connected_apps_metadata
+
+    def get_connected_uploaders_metadata(
+        self, uploaders_metadata: List[dict], _retry_in: int = 0
+    ):
+
+        connected_uploaders_metadata = []
+        if len(self.connected_apps) == 1 and uploaders_metadata is not None:
+            return uploaders_metadata
+
+        if uploaders_metadata is not None:
+            connected_uploaders_metadata.extend(uploaders_metadata)
+
+        for idx, app_id in enumerate(self.connected_apps):
+
+            if idx == 0 and uploaders_metadata is not None:
+                continue
+
+            metadata = self._get_connected_uploader_metadata(app_id)
+
+            if metadata is not None:
+
+                if _retry_in > 120:
+                    _retry_in = 0
+                _retry_in = _retry_in + 5
+                log.error(
+                    f"Can't get connected uploaders metadata for app id: {app_id}... Retrying in {_retry_in} seconds..."
+                )
+                time.sleep(_retry_in)
+                self.get_connected_apps_metadata(uploaders_metadata, _retry_in)
+
+            connected_uploaders_metadata.extend(metadata)
+
+        log.success(f"Succesfully got uploaders metadata for {self.connected_apps}")
+        return connected_uploaders_metadata
 
     def extract_uploader_statuses(self, uploaders_metadata: List[dict]):
         statuses = []
@@ -68,39 +136,3 @@ class DefaultMetadataHandler:
                 report_statuses.append(rstatus)
 
         return report_statuses
-
-    def _get_connected_metadata(self, name: str, given_metadata: dict = None):
-
-        conn_metadata = []
-        if given_metadata:
-            conn_metadata = [given_metadata]
-
-        if len(self.connected_apps) == 1:
-            return conn_metadata
-
-        for app_id in self.connected_apps:
-            if given_metadata:
-                if given_metadata["app_id"] == app_id:
-                    continue  # already got parrent app metadata
-
-            metadata = self.metadata_handler[name](app_id)
-            if metadata is None:
-                try:
-                    if _retry_in > 120:
-                        _retry_in = 0
-                    _retry_in = _retry_in + 5
-                    log.error(
-                        f"Can't get connected {name} metadata for app id: {app_id}... Retrying in {_retry_in} seconds..."
-                    )
-                    time.sleep(_retry_in)
-                    self.get_connected_entities_metadata(given_metadata, _retry_in)
-                except KeyboardInterrupt:
-                    log.info(f"Stopping getting connected {name}s metadata")
-                    sys.exit(0)
-            else:
-                # Not sure why `app_metadata` sometimes keeps coming None here
-                # Even if is checked for None...
-                conn_metadata.extend(metadata)
-
-        log.success(f"Got conected {name}s metadata from registry service successfully")
-        return conn_metadata

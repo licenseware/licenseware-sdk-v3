@@ -43,14 +43,9 @@ class NewReport:
         ns = get_altered_strings(self.app_id).dash
         reportid = get_altered_strings(self.report_id).dash
 
+        self._ensure_parrent_is_first_in_connected_apps()
         if isinstance(self.filters, ReportFilter):
             self.filters = self.filters.metadata
-
-        if self.connected_apps is None:
-            self.connected_apps = [self.app_id]
-
-        if self.app_id not in self.connected_apps:
-            self.connected_apps.append(self.app_id)
 
         self.report_components: Dict[str, NewReportComponent] = dict()
         self.report_components_metadata = None
@@ -74,7 +69,7 @@ class NewReport:
         self.report_components_metadata = self._get_report_components_metadata()
 
     def get_metadata(
-        self, parrent_app_metadata: dict = None, uploaders_metadata: dict = None
+        self, parrent_app_metadata: dict = None, uploaders_metadata: List[dict] = None
     ):
 
         if not self.registrable:
@@ -139,3 +134,15 @@ class NewReport:
         if not self.report_components:
             self._attach_all()
         return [comp.get_metadata() for _, comp in self.report_components.items()]
+
+    def _ensure_parrent_is_first_in_connected_apps(self):
+
+        if self.connected_apps is None:
+            self.connected_apps = [self.app_id]
+
+        if self.app_id not in self.connected_apps:
+            self.connected_apps.append(self.app_id)
+
+        if self.connected_apps[0] != self.app_id:
+            del self.connected_apps[self.connected_apps.index(self.app_id)]
+            self.connected_apps = [self.app_id] + self.connected_apps
