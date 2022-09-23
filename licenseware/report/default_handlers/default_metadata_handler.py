@@ -1,11 +1,12 @@
 import sys
 import time
 from typing import List
-from licenseware.constants.alias_types import AppId
-from licenseware.utils.logger import log
+
 from licenseware.config.config import Config
-from licenseware.utils.get_registry_metadata import get_registry_metadata
+from licenseware.constants.alias_types import AppId
 from licenseware.constants.states import States
+from licenseware.utils.get_registry_metadata import get_registry_metadata
+from licenseware.utils.logger import log
 
 
 class DefaultMetadataHandler:

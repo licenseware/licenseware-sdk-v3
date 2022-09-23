@@ -21,7 +21,7 @@ def default_update_status_handler(
     }
 
     return redisdb.set(
-        key=f"uploader_status:{uploader_id or '*'}:{tenant_id or '*'}",
+        key=f"uploader_status:{uploader_id}:{tenant_id}",
         value=data,
         expiry=config.EXPIRE_UPLOADER_STATUS,
     )

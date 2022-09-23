@@ -1,5 +1,6 @@
-from .logger import log
 from licenseware.dependencies import requests
+
+from .logger import log
 
 
 def get_registry_metadata(url: str, headers: dict, **query_params):
