@@ -94,6 +94,7 @@ class Config(BaseSettings):  # pragma no cover
     EXPIRE_UPLOADER_STATUS: int = 7200  # 2 hours
     EXPIRE_USER_CHECK: int = 60  # 1 minute
     EXPIRE_MACHINE_CHECK: int = 60  # 1 minute
+    EXPIRE_NOTIFICATION: int = 259_200  # 3 days
 
     KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
     KAFKA_CONSUMER_POLL: float = 1.0
