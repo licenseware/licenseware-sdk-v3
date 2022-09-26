@@ -107,8 +107,6 @@ class NewReport:
             "parrent_app": parrent_app_metadata,
             "apps": apps_metadata,
             "status": report_statuses,
-            "processing_status": uploader_statuses,
-            "last_update_date": uploader_statuses,
         }
 
         return metadata

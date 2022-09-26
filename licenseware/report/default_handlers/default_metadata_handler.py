@@ -131,6 +131,8 @@ class DefaultMetadataHandler:
                     "status": States.ENABLED
                     if ustatus["status"] == States.IDLE
                     else States.DISABLED,
+                    "processing_status": ustatus["status"],
+                    "last_update_date": ustatus["updated_at"],
                 }
                 report_statuses.append(rstatus)
 
