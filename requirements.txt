@@ -1,5 +1,6 @@
 PyJWT~=2.4
 celery~=5.2
+flower~=1.2
 confluent-kafka~=1.9
 fastapi~=0.78
 pydantic[dotenv]==1.10.2
