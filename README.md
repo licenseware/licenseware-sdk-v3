@@ -151,7 +151,7 @@ Creating the worker function which will handle the `event`
 ```py
 
 from app.dependencies.workers import worker
-from licenseware import States, log, history
+from licenseware import States, log
 from settings import config
 
 from .rv_tools_data_worker import file_workflow_rvtools
@@ -165,10 +165,7 @@ def rv_tools_worker(event: dict):
     log.info("Starting working")
     log.debug(event)
 
-    registered_uploaders.publish_processing_status(
-        event["tenant_id"], event["uploader_id"], States.RUNNING
-    )
-    history.log_start_processing(event["event_id"], config)
+    registered_uploaders.publish_processing_status(event, States.RUNNING)
 
     try:
         for filepath in event["filepaths"]:
@@ -178,11 +175,7 @@ def rv_tools_worker(event: dict):
                 filepath=filepath,
             )
     finally:
-        history.log_end_processing(event["event_id"], config)
-
-        registered_uploaders.publish_processing_status(
-            event["tenant_id"], event["uploader_id"], States.IDLE
-        )
+        registered_uploaders.publish_processing_status(event, States.IDLE)
 
         log.info("Finished working")
 
@@ -862,7 +855,7 @@ Where the `history.log` decorator cannot be used you can create an instance of `
 - `log_filecontent_validation` - - if you are overwriting the default file content validation function;
 - `log_success` - place it where function completed succesfully;
 - `log_failure` - place it where function failed to complete, an error occured;
-- `log_start_processing` and `log_end_processing` - use it only on the main worker function to log the total processing time;
+- `log_start_processing` and `log_end_processing` - are used in `publish_processing_status` to track the total processing time of the worker;
 
 A basic example:
 

@@ -70,8 +70,8 @@ class DefaultMetadataHandler:
                 )
                 time.sleep(_retry_in)
                 self.get_connected_apps_metadata(parrent_app_metadata, _retry_in)
-
-            connected_apps_metadata.extend(metadata)
+            else:
+                connected_apps_metadata.extend(metadata)
 
         log.success(f"Succesfully got apps metadata for {self.connected_apps}")
         return connected_apps_metadata
@@ -94,8 +94,7 @@ class DefaultMetadataHandler:
 
             metadata = self._get_connected_uploader_metadata(app_id)
 
-            if metadata is not None:
-
+            if metadata is None:
                 if _retry_in > 120:
                     _retry_in = 0
                 _retry_in = _retry_in + 5
@@ -104,8 +103,8 @@ class DefaultMetadataHandler:
                 )
                 time.sleep(_retry_in)
                 self.get_connected_apps_metadata(uploaders_metadata, _retry_in)
-
-            connected_uploaders_metadata.extend(metadata)
+            else:
+                connected_uploaders_metadata.extend(metadata)
 
         log.success(f"Succesfully got uploaders metadata for {self.connected_apps}")
         return connected_uploaders_metadata

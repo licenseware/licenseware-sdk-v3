@@ -172,13 +172,17 @@ class RegisteredUploaders:  # pragma no cover
 
     def publish_processing_status(
         self,
-        tenant_id: str,
-        uploader_id: Enum,
+        event: dict,
         status: str,
     ):
-        uploader = self._get_current_uploader(uploader_id)
+        for param in ["tenant_id", "uploader_id", "event_id"]:
+            assert (
+                param in event.keys()
+            ), f"Event dict must have 'tenant_id', 'uploader_id', 'event_id' keys"
+
+        uploader = self._get_current_uploader(event["uploader_id"])
         response = uploader.update_status_handler(
-            tenant_id, uploader.uploader_id, status, self.config
+            event["tenant_id"], uploader.uploader_id, status, self.config
         )
         self.registry_updater(fresh_connect=True)
 
@@ -188,7 +192,7 @@ class RegisteredUploaders:  # pragma no cover
         )
         publish_notification(
             producer=self.producer,
-            tenant_id=tenant_id,
+            tenant_id=event["tenant_id"],
             title=notification_title,
             event_type=EventType.UPLOADER_STATUS_UPDATED,
             icon="Uploader",
@@ -199,9 +203,19 @@ class RegisteredUploaders:  # pragma no cover
                 "app_id": uploader.app_id,
                 "uploader_id": uploader.uploader_id,
                 "status": status,
-                "tenant_id": tenant_id,
+                "tenant_id": event["tenant_id"],
             },
         )
+
+        historyrepo = self._get_history_repo(self.config.mongo_db_connection)
+        self._log_processing_time(
+            event["tenant_id"],
+            event["event_id"],
+            uploader.uploader_id,
+            status,
+            historyrepo,
+        )
+
         return response
 
     # PRIVATE
@@ -228,6 +242,30 @@ class RegisteredUploaders:  # pragma no cover
             collection=self.config.MONGO_COLLECTION.QUOTA,
             data_validator="ignore",
         )
+
+    def _log_processing_time(
+        self,
+        tenant_id: str,
+        event_id: str,
+        uploader_id: str,
+        status: str,
+        repo: MongoRepository,
+    ):
+
+        history = History(
+            tenant_id=tenant_id,
+            authorization=None,
+            event_id=event_id,
+            uploader_id=uploader_id,
+            app_id=self.config.APP_ID,
+            repo=repo,
+        )
+
+        if status == States.RUNNING:
+            history.log_start_processing()
+
+        if status == States.IDLE:
+            history.log_end_processing()
 
     def _log_filenames_validation(
         self,
