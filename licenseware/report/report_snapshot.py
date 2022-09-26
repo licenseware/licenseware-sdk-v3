@@ -1,5 +1,3 @@
-import random
-import string
 import uuid
 from datetime import datetime
 from typing import List
@@ -8,14 +6,9 @@ from licenseware.config.config import Config
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.utils.mongo_limit_skip_filters import insert_mongo_limit_skip_filters
 from licenseware.utils.mongo_query_from_filters import get_mongo_query_from_filters
+from licenseware.utils.shortid import shortid
 
 from .report import NewReport, NewReportComponent
-
-
-def shortid(length=6):
-    # Not colision prof
-    # but enough when combined with tenant_id
-    return "".join(random.choices(string.digits + string.ascii_uppercase, k=length))
 
 
 class ReportSnapshot:

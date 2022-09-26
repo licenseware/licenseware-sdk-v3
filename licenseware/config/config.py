@@ -105,10 +105,6 @@ class Config(BaseSettings):  # pragma no cover
     CELERY_BEATS_REGISTRATION_INTERVAL: int = 600  # 10 minutes
     REFRESH_MACHINE_TOKEN_INTERVAL: int = 86_400  # 24 hours
 
-    @property
-    def QUEUE(self):
-        return get_altered_strings(self.APP_ID).underscore
-
     CELERY_BROKER_TYPE: CeleryBrokerType = CeleryBrokerType.REDIS
     WEBAPP_FRAMEWORK: WebAppFramework = WebAppFramework.FASTAPI
 
