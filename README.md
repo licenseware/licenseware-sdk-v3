@@ -149,8 +149,9 @@ rv_tools_validation_parameters = UploaderValidationParameters(
 Creating the worker function which will handle the `event`
 
 ```py
+
 from app.dependencies.workers import worker
-from licenseware import States, log
+from licenseware import States, log, history
 from settings import config
 
 from .rv_tools_data_worker import file_workflow_rvtools
@@ -164,9 +165,10 @@ def rv_tools_worker(event: dict):
     log.info("Starting working")
     log.debug(event)
 
-    registered_uploaders.notify_processing_status(
+    registered_uploaders.publish_processing_status(
         event["tenant_id"], event["uploader_id"], States.RUNNING
     )
+    history.log_start_processing(event["event_id"], config)
 
     try:
         for filepath in event["filepaths"]:
@@ -175,16 +177,14 @@ def rv_tools_worker(event: dict):
                 _event,
                 filepath=filepath,
             )
-    except:
-        registered_uploaders.notify_processing_status(
+    finally:
+        history.log_end_processing(event["event_id"], config)
+
+        registered_uploaders.publish_processing_status(
             event["tenant_id"], event["uploader_id"], States.IDLE
         )
 
-    registered_uploaders.notify_processing_status(
-        event["tenant_id"], event["uploader_id"], States.IDLE
-    )
-
-    log.info("Finished working")
+        log.info("Finished working")
 
 ```
 
@@ -237,21 +237,23 @@ rv_tools_uploader = NewUploader(
 ```
 In the `NewUploader` object we gather all information about this uploader
 
-
-- `name` - the name of the uploader (will be displayed by frontend);
-- `description` - uploader description (will be displayed by frontend);
-- `uploader_id` - this id must be `unique`;
+- `name` - uploader name;
+- `description` - describe what this uploader does;
+- `uploader_id` - try to make this unique accross all apps;
 - `accepted_file_types` - the files extentions accepted  (will be displayed by frontend);
+- `config` - the instance of Config from settings.py;
+- `worker` - the function which will trigger the processing;
+- `free_quota_units` - the number of free quota units on the user free plan;
+- `used_collections` - a list of collections which will be used by the worker function to fill (this is used  on `clear_data` for tenant option);
 - `validation_parameters` - here we pass the instance of `UploaderValidationParameters` class;
 - `encryption_parameters` - here we pass the instance of `UploaderEncryptionParameters` class;
+- `flags`- here you can set a list of flags for this uploader. Flags will be imported from `constants` package (`from licenseware import Flags`);
+- `icon` - the icon of this uploader which will be displayed in frontend;
 - `filenames_validation_handler` - by default the validation is handled by `uploader.defaults.default_filenames_validation_handler` function. If you need to treat the filename validation in a different way you can always pass another function. The `filenames_validation_handler` function will receive the a list of strings as a first parameter and an instance of `UploaderValidationParameters` class and must return an instace of `uiresponses.FileValidationResponse`;
 - `filecontents_validation_handler` - by default the validation is handled by `uploader.defaults.default_filecontents_validation_handler` function. If you need to overwrite this functionality you can pass your custom `filecontents_validation_handler` function which will have the same signature as `default_filenames_validation_handler`;
 - Obs: for setting the state of the validation you need to use the States `from licenseware States`;
-- `flags`- here you can set a list of flags for this uploader. Flags will be imported from `constants` package (`from licenseware import Flags`);
-- `icon` - the icon of this uploader which will be displayed in frontend;
-- `config` - the configuration class instance will will need to make available the following information:
-    * `config.APP_ID` - each service must have an unique ID;
-    
+- `registrable` - set it to False if this uploader doesn't need to be registered to registry-service;
+
 
 We can remove the fields we don't fill and reduce the above to this:
 
@@ -860,6 +862,7 @@ Where the `history.log` decorator cannot be used you can create an instance of `
 - `log_filecontent_validation` - - if you are overwriting the default file content validation function;
 - `log_success` - place it where function completed succesfully;
 - `log_failure` - place it where function failed to complete, an error occured;
+- `log_start_processing` and `log_end_processing` - use it only on the main worker function to log the total processing time;
 
 A basic example:
 

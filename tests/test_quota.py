@@ -34,7 +34,7 @@ def test_quota(mongo_connection):
         tenant_id=user["TenantId"],
         authorization=user["Authorization"],
         uploader_id="rv_tools",
-        free_units=1000,
+        free_quota_units=1000,
         repo=repo,
         config=config,
     )

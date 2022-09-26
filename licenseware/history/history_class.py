@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from licenseware.repository.repository_interface import RepositoryInterface
+from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 
 from . import history
 
@@ -13,7 +13,7 @@ class History:
         event_id: str,
         app_id: str,
         uploader_id: str,
-        repo: RepositoryInterface,
+        repo: MongoRepository,
     ) -> None:
         self.tenant_id = tenant_id
         self.authorization = authorization
@@ -105,3 +105,9 @@ class History:
             repo=self.repo,
             entities=entities,
         )
+
+    def log_start_processing(self):
+        return history.log_start_processing(event_id=self.event_id, repo=self.repo)
+
+    def log_end_processing(self):
+        return history.log_end_processing(event_id=self.event_id, repo=self.repo)

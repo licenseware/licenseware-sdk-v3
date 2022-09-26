@@ -74,7 +74,12 @@ def test_report_creation(mocker):
     class RequestsResponse:
         status_code = 200
 
+        @staticmethod
+        def json():
+            return [{"status": ["success"]}]
+
     mocker.patch("requests.post", return_value=RequestsResponse)
+    mocker.patch("requests.get", return_value=RequestsResponse)
 
     config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
 

@@ -9,7 +9,7 @@ def default_check_quota_handler(
     tenant_id: str,
     authorization: str,
     uploader_id: str,
-    free_units: int,
+    free_quota_units: int,
     validation_response: FileValidationResponse,
     repo: MongoRepository,
     config: Config,
@@ -19,7 +19,7 @@ def default_check_quota_handler(
         tenant_id=tenant_id,
         authorization=authorization,
         uploader_id=uploader_id,
-        free_units=free_units,
+        free_quota_units=free_quota_units,
         repo=repo,
         config=config,
     )

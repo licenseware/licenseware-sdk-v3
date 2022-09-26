@@ -2,7 +2,7 @@ import datetime
 from dataclasses import dataclass
 from typing import Callable, List, Tuple, Union
 
-from licenseware.config.config import Config
+from licenseware.config.config import Collections, Config
 from licenseware.constants import alias_types as alias
 from licenseware.constants.uploader_types import (
     FileValidationResponse,
@@ -30,7 +30,8 @@ class NewUploader:
     accepted_file_types: tuple
     config: Config
     worker: Callable[[WorkerEvent], None]
-    free_units: int = 1
+    free_quota_units: int = 1
+    used_collections: List[str] = None
     validation_parameters: UploaderValidationParameters = None
     encryption_parameters: UploaderEncryptionParameters = None
     flags: Tuple[str] = None
@@ -84,6 +85,9 @@ class NewUploader:
             if self.encryption_parameters is not None
             else None
         )
+
+        if self.used_collections is None:
+            self.used_collections = [Collections.DATA]
 
         ns = get_altered_strings(self.app_id).dash
         uploaderid = get_altered_strings(self.uploader_id).dash

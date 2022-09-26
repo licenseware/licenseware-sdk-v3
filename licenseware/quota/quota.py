@@ -22,7 +22,7 @@ class Quota:
         tenant_id: str,
         authorization: str,
         uploader_id: str,
-        free_units: int,
+        free_quota_units: int,
         repo: MongoRepository,
         config: Config,
     ):
@@ -40,7 +40,7 @@ class Quota:
 
         self.user_id = user_info["user_id"]
         self.monthly_quota = (
-            sys.maxsize if user_info["plan_type"] == "UNLIMITED" else free_units
+            sys.maxsize if user_info["plan_type"] == "UNLIMITED" else free_quota_units
         )
 
         self.quota_filters = {

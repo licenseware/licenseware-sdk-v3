@@ -1,8 +1,10 @@
 import inspect
+import time
 import traceback
 from functools import wraps
 from typing import Any, Callable, Union
 
+from licenseware.config.config import Config
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.repository.repository_interface import RepositoryInterface
 from licenseware.utils.logger import log as logg
@@ -243,6 +245,32 @@ def log_filecontent_validation(
     )
 
 
+def log_start_processing(event_id: str, config: Config):
+
+    repo = MongoRepository(
+        config.mongo_db_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    start_time = time.perf_counter()
+    return repo.update_one(
+        filters={"event_id": event_id}, data={"processing_time": start_time}
+    )
+
+
+def log_end_processing(event_id: str, config: Config):
+
+    repo = MongoRepository(
+        config.mongo_db_connection, collection=config.MONGO_COLLECTION.HISTORY
+    )
+
+    event = repo.find_one(filters={"event_id": event_id})
+    total_seconds = time.perf_counter() - event["processing_time"]
+    return repo.update_one(
+        filters={"event_id": event_id},
+        data={"processing_time": time.strftime("%M:%S", time.gmtime(total_seconds))},
+    )
+
+
 def log(
     *dargs,
     on_success_save: str = None,
@@ -304,6 +332,7 @@ def log(
             app_id: 'app',
             event_id: '6cd474cd-663f-4d1f-891e-e18d0d0ea77e',
             tenant_id: 'b37761e3-6926-4cc1-88c7-4d0478b04adf',
+            "processing_time": "32:34", # MM:SS
             filename_validation: [
                 {
                     message: 'Filename is valid',

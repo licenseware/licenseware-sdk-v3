@@ -35,9 +35,12 @@ def get_filename(func, func_args, func_kwargs):
 
 def get_db_connection(func, func_args, func_kwargs):
     repo = get_value_from_func(func, func_args, func_kwargs, "repo")
-    if repo is None:
-        return
-    return repo.db_connection
+    if repo is not None:
+        return repo.db_connection
+
+    cfg = get_value_from_func(func, func_args, func_kwargs, "config")
+    if cfg is not None:
+        return cfg.mongo_db_connection
 
 
 def get_config(func, func_args, func_kwargs):

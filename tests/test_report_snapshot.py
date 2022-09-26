@@ -36,7 +36,16 @@ def repo(mongo_connection):
 # pytest -s -v tests/test_report_snapshot.py
 
 
-def test_report_snaphot(repo):
+def test_report_snaphot(repo, mocker):
+    class RequestsResponse:
+        status_code = 200
+
+        @staticmethod
+        def json():
+            return [{"status": ["success"]}]
+
+    mocker.patch("requests.post", return_value=RequestsResponse)
+    mocker.patch("requests.get", return_value=RequestsResponse)
 
     config = Config(FRONTEND_URL="fe url", PUBLIC_TOKEN_REPORT_URL="report public")
 
