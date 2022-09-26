@@ -9,6 +9,6 @@ openpyxl~=3.0
 pandas~=1.2
 pymongo==4.2.0
 python-multipart==0.0.5
-redis~=4.3
+redis==4
 requests~=2.28
 uvicorn~=0.18
