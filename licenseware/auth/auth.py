@@ -1,4 +1,3 @@
-import os
 import sys
 import time
 
@@ -41,7 +40,6 @@ def login_machine(config: Config, redis_cache: RedisCache, _retry_in: int = 0):
         login_machine(config, redis_cache, _retry_in)
 
     machine_token = response.json()["Authorization"]
-    os.environ["MACHINE_TOKEN"] = machine_token
     redis_cache.set("MACHINE_TOKEN", machine_token, expiry=None)
     log.success("Machine login successful!")
 
