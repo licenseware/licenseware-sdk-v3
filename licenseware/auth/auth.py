@@ -4,6 +4,7 @@ import time
 
 from licenseware.config.config import Config
 from licenseware.dependencies import requests
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.utils.logger import log
 
 
@@ -13,7 +14,7 @@ def login_user(email: str, password: str, login_url: str):
     return response.json()
 
 
-def login_machine(config: Config, _retry_in: int = 0):
+def login_machine(config: Config, redis_cache: RedisCache, _retry_in: int = 0):
 
     if _retry_in > 120:
         _retry_in = 0
@@ -41,16 +42,16 @@ def login_machine(config: Config, _retry_in: int = 0):
 
     machine_token = response.json()["Authorization"]
     os.environ["MACHINE_TOKEN"] = machine_token
-    config.redisdb.set("MACHINE_TOKEN", machine_token, expiry=None)
+    redis_cache.set("MACHINE_TOKEN", machine_token, expiry=None)
     log.success("Machine login successful!")
 
 
-def cron_login_machine(config: Config):
+def cron_login_machine(config: Config, redis_cache: RedisCache):
     try:
-        login_machine(config)
+        login_machine(config, redis_cache)
         while True:
             time.sleep(config.REFRESH_MACHINE_TOKEN_INTERVAL)
-            login_machine(config)
+            login_machine(config, redis_cache)
             log.info(f"Refreshed machine token")
     except KeyboardInterrupt:
         log.info("Shutting down login_machine...")

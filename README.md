@@ -38,28 +38,12 @@ An `uploader` is reponsible for handling files uploaded for processing.
 Each uploader will have it's own (mostly) unique attributes and actions. 
 These attributes and actions which define an uploader are needed to handle the file from the upload up to file processing handler.
 
-- Create a new uploader
-
-Import uploader constructors
-```py
-from settings import config
-from licenseware import (
-    NewUploader, 
-    UploaderValidationParameters,
-    UploaderEncryptionParameters, 
-    FileTypes
-)
-```
-- `config` - this object will contain common data for our application;
-- `NewUploader` - this object will `hold` all the information needed (metadata) for describing file(s) which will be uploaded for processing;
-- `UploaderValidationParameters` - this object will contain metadata needed to validate file(s);
-- `UploaderEncryptionParameters` - this object will contain metadata needed to encrypt sensitive data from file(s);
-- `FileTypes` - this contains all the file types we can process (.xml, .csv, .xlsx etc);
-
-This list can grow depending on the requirements.
 
 Define uploader encryption parameters
 ```py
+
+from licenseware import UploaderEncryptionParameters
+
 rv_tools_encryption_parameters = UploaderEncryptionParameters(
     filepaths=["DeviceX", "encrypt_this(.*)_untilhere"],
     filecontent=["MachineName=(.*?)"],
@@ -96,6 +80,8 @@ In a similar way this can be done for `filepaths` and `filecontent`.
 
 Define uploader validation parameters
 ```py
+
+from licenseware import UploaderValidationParameters
 
 rv_tools_validation_parameters = UploaderValidationParameters(
     required_input_type="excel",
@@ -185,7 +171,7 @@ The worker function is responsibile for providing the processing information to 
 
 The `event` received will be a dictionary like this:
 
-```json
+```py
 event = {
     "tenant_id": tenant_id,
     "authorization": authorization,
@@ -205,13 +191,13 @@ event = {
 - `app_id` - the unique app id which holds this uploader;
 
 
-Define uploader full metadata
+Attach to a new uploader what we defined up:
 
 ```py
 
 from licenseware import FileTypes, NewUploader
 from settings import config
-
+from app.dependencies.db import redis_cache
 from .encryptor import rv_tools_encryption_parameters
 from .validator import rv_tools_validation_parameters
 from .worker import rv_tools_worker
@@ -225,10 +211,19 @@ rv_tools_uploader = NewUploader(
     validation_parameters=rv_tools_validation_parameters,
     encryption_parameters=rv_tools_encryption_parameters,
     config=config,
+    redis_cache=redis_cache,
 )
 
 ```
-In the `NewUploader` object we gather all information about this uploader
+
+- `config` - this object will contain common data for our application;
+- `NewUploader` - this object will `hold` all the information needed (metadata) for describing file(s) which will be uploaded for processing;
+- `UploaderValidationParameters` - this object will contain metadata needed to validate file(s);
+- `UploaderEncryptionParameters` - this object will contain metadata needed to encrypt sensitive data from file(s);
+- `FileTypes` - this contains all the file types we can process (.xml, .csv, .xlsx etc);
+
+This list can grow depending on the requirements.
+In the `NewUploader` object we gather all information about this uploader.
 
 - `name` - uploader name;
 - `description` - describe what this uploader does;
@@ -248,36 +243,15 @@ In the `NewUploader` object we gather all information about this uploader
 - `registrable` - set it to False if this uploader doesn't need to be registered to registry-service;
 
 
-We can remove the fields we don't fill and reduce the above to this:
-
-```py
-
-rv_tools_uploader = NewUploader(
-    name="RVTools",
-    description="XLSX export from RVTools after scanning your Vmware infrastructure.",
-    uploader_id="rv_tools",
-    accepted_file_types=FileTypes.GENERIC_EXCEL,
-    validation_parameters=rv_tools_validation_parameters,
-    encryption_parameters=rv_tools_encryption_parameters,
-    config=config
-)
-
-```
-
-This `rv_tools_uploader` instance will make available the following needed methods:
-- `validate_filenames` - method which will be used to validate file names received from frontend in the filename validation step;
-- `validate_filecontents` - method which will be used to validate file contents received from frontend in the upload files step;
-- `metadata` - property which contains all the needed information to register a new uploader to discovery/registry-service;
-
 
 Each uploader created needs to be `registered`in the `uploaders/__init__.py` file:
 
 ```py
 
-from licenseware import RegisteredUploaders
-
 from app.dependencies.pubsub import producer
+from app.dependencies.db import mongodb_connection, redis_cache
 from app.services.defaults.registry_updater import registry_updater
+from licenseware import RegisteredUploaders
 from settings import config
 
 from .rv_tools.uploader import rv_tools_uploader
@@ -286,9 +260,13 @@ uploaders = [rv_tools_uploader]
 
 
 registered_uploaders = RegisteredUploaders(
-    uploaders, registry_updater, producer, config
+    uploaders,
+    registry_updater,
+    producer,
+    config,
+    redis_cache,
+    mongodb_connection,
 )
-
 
 ```
 
@@ -306,26 +284,13 @@ Each report component has a corespondent front-end component which `knows` how t
 The same principles apply as with `Uploaders`.
 
 
-- Start by importing the report contructors
-
-```py
-from settings import config
-from licenseware import (
-    NewReport, 
-    NewReportComponent,
-    ReportFilter,
-    StyleAttrs,
-    SummaryAttrs,
-    BarHorizontalAttrs,
-    Icons
-)
-```
-
 - Declare a new report
 
 Below we contruct report filters. This step can be done after you have defined all report components.
 
 ```py
+
+from licenseware import ReportFilter
 
 report_filters = (
         ReportFilter()
@@ -372,6 +337,7 @@ Using the `NewReport` class we fill the below parameters (filters can be filled 
 
 ```py
 
+from app.dependencies.db import mongodb_connection, redis_cache
 from app.report_components import report_components
 from licenseware import NewReport
 from settings import config
@@ -385,6 +351,8 @@ devices_overview_report = NewReport(
     filters=report_filters,
     components=report_components,
     config=config,
+    db_connection=mongodb_connection,
+    redis_cache=redis_cache,
     connected_apps=[
         "ifmp-service",
         "odb-service",
@@ -393,7 +361,6 @@ devices_overview_report = NewReport(
 
 
 devices_overview_report.attach(component_id="all_devices")
-
 
 ```
 
@@ -960,6 +927,7 @@ producer.publish(TopicType.USER_EVENTS, data_stream)
 
 ```
 The factory function is up to you to create it with the configurations you need.
+If you want just the default one you can do `from licenseware import get_kafka_producer`.
 We are using a factory function for getting the confluent kafka producer to reconnect in case the connection fails.
 
 
@@ -1000,6 +968,7 @@ if __name__ == "__main__":
 
 ```
 The factory function is up to you to create it with the configurations you need.
+If you want just the default one you can do `from licenseware import get_kafka_consumer`.
 We are using a factory function for getting the confluent kafka consumer to reconnect in case the connection fails.
 
 
@@ -1030,3 +999,5 @@ rc.get("apps:odb-service")
 rc.get_key("apps:odb-service")
 
 ```
+
+This the redis_cache instance is already available in app/dependencies you can import it in app with `from app.dependencies.db import redis_cache`.
