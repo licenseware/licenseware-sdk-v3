@@ -1,3 +1,6 @@
+import json
+import urllib.request
+
 from setuptools import find_packages, setup
 
 # https://packaging.python.org/guides/distributing-packages-using-setuptools/?highlight=setup.py#setup-py
@@ -8,14 +11,22 @@ from setuptools import find_packages, setup
 # twine upload *
 
 
+RELEASES_URL = "https://api.github.com/repos/licenseware/licenseware-sdk-v3/releases"
+
+try:
+    response = urllib.request.urlopen(RELEASES_URL)
+    data = json.loads(response.read())
+    VERSION = data[0]["name"]
+except:
+    VERSION = "v3.0.0"
+
+
 with open("README.md", "r") as f:
     long_description = f.read()
 
 with open("requirements.txt", "r") as f:
     REQUIREMENTS = f.readlines()
 
-
-VERSION = "3.0.0"
 
 setup(
     name="licenseware",
@@ -31,9 +42,4 @@ setup(
     packages=find_packages(where=".", exclude=["tests"]),
     include_package_data=True,
     package_data={"": ["*"]},
-    # entry_points={
-    #     "console_scripts": [
-    #         "licenseware=licenseware.cli:cli_entrypoint",
-    #     ],
-    # },
 )

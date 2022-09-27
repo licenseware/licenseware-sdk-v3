@@ -29,7 +29,10 @@
 - install licenseware: `make install`;
 - uninstall licenseware: `make uninstall`;
 - build licenseware wheel: `make build`;
-- install from git: `pip3 install git+https://git@github.com/licenseware/licenseware-sdk-v3.git`; 
+- install from git latest: `pip3 install git+https://git@github.com/licenseware/licenseware-sdk-v3.git`; 
+- install from git a specific release: `pip3 install git+https://git@github.com/licenseware/licenseware-sdk-v3.git@v3.0.0`;
+- pin a specific sdk release in requirements.txt: `git+https://git@github.com/licenseware/licenseware-sdk-v3.git@v3.0.0`;
+
 
 <a name="Uploaders"></a>
 # Uploaders
