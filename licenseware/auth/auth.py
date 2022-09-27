@@ -34,11 +34,11 @@ def login_machine(config: Config, redis_cache: RedisCache, _retry_in: int = 0):
         if response.status_code != 200:
             log.error(f"Could not login '{config.MACHINE_NAME}'")
             time.sleep(_retry_in)
-            login_machine(config, _retry_in)
+            login_machine(config, redis_cache, _retry_in)
     except:
         log.error(f"Could not login '{config.MACHINE_NAME}'")
         time.sleep(_retry_in)
-        login_machine(config, _retry_in)
+        login_machine(config, redis_cache, _retry_in)
 
     machine_token = response.json()["Authorization"]
     os.environ["MACHINE_TOKEN"] = machine_token
