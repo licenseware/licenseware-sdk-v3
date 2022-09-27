@@ -2,7 +2,6 @@ import uuid
 
 from licenseware.constants.base_enum import BaseEnum
 from licenseware.dependencies import BaseSettings
-from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.utils.alter_string import get_altered_strings
 
 
@@ -117,41 +116,6 @@ class Config(BaseSettings):  # pragma no cover
     @property
     def celery_result_backend_uri(self):
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}/{self.CELERY_BACKEND_REDIS_DB}"
-
-    @property
-    def db_config(self):
-        return {
-            Environment.PROD: {
-                "host": self.MONGO_HOST,
-                "port": self.MONGO_PORT,
-                "db_name": self.MONGO_DBNAME,
-                "username": self.MONGO_USER,
-                "password": self.MONGO_PASSWORD,
-            },
-            Environment.DEV: {
-                "host": self.REDIS_HOST,
-                "port": self.REDIS_PORT,
-                "db": self.REDIS_DB,
-            },
-        }[self.CURRENT_ENVIRONMENT]
-
-    @property
-    def mongo_db_connection(self):
-        from pymongo import MongoClient
-
-        MONGO_CONNECTION_STRING = f"mongodb://{self.MONGO_USER}:{self.MONGO_PASSWORD}@{self.MONGO_HOST}:{self.MONGO_PORT}"
-        mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[self.MONGO_DBNAME]
-        return mongo_connection
-
-    @property
-    def redisdb(self):
-        return RedisCache(self)
-
-    def get_machine_headers(self, key: str = "auth_jwt"):
-        return {key: self.redisdb.get_key("MACHINE_TOKEN")}
-
-    def get_machine_token(self):
-        return self.redisdb.get_key("MACHINE_TOKEN")
 
     class Config:
         env_file = ".env"

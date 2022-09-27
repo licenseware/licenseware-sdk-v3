@@ -10,6 +10,8 @@ from licenseware import (
     ReportSnapshot,
     StyleAttrs,
     WebResponse,
+    get_mongodb_connection,
+    get_redis_cache,
 )
 
 from . import tenant_id
@@ -48,6 +50,8 @@ def test_report_snaphot(repo, mocker):
     mocker.patch("requests.get", return_value=RequestsResponse)
 
     config = Config(FRONTEND_URL="fe url", PUBLIC_TOKEN_REPORT_URL="report public")
+    db_connection = get_mongodb_connection(config)
+    redis_cache = get_redis_cache(config)
 
     def get_component_data(*args, **kwargs):
         return WebResponse(status_code=200, content=[{"some_field": "some_data"}])
@@ -78,6 +82,8 @@ def test_report_snaphot(repo, mocker):
         report_id="device_details_report",
         components=[all_devices_component],
         config=config,
+        db_connection=db_connection,
+        redis_cache=redis_cache,
     )
 
     devices_overview_report.attach("all_devices")

@@ -5,6 +5,7 @@ from licenseware import (
     FileValidationResponse,
     MongoRepository,
     ValidationResponse,
+    get_mongodb_connection,
     login_user,
 )
 from licenseware.uploader.default_handlers import default_check_quota_handler
@@ -15,6 +16,7 @@ from licenseware.uploader.default_handlers import default_check_quota_handler
 def test_default_check_quota_handler():
 
     config = Config()
+    db_connection = get_mongodb_connection(config)
 
     user = login_user("alin@licenseware.io", "super-secret", config.AUTH_USER_LOGIN_URL)
 
@@ -30,7 +32,7 @@ def test_default_check_quota_handler():
     )
 
     repo = MongoRepository(
-        config.mongo_db_connection,
+        db_connection,
         collection=config.MONGO_COLLECTION.QUOTA,
         data_validator="ignore",
     )
@@ -52,8 +54,7 @@ def test_default_check_quota_handler():
 def test_raw_find():
 
     config = Config()
-
-    conn = config.mongo_db_connection
+    conn = get_mongodb_connection(config)
 
     conn["QuotaTest"].insert_one(
         {

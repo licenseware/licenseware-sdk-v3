@@ -5,7 +5,6 @@ from functools import wraps
 from typing import Any, Callable, Union
 
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
-from licenseware.repository.repository_interface import RepositoryInterface
 from licenseware.utils.logger import log as logg
 
 from .metadata import create_metadata, get_metadata
@@ -13,7 +12,7 @@ from .schemas import entities_validator, remove_entities_validator
 from .step import save_filecontent_validation, save_filename_validation, save_step
 
 
-def add_entities(event_id: str, entities: list, repo: RepositoryInterface):
+def add_entities(event_id: str, entities: list, repo: MongoRepository):
     """
     Add reference ids to entities like databases, devices etc
     Usage:
@@ -37,7 +36,7 @@ def add_entities(event_id: str, entities: list, repo: RepositoryInterface):
 def remove_entities(
     event_id: str,
     entities: list,
-    repo: RepositoryInterface,
+    repo: MongoRepository,
 ):
     """
     Remove reference ids to entities like databases, devices etc from history
@@ -68,7 +67,7 @@ def log_success(
     uploader_id: str,
     app_id: str,
     filepath: str,
-    repo: RepositoryInterface,
+    repo: MongoRepository,
     on_success_save: str = None,
     step: str = None,
     func_source: str = None,
@@ -138,7 +137,7 @@ def log_failure(
     filepath: str,
     error_string: str,
     traceback_string: str,
-    repo: RepositoryInterface,
+    repo: MongoRepository,
     on_failure_save: str = None,
     step: str = None,
     func_source: str = None,
@@ -211,7 +210,7 @@ def log_filename_validation(
     uploader_id: str,
     app_id: str,
     filename_validation: list,
-    repo: RepositoryInterface,
+    repo: MongoRepository,
 ):
 
     return save_filename_validation(
@@ -231,7 +230,7 @@ def log_filecontent_validation(
     app_id: str,
     filecontent_validation: list,
     filepaths: list,
-    repo: RepositoryInterface,
+    repo: MongoRepository,
 ):
     return save_filecontent_validation(
         tenant_id=tenant_id,

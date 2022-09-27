@@ -10,6 +10,8 @@ from licenseware import (
     ReportFilter,
     StyleAttrs,
     SummaryAttrs,
+    get_mongodb_connection,
+    get_redis_cache,
 )
 
 # pytest -s -v tests/test_report.py
@@ -21,6 +23,8 @@ t = unittest.TestCase()
 def test_parse_report_components():
 
     config = Config(FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
+    db_connection = get_mongodb_connection(config)
+    redis_cache = get_redis_cache(config)
 
     # Declaring some attributes
     summary = (
@@ -55,6 +59,8 @@ def test_parse_report_components():
         filters=[],
         components=[fmw_summary_component],
         config=config,
+        db_connection=db_connection,
+        redis_cache=redis_cache,
     )
 
     # fmw_deployment_report.attach("fmw_summary")
@@ -82,6 +88,8 @@ def test_report_creation(mocker):
     mocker.patch("requests.get", return_value=RequestsResponse)
 
     config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
+    db_connection = get_mongodb_connection(config)
+    redis_cache = get_redis_cache(config)
 
     FMW_FILTERS = (
         ReportFilter()
@@ -166,6 +174,8 @@ def test_report_creation(mocker):
         filters=FMW_FILTERS,
         components=report_components,
         config=config,
+        db_connection=db_connection,
+        redis_cache=redis_cache,
     )
 
     # Attaching a report component to a report
@@ -198,6 +208,8 @@ def test_report_creation(mocker):
 def test_report_metadata_connected_apps():
 
     config = Config(APP_ID="odb-service", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
+    db_connection = get_mongodb_connection(config)
+    redis_cache = get_redis_cache(config)
 
     fmw_deployment_report = NewReport(
         name="Oracle Fusion Middleware Deployment",
@@ -205,6 +217,8 @@ def test_report_metadata_connected_apps():
         description="Provides overview of Oracle Fusion Middleware deployed components and product bundles.",
         filters=[],
         config=config,
+        db_connection=db_connection,
+        redis_cache=redis_cache
         # connected_apps=["odb-service", "ifmp-service"],
     )
 

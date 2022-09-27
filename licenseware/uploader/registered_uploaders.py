@@ -9,6 +9,7 @@ from licenseware.history.history_class import History
 from licenseware.notifications.publish_notification import publish_notification
 from licenseware.pubsub.producer import Producer
 from licenseware.pubsub.types import EventType
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 from licenseware.uploader.uploader import NewUploader
 from licenseware.utils.alter_string import get_altered_strings
@@ -27,8 +28,12 @@ class RegisteredUploaders:  # pragma no cover
         registry_updater: Callable,
         producer: Producer,
         config: Config,
+        redis_cache: RedisCache,
+        mongodb_connection: Any,
     ) -> None:
         self.config = config
+        self.redis_cache = redis_cache
+        self.mongodb_connection = mongodb_connection
         self.producer = producer
         self.uploaders = uploaders
         self.registry_updater = registry_updater
@@ -146,7 +151,7 @@ class RegisteredUploaders:  # pragma no cover
     ):
         uploader = self._get_current_uploader(uploader_id)
         return uploader.check_status_handler(
-            tenant_id, uploader.uploader_id, self.config
+            tenant_id, uploader.uploader_id, self.redis_cache
         )
 
     @failsafe
@@ -182,7 +187,11 @@ class RegisteredUploaders:  # pragma no cover
 
         uploader = self._get_current_uploader(event["uploader_id"])
         response = uploader.update_status_handler(
-            event["tenant_id"], uploader.uploader_id, status, self.config
+            event["tenant_id"],
+            uploader.uploader_id,
+            status,
+            self.redis_cache,
+            self.config,
         )
         self.registry_updater(fresh_connect=True)
 
@@ -207,7 +216,7 @@ class RegisteredUploaders:  # pragma no cover
             },
         )
 
-        historyrepo = self._get_history_repo(self.config.mongo_db_connection)
+        historyrepo = self._get_history_repo(self.mongodb_connection)
         self._log_processing_time(
             event["tenant_id"],
             event["event_id"],

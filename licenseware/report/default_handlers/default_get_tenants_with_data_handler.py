@@ -1,12 +1,12 @@
-from licenseware.config.config import Config
+from licenseware.config.config import Collections
 from licenseware.repository.mongo_repository.mongo_repository import MongoRepository
 
 
-def _get_repo(config: Config):
+def _get_repo(db_connection):
 
     repo = MongoRepository(
-        config.mongo_db_connection,
-        collection=config.MONGO_COLLECTION.DATA,
+        db_connection,
+        collection=Collections.DATA,
         data_validator="ignore",
     )
 
@@ -37,9 +37,9 @@ def _get_pipeline(tenant_id: str):
     return pipeline
 
 
-def default_get_tenants_with_data_handler(config: Config, tenant_id: str = None):
+def default_get_tenants_with_data_handler(db_connection, tenant_id: str = None):
 
-    repo = _get_repo(config)
+    repo = _get_repo(db_connection)
     pipeline = _get_pipeline(tenant_id)
 
     last_update_dates = repo.execute_query(pipeline)

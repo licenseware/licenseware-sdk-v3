@@ -131,8 +131,6 @@ class ReportSnapshot:
             "component_id": component_id,
         }
 
-        print(filters)
-
         updated_doc = self.repo.update_one(
             filters=filters,
             data=data,

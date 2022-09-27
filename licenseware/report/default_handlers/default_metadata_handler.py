@@ -4,6 +4,8 @@ from typing import List
 from licenseware.config.config import Config
 from licenseware.constants.alias_types import AppId
 from licenseware.constants.states import States
+from licenseware.redis_cache.redis_cache import RedisCache
+from licenseware.utils.get_machine_info import get_machine_headers
 from licenseware.utils.get_registry_metadata import get_registry_metadata
 from licenseware.utils.logger import log
 
@@ -13,15 +15,17 @@ class DefaultMetadataHandler:
         self,
         connected_apps: List[AppId],
         config: Config,
+        redis_cache: RedisCache,
     ):
         self.config = config
+        self.redis_cache = redis_cache
         self.connected_apps = connected_apps
 
     def _get_connected_uploader_metadata(self, app_id: str):
         try:
             metadata = get_registry_metadata(
                 url=self.config.REGISTRY_SERVICE_UPLOADERS_URL,
-                headers=self.config.get_machine_headers(),
+                headers=get_machine_headers(self.redis_cache),
                 app_id=app_id,
             )
             assert metadata is not None
@@ -36,7 +40,7 @@ class DefaultMetadataHandler:
         try:
             metadata = get_registry_metadata(
                 url=self.config.REGISTRY_SERVICE_APPS_URL,
-                headers=self.config.get_machine_headers(),
+                headers=get_machine_headers(self.redis_cache),
                 app_id=app_id,
             )
             assert metadata is not None

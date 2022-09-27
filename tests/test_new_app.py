@@ -11,6 +11,8 @@ from licenseware import (
     NewUploader,
     StyleAttrs,
     SummaryAttrs,
+    get_mongodb_connection,
+    get_redis_cache,
 )
 
 # pytest -s -v tests/test_new_app.py
@@ -43,6 +45,8 @@ def test_new_app():
 def test_adding_objects():
 
     config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
+    db_connection = get_mongodb_connection(config)
+    redis_cache = get_redis_cache(config)
 
     summary = (
         SummaryAttrs()
@@ -75,6 +79,8 @@ def test_adding_objects():
         filters=[],
         config=config,
         connected_apps=["odb-service", "ifmp-service"],
+        db_connection=db_connection,
+        redis_cache=redis_cache,
     )
 
     def workerfunc(event):
@@ -87,6 +93,7 @@ def test_adding_objects():
         accepted_file_types=[".xlsx"],
         worker=workerfunc,
         config=config,
+        redis_cache=redis_cache,
     )
 
     app = NewApp(

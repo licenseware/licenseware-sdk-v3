@@ -8,10 +8,9 @@ def default_update_status_handler(
     tenant_id: str,
     uploader_id: str,
     status: str,
+    redis_cache: RedisCache,
     config: Config,
 ):  # pragma no cover
-
-    redisdb = RedisCache(config)
 
     data = {
         "tenant_id": tenant_id,
@@ -20,7 +19,7 @@ def default_update_status_handler(
         "updated_at": datetime.datetime.utcnow().isoformat(),
     }
 
-    return redisdb.set(
+    return redis_cache.set(
         key=f"uploader_status:{uploader_id}:{tenant_id}",
         value=data,
         expiry=config.EXPIRE_UPLOADER_STATUS,

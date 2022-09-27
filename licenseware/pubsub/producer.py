@@ -1,7 +1,14 @@
+# In python 3.11+ this will not be necessary (typing hack)
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma no cover
+    from licenseware.config.config import Config
+
 import json
 from typing import Callable
 
-from licenseware.config.config import Config
 from licenseware.utils.logger import log
 
 from .types import EventType, TopicType

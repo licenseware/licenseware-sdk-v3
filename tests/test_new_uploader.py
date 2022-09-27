@@ -4,6 +4,7 @@ from licenseware import (
     NewUploader,
     UploaderEncryptionParameters,
     UploaderValidationParameters,
+    get_redis_cache,
 )
 from licenseware.uploader.default_handlers import (
     default_filecontents_validation_handler,
@@ -21,6 +22,7 @@ def test_new_uploader(mocker):
     mocker.patch("requests.post", return_value=RequestsResponse)
 
     config = Config(APP_ID="ifmp")
+    redis_cache = get_redis_cache(config)
 
     filenames = ["notok.csv", "rv_tools.xlsx"]
 
@@ -44,6 +46,7 @@ def test_new_uploader(mocker):
         validation_parameters=rv_tools_validation_parameters,
         encryption_parameters=rv_tools_encryption_parameters,
         config=config,
+        redis_cache=redis_cache,
     )
 
     response = rv_tools_uploader.filenames_validation_handler(
@@ -83,6 +86,7 @@ def test_new_uploader_custom_handlers(mocker):
     mocker.patch("requests.post", return_value=RequestsResponse)
 
     config = Config()
+    redis_cache = get_redis_cache(config)
 
     filenames = ["notok.csv", "rv_tools.xlsx"]
 
@@ -120,6 +124,7 @@ def test_new_uploader_custom_handlers(mocker):
         filenames_validation_handler=custom_validate_filenames,
         filecontents_validation_handler=custom_validate_filecontents,
         config=config,
+        redis_cache=redis_cache,
     )
 
     response = rv_tools_uploader.filenames_validation_handler(

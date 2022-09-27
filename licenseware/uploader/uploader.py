@@ -10,6 +10,7 @@ from licenseware.constants.uploader_types import (
 )
 from licenseware.constants.web_response import WebResponse
 from licenseware.constants.worker_event_type import WorkerEvent
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
     default_check_status_handler,
@@ -29,6 +30,7 @@ class NewUploader:
     uploader_id: str
     accepted_file_types: tuple
     config: Config
+    redis_cache: RedisCache
     worker: Callable[[WorkerEvent], None]
     free_quota_units: int = 1
     used_collections: List[str] = None
@@ -56,7 +58,11 @@ class NewUploader:
         WebResponse,
     ] = default_check_quota_handler
     check_status_handler: Callable[
-        [alias.TenantId, alias.UploaderId, Config],
+        [
+            alias.TenantId,
+            alias.UploaderId,
+            RedisCache,
+        ],
         WebResponse,
     ] = default_check_status_handler
     update_status_handler: Callable[
@@ -64,6 +70,7 @@ class NewUploader:
             alias.TenantId,
             alias.UploaderId,
             alias.Status,
+            RedisCache,
             Config,
         ],
         UploaderStatusResponse,
@@ -124,5 +131,5 @@ class NewUploader:
         return metadata
 
     def _get_uploader_statuses(self):
-        results = self.config.redisdb.get(f"uploader_status:{self.uploader_id}:*")
+        results = self.redis_cache.get(f"uploader_status:{self.uploader_id}:*")
         return results

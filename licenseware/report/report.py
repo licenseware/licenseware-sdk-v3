@@ -1,10 +1,11 @@
 import datetime
 from dataclasses import dataclass
-from typing import Callable, Dict, List
+from typing import Any, Callable, Dict, List
 
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.utils.alter_string import get_altered_strings
 
 from .default_handlers import (
@@ -21,13 +22,15 @@ class NewReport:
     description: str
     report_id: str
     config: Config
+    db_connection: Any
+    redis_cache: RedisCache
     connected_apps: List[alias.AppId] = None
     flags: List[str] = None
     filters: ReportFilter = None
     components: List[NewReportComponent] = None
     registrable: bool = True
     tenants_with_data_handler: Callable[
-        [alias.Repository, alias.TenantId],
+        [alias.DBConnection, alias.TenantId],
         List[Dict[alias.TenantId, alias.UpdatedAt]],
     ] = default_get_tenants_with_data_handler
     external_metadata_handler: DefaultMetadataHandler = DefaultMetadataHandler
@@ -75,11 +78,9 @@ class NewReport:
         if not self.registrable:
             return
 
-        tenants_with_data = self.tenants_with_data_handler(
-            self.config.mongo_db_connection
-        )
+        tenants_with_data = self.tenants_with_data_handler(self.db_connection)
         metadata: DefaultMetadataHandler = self.external_metadata_handler(
-            self.connected_apps, self.config
+            self.connected_apps, self.config, self.redis_cache
         )
         apps_metadata = metadata.get_connected_apps_metadata(parrent_app_metadata)
         uploaders_metadata = metadata.get_connected_uploaders_metadata(
