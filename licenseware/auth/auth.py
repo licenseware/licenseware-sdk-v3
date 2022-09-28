@@ -31,10 +31,12 @@ def login_machine(config: Config, redis_cache: RedisCache, _retry_in: int = 0):
         )
 
         if response.status_code != 200:
+            log.warning(response.content)
             log.error(f"Could not login '{config.MACHINE_NAME}'")
             time.sleep(_retry_in)
             login_machine(config, redis_cache, _retry_in)
-    except:
+    except Exception as err:
+        log.warning(err)
         log.error(f"Could not login '{config.MACHINE_NAME}'")
         time.sleep(_retry_in)
         login_machine(config, redis_cache, _retry_in)
