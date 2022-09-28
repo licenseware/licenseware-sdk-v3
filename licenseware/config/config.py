@@ -88,7 +88,7 @@ class Config(BaseSettings):  # pragma no cover
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
     REDIS_RESULT_CACHE_DB: int = 1
-    REDIS_PASSWORD: int = None
+    REDIS_PASSWORD: str = None
     EXPIRE_REGISTRATION: int = 900  # 15 mins
     EXPIRE_UPLOADER_STATUS: int = 7200  # 2 hours
     EXPIRE_USER_CHECK: int = 60  # 1 minute
