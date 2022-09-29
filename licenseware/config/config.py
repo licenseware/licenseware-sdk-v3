@@ -1,8 +1,5 @@
-import uuid
-
 from licenseware.constants.base_enum import BaseEnum
 from licenseware.dependencies import BaseSettings
-from licenseware.utils.alter_string import get_altered_strings
 
 
 class Collections(BaseEnum):
@@ -42,49 +39,46 @@ class WebAppFramework(BaseEnum):
 
 
 class Config(BaseSettings):  # pragma no cover
-    APP_ID: str = "app"
-    APP_SECRET: str = str(uuid.uuid4())
-    FILE_UPLOAD_PATH: str = "/tmp/client-files"
+    APP_ID: str
+    APP_SECRET: str
+    FILE_UPLOAD_PATH: str
     CURRENT_ENVIRONMENT: Environment = Environment.DEV
     ENVIRONMENTS: Environment = Environment
     LOG_LEVEL: LogLevel = LogLevel.INFO
     PORT: int = 8000
-    DASHBOARD_WORKERS_HOST: str = "127.0.0.1"
-    DASHBOARD_WORKERS_PORT: int = 5567
+    DASHBOARD_WORKERS_HOST: str
+    DASHBOARD_WORKERS_PORT: int
 
-    BASE_URL: str = "http://localhost"
-    APP_URL: str = BASE_URL + "/" + APP_ID
-    PUBLIC_TOKEN_REPORT_URL: str = None
-    FRONTEND_URL: str = "http://frontend.localhost"
+    BASE_URL: str
+    APP_URL: str
+    PUBLIC_TOKEN_REPORT_URL: str
+    FRONTEND_URL: str
 
-    MACHINE_NAME: str = "testing-service"
-    MACHINE_PASSWORD: str = "lware-secret"
+    MACHINE_NAME: str
+    MACHINE_PASSWORD: str
 
-    AUTH_SERVICE_URL: str = "http://localhost/auth"
-    AUTH_MACHINE_LOGIN_URL: str = AUTH_SERVICE_URL + "/machines/login"
-    AUTH_USER_LOGIN_URL: str = AUTH_SERVICE_URL + "/login"
-    AUTH_USER_INFO_URL: str = AUTH_SERVICE_URL + "/users/tables"
-    AUTH_MACHINE_CHECK_URL: str = AUTH_SERVICE_URL + "/machine_authorization"
-    AUTH_USER_CHECK_URL: str = AUTH_SERVICE_URL + "/verify"
+    AUTH_SERVICE_URL: str
+    AUTH_MACHINE_LOGIN_URL: str
+    AUTH_USER_LOGIN_URL: str
+    AUTH_USER_INFO_URL: str
+    AUTH_MACHINE_CHECK_URL: str
+    AUTH_USER_CHECK_URL: str
 
-    REGISTRY_SERVICE_URL: str = "http://localhost:3001/registry-service"
-    REGISTRY_SERVICE_APPS_URL: str = REGISTRY_SERVICE_URL + "/apps"
-    REGISTRY_SERVICE_UPLOADERS_URL: str = REGISTRY_SERVICE_URL + "/uploaders"
-    REGISTRY_SERVICE_REPORTS_URL: str = REGISTRY_SERVICE_URL + "/reports"
-    REGISTRY_SERVICE_COMPONENTS_URL: str = REGISTRY_SERVICE_URL + "/report-components"
+    REGISTRY_SERVICE_URL: str
+    REGISTRY_SERVICE_APPS_URL: str
+    REGISTRY_SERVICE_UPLOADERS_URL: str
+    REGISTRY_SERVICE_REPORTS_URL: str
+    REGISTRY_SERVICE_COMPONENTS_URL: str
 
-    MONGO_HOST: str = "localhost"
+    MONGO_HOST: str
+    MONGO_DBNAME: str
     MONGO_PORT: int = 27017
 
-    @property
-    def MONGO_DBNAME(self):
-        return get_altered_strings(self.APP_ID).title_joined + "DB"
-
-    MONGO_USER: str = "lware"
-    MONGO_PASSWORD: str = "lware-secret"
+    MONGO_USER: str
+    MONGO_PASSWORD: str
     MONGO_COLLECTION: Collections = Collections
 
-    REDIS_HOST: str = "localhost"
+    REDIS_HOST: str
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
     REDIS_RESULT_CACHE_DB: int = 1
@@ -95,7 +89,7 @@ class Config(BaseSettings):  # pragma no cover
     EXPIRE_MACHINE_CHECK: int = 60  # 1 minute
     EXPIRE_NOTIFICATION: int = 259_200  # 3 days
 
-    KAFKA_BROKER_URL: str = "PLAINTEXT://localhost:9092"
+    KAFKA_BROKER_URL: str
     KAFKA_CONSUMER_POLL: float = 1.0
     KAFKA_SECURITY_PROTOCOL: str = "PLAINTEXT"
 
