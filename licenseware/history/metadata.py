@@ -21,6 +21,8 @@ class FuncMetadata:
     filename: str
     db_connection: Any
     config: Config
+    func_args: tuple
+    func_kwargs: dict
 
 
 def create_metadata(
@@ -33,6 +35,9 @@ def create_metadata(
     filepath: str,
     func_name: str = None,
     func_source: str = None,
+    func_processing_time: str = None,
+    func_args: tuple = None,
+    func_kwargs: dict = None,
 ):
     metadata = {
         "callable": func_name,
@@ -44,6 +49,9 @@ def create_metadata(
         "uploader_id": uploader_id,
         "filepath": filepath,
         "filename": os.path.basename(filepath),
+        "func_processing_time": func_processing_time,
+        "func_args": utils.get_parsed_func_args(func_args),
+        "func_kwargs": utils.get_parsed_func_kwargs(func_kwargs),
     }
 
     return metadata
@@ -53,12 +61,8 @@ def get_metadata(func, func_args, func_kwargs):
 
     metadata = FuncMetadata(
         callable=func.__name__,
-        step=func.__doc__.strip() if func.__doc__ else func.__name__,
-        source=str(inspect.getmodule(func))
-        .split("from")[1]
-        .strip()
-        .replace("'", "")
-        .replace(">", ""),
+        step=utils.get_func_doc(func),
+        source=utils.get_func_source(func),
         tenant_id=utils.get_tenant_id(func, func_args, func_kwargs),
         event_id=utils.get_event_id(func, func_args, func_kwargs),
         app_id=utils.get_app_id(func, func_args, func_kwargs),
@@ -67,9 +71,13 @@ def get_metadata(func, func_args, func_kwargs):
         filename=utils.get_filename(func, func_args, func_kwargs),
         db_connection=utils.get_db_connection(func, func_args, func_kwargs),
         config=utils.get_config(func, func_args, func_kwargs),
+        func_args=utils.get_parsed_func_args(func_args),
+        func_kwargs=utils.get_parsed_func_kwargs(func_kwargs),
     )
 
     for field in fields(metadata):
+        if field.name in {"func_args", "func_kwargs"}:
+            continue
         if getattr(metadata, field.name) is None:
             raise Exception(
                 f"Field '{field.name}' not found on function '{func.__name__}' (self or args/kwargs)"

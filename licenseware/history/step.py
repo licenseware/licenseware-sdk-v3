@@ -80,6 +80,9 @@ def save_processing_details(metadata, response, repo: MongoRepository):
                 "source": metadata["source"],
                 "filename": metadata["filename"],
                 "updated_at": datetime.datetime.utcnow().isoformat(),
+                "func_processing_time": metadata.get("func_processing_time"),
+                "func_args": metadata["func_args"],
+                "func_kwargs": metadata["func_kwargs"],
             }
         ],
     }

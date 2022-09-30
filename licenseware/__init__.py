@@ -6,6 +6,7 @@ from licenseware.datatable import *
 from licenseware.dependencies import *
 from licenseware.exceptions import *
 from licenseware.history.history_class import History
+from licenseware.history.history_logger_metaclass import HistoryLogger
 from licenseware.notifications import *
 from licenseware.pubsub import *
 from licenseware.quota import *

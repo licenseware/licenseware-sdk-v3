@@ -143,7 +143,7 @@ from app.dependencies.workers import worker
 from licenseware import States, log
 from settings import config
 
-from .rv_tools_data_worker import file_workflow_rvtools
+from .rv_tools_data_worker import ProcessRVToolsEvent
 
 
 @worker.task(name="rv_tools_worker", queue=config.APP_ID)
@@ -155,17 +155,10 @@ def rv_tools_worker(event: dict):
     log.debug(event)
 
     registered_uploaders.publish_processing_status(event, States.RUNNING)
-
     try:
-        for filepath in event["filepaths"]:
-            _event = {**{"filepath": filepath}, **event}
-            file_workflow_rvtools(
-                _event,
-                filepath=filepath,
-            )
+        ProcessRVToolsEvent(event).run_processing_pipeline()
     finally:
         registered_uploaders.publish_processing_status(event, States.IDLE)
-
         log.info("Finished working")
 
 ```
@@ -192,6 +185,48 @@ event = {
 - `clear_data` - bool which if is true you must delete previous processed data;
 - `event_id` - uuid unique to this processing request;
 - `app_id` - the unique app id which holds this uploader;
+
+
+Ideally the file process event handler (`ProcessUplaoderIdEvent`) would look something like this:
+
+```py
+# rv_tools_data_worker.py
+
+from typing import List
+from licenseware import HistoryLogger, WorkerEvent, get_mongodb_connection
+from settings import config
+
+class ProcessRVToolsEvent(metaclass=HistoryLogger):
+    def __init__(self, event: dict) -> None:
+        self.event = WorkerEvent(**event)
+        self.db_connection = get_mongodb_connection(config)
+        self.config = config
+
+    def get_raw_data_from_file(self, filepath: str):
+        time.sleep(0.3)
+        print("Getting raw data from file")
+
+    def extract_virtual_devices(self, raw_data: List[dict]):
+        time.sleep(0.1)
+        print("Extracting virtual devices")
+
+    def save_virtual_devices(self, virtual_devices: List[dict]):
+        time.sleep(0.5)
+        print("Saving virtual devices")
+
+    def run_processing_pipeline(self):
+        for fp in self.event.filepaths:
+            # Needed for history
+            self.filepath = fp
+            self.filename = os.path.basename(fp)
+            # The file processing pipeline
+            raw_data = self.get_raw_data_from_file(filepath=fp)
+            virtual_devices = self.extract_virtual_devices(raw_data)
+            self.save_virtual_devices(virtual_devices)
+
+```
+
+`HistoryLogger` - will log all methods from this class and save information related to the success/failure of the pipeline operation. This way it's easier to see which functions failed, why (traceback error is saved) on which tenant and so on.
 
 
 Attach to a new uploader what we defined up:
@@ -779,7 +814,36 @@ Checkout `licenseware/repository/mongo_repository` for more information.
 
 In order to have a history of the processing steps from begining to the end `licenseware.history.log` decorator can be used to decorate processing functions.
 
-Below is an basic usage example:
+Recomended way of using history:
+
+```py
+
+from typing import List
+from licenseware import WorkerEvent, HistoryLogger, get_mongodb_connection
+from settings import config
+
+
+class ProcessUploaderIdEvent(metaclass=HistoryLogger):
+    def __init__(self, event: dict) -> None:
+        self.event = WorkerEvent(**event)
+        self.db_connection = get_mongodb_connection(config)
+        self.config = config  
+
+    # Here add processing funcs
+
+    def run_processing_pipeline(self):
+        for fp in self.event.filepaths:
+            # Needed for HistoryLogger
+            self.filepath = fp
+            self.filename = os.path.basename(fp)
+
+            # Here call the processing funcs in order
+```
+
+`ProcessUploaderIdEvent` will go in the uploader worker function as described on `Uploaders` section.
+
+
+Another usage example:
 
 ```py
 
@@ -827,7 +891,7 @@ Where the `history.log` decorator cannot be used you can create an instance of `
 - `log_failure` - place it where function failed to complete, an error occured;
 - `log_start_processing` and `log_end_processing` - are used in `publish_processing_status` to track the total processing time of the worker;
 
-A basic example:
+Custom usage without using `history.log` decorator:
 
 ```py
 
@@ -873,8 +937,6 @@ class ProcessingClass:
 
 As you can see this method is very verbose an ugly this is what `history.log` decorator does under the hood.
 I takes the required parameters and saves success and failures in encountered in a processing pipeline. 
-
-Checkout `licenseware/repository/history` for more information.
 
 
 <a name="pubsub"></a>

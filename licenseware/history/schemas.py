@@ -23,6 +23,9 @@ class ProcessingDetailsSchema(Schema):
     source = fields.String(required=False, allow_none=True)
     updated_at = fields.String(required=True)
     filename = fields.String(required=True)
+    func_processing_time = fields.String(required=False, allow_none=True)
+    func_args = fields.Raw(required=False, allow_none=True)
+    func_kwargs = fields.Raw(required=False, allow_none=True)
 
 
 class HistorySchema(Schema):
