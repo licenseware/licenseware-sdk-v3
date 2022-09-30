@@ -130,6 +130,10 @@ class RegisteredUploaders:  # pragma no cover
             historyrepo,
         )
 
+        self._clear_used_collections(
+            db_connection, tenant_id, clear_data, uploader.used_collections
+        )
+
         event = {
             "tenant_id": tenant_id,
             "authorization": authorization,
@@ -228,6 +232,20 @@ class RegisteredUploaders:  # pragma no cover
         return response
 
     # PRIVATE
+
+    def _clear_used_collections(
+        self,
+        db_connection,
+        tenant_id: str,
+        clear_data: bool,
+        used_collections: List[str],
+    ):
+        if not clear_data:
+            return
+
+        repo = MongoRepository(db_connection, data_validator="ignore")
+        for collection in used_collections:
+            repo.delete_many({"tenant_id": tenant_id}, collection)
 
     def _get_current_uploader(self, uploader_id: Enum):
 
