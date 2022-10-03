@@ -1,7 +1,6 @@
 import unittest
 
 from licenseware import (
-    Config,
     ErrorAlreadyAttached,
     Flags,
     Icons,
@@ -15,6 +14,9 @@ from licenseware import (
     get_redis_cache,
 )
 
+from . import config
+
+
 # pytest -s -v tests/test_new_app.py
 
 t = unittest.TestCase()
@@ -22,8 +24,6 @@ t = unittest.TestCase()
 
 # pytest -s -v tests/test_new_app.py::test_new_app
 def test_new_app():
-
-    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
 
     fmw = NewApp(
         name="Oracle Middleware Manager",
@@ -44,7 +44,6 @@ def test_new_app():
 # pytest -s -v tests/test_new_app.py::test_adding_objects
 def test_adding_objects():
 
-    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
     db_connection = get_mongodb_connection(config)
     redis_cache = get_redis_cache(config)
 

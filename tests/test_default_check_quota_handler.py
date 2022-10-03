@@ -1,7 +1,6 @@
 import uuid
 
 from licenseware import (
-    Config,
     FileValidationResponse,
     MongoRepository,
     ValidationResponse,
@@ -9,16 +8,22 @@ from licenseware import (
     login_user,
 )
 from licenseware.uploader.default_handlers import default_check_quota_handler
+from . import config, tenant_id
+
 
 # pytest -s -v tests/test_default_check_quota_handler.py
 
 # pytest -s -v tests/test_default_check_quota_handler.py::test_default_check_quota_handler
-def test_default_check_quota_handler():
+def test_default_check_quota_handler(mocker):
 
-    config = Config()
+    user = {"TenantId": tenant_id, "Authorization": tenant_id}
+
+    mocker.patch(
+        "licenseware.quota.get_user_info",
+        return_value={"user": {"id": tenant_id, "plan_type": "Free"}},
+    )
+
     db_connection = get_mongodb_connection(config)
-
-    user = login_user("alin@licenseware.io", "super-secret", config.AUTH_USER_LOGIN_URL)
 
     fileResponse = FileValidationResponse(
         status="success",
@@ -53,7 +58,6 @@ def test_default_check_quota_handler():
 # pytest -s -v tests/test_default_check_quota_handler.py::test_raw_find
 def test_raw_find():
 
-    config = Config()
     conn = get_mongodb_connection(config)
 
     conn["QuotaTest"].insert_one(

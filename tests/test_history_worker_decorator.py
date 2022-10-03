@@ -2,35 +2,8 @@ import os
 import uuid
 import time
 from typing import List
-from licenseware import WorkerEvent, HistoryLogger, Config, get_mongodb_connection
-
-
-config = Config(
-    APP_ID="ifmp-service",
-    APP_SECRET="super-secret",
-    BASE_URL="http/todo",
-    PUBLIC_TOKEN_REPORT_URL="",
-    FRONTEND_URL="",
-    MACHINE_NAME="ifmp-service",
-    MACHINE_PASSWORD="",
-    AUTH_SERVICE_URL="",
-    AUTH_MACHINE_LOGIN_URL="",
-    AUTH_USER_LOGIN_URL="",
-    AUTH_USER_INFO_URL="",
-    AUTH_MACHINE_CHECK_URL="",
-    AUTH_USER_CHECK_URL="",
-    REGISTRY_SERVICE_URL="",
-    REGISTRY_SERVICE_APPS_URL="",
-    REGISTRY_SERVICE_UPLOADERS_URL="",
-    REGISTRY_SERVICE_REPORTS_URL="",
-    REGISTRY_SERVICE_COMPONENTS_URL="",
-    MONGO_HOST="localhost",
-    MONGO_DBNAME="db",
-    MONGO_USER="lware",
-    MONGO_PASSWORD="lware-secret",
-    REDIS_HOST="",
-    KAFKA_BROKER_URL="",
-)
+from licenseware import WorkerEvent, HistoryLogger, get_mongodb_connection
+from . import config
 
 
 class ProcessRVToolsEvent(metaclass=HistoryLogger):

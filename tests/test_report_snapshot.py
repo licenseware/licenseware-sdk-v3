@@ -2,7 +2,6 @@ import pytest
 from pymongo import MongoClient
 
 from licenseware import (
-    Config,
     MongoRepository,
     NewReport,
     NewReportComponent,
@@ -14,7 +13,7 @@ from licenseware import (
     get_redis_cache,
 )
 
-from . import tenant_id
+from . import tenant_id, config
 
 
 @pytest.fixture
@@ -27,7 +26,6 @@ def mongo_connection():
 
 @pytest.fixture
 def repo(mongo_connection):
-    config = Config()
     return MongoRepository(
         mongo_connection,
         collection=config.MONGO_COLLECTION.REPORT_SNAPSHOTS,
@@ -49,7 +47,6 @@ def test_report_snaphot(repo, mocker):
     mocker.patch("requests.post", return_value=RequestsResponse)
     mocker.patch("requests.get", return_value=RequestsResponse)
 
-    config = Config(FRONTEND_URL="fe url", PUBLIC_TOKEN_REPORT_URL="report public")
     db_connection = get_mongodb_connection(config)
     redis_cache = get_redis_cache(config)
 

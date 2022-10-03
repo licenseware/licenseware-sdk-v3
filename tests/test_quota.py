@@ -1,15 +1,8 @@
 import pytest
 from pymongo import MongoClient
 
-from licenseware import Config, MongoRepository, Quota, login_user
-from licenseware.config import config as cfg
-
-
-class CustomConfig(Config):
-    CURRENT_ENVIRONMENT: cfg.Environment = cfg.Environment.DESKTOP
-
-
-config = CustomConfig()
+from licenseware import MongoRepository, Quota, login_user
+from . import config
 
 
 @pytest.fixture

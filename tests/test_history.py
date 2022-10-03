@@ -4,8 +4,9 @@ import uuid
 import pytest
 from pymongo import MongoClient
 
-from licenseware import Config, History, MongoRepository, history
+from licenseware import History, MongoRepository, history
 from licenseware.history.metadata import get_metadata
+from . import config
 
 
 @pytest.fixture
@@ -31,14 +32,6 @@ def test_get_metadata():
 
 # pytest -s -v tests/test_history.py::test_history_log_decorator
 def test_history_log_decorator(mongo_connection):
-
-    from licenseware import Config
-
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
-
     class InfraService:
         def __init__(self):
             self.event_id = str(uuid.uuid4())
@@ -64,10 +57,6 @@ def test_history_log_decorator(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_class_log_filename_validation
 def test_history_class_log_filename_validation(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
@@ -97,10 +86,6 @@ def test_history_class_log_filename_validation(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_class_log_filecontent_validation
 def test_history_class_log_filecontent_validation(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
@@ -131,10 +116,6 @@ def test_history_class_log_filecontent_validation(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_class_log_success
 def test_history_class_log_success(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
@@ -174,10 +155,6 @@ def test_history_class_log_success(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_class_log_failure
 def test_history_class_log_failure(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
@@ -221,10 +198,6 @@ def test_history_class_log_failure(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_log_filename_validation
 def test_history_log_filename_validation(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
@@ -251,10 +224,6 @@ def test_history_log_filename_validation(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_log_filecontent_validation
 def test_history_log_filecontent_validation(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
@@ -282,10 +251,6 @@ def test_history_log_filecontent_validation(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_log_success
 def test_history_log_success(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     repo = MongoRepository(mongo_connection, collection=config.MONGO_COLLECTION.HISTORY)
 
@@ -311,10 +276,6 @@ def test_history_log_success(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_log_failure
 def test_history_log_failure(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     repo = MongoRepository(mongo_connection, collection=config.MONGO_COLLECTION.HISTORY)
 
@@ -342,10 +303,6 @@ def test_history_log_failure(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_entities
 def test_history_entities(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     repo = MongoRepository(mongo_connection, collection=config.MONGO_COLLECTION.HISTORY)
 
@@ -389,10 +346,6 @@ def test_history_entities(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_class_log_decorator
 def test_history_class_log_decorator(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
@@ -440,10 +393,6 @@ def test_history_class_log_decorator(mongo_connection):
 
 # pytest -s -v tests/test_history.py::test_history_class_entities
 def test_history_class_entities(mongo_connection):
-    class CustomConfig(Config):
-        pass
-
-    config = CustomConfig()
 
     history_repo = MongoRepository(
         mongo_connection, collection=config.MONGO_COLLECTION.HISTORY
