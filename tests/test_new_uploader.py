@@ -11,6 +11,9 @@ from licenseware.uploader.default_handlers import (
     default_filenames_validation_handler,
 )
 
+from . import config
+
+
 # pytest -s -v tests/test_new_uploader.py
 
 
@@ -21,7 +24,6 @@ def test_new_uploader(mocker):
 
     mocker.patch("requests.post", return_value=RequestsResponse)
 
-    config = Config(APP_ID="ifmp")
     redis_cache = get_redis_cache(config)
 
     filenames = ["notok.csv", "rv_tools.xlsx"]
@@ -85,7 +87,6 @@ def test_new_uploader_custom_handlers(mocker):
 
     mocker.patch("requests.post", return_value=RequestsResponse)
 
-    config = Config()
     redis_cache = get_redis_cache(config)
 
     filenames = ["notok.csv", "rv_tools.xlsx"]

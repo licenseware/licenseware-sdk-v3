@@ -41,16 +41,20 @@ class WebAppFramework(BaseEnum):
 class Config(BaseSettings):  # pragma no cover
     APP_ID: str
     APP_SECRET: str
-    FILE_UPLOAD_PATH: str
+    FILE_UPLOAD_PATH: str = "/tmp/lware"
     CURRENT_ENVIRONMENT: Environment = Environment.DEV
     ENVIRONMENTS: Environment = Environment
     LOG_LEVEL: LogLevel = LogLevel.INFO
     PORT: int = 8000
-    DASHBOARD_WORKERS_HOST: str
-    DASHBOARD_WORKERS_PORT: int
+    DASHBOARD_WORKERS_HOST: str = None
+    DASHBOARD_WORKERS_PORT: int = None
 
     BASE_URL: str
-    APP_URL: str
+
+    @property
+    def APP_URL(self):
+        return self.BASE_URL + "/" + self.APP_ID
+
     PUBLIC_TOKEN_REPORT_URL: str
     FRONTEND_URL: str
 

@@ -14,6 +14,9 @@ from licenseware import (
     get_redis_cache,
 )
 
+from . import config
+
+
 # pytest -s -v tests/test_report.py
 
 t = unittest.TestCase()
@@ -22,7 +25,6 @@ t = unittest.TestCase()
 # pytest -s -v tests/test_report.py::test_parse_report_components
 def test_parse_report_components():
 
-    config = Config(FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
     db_connection = get_mongodb_connection(config)
     redis_cache = get_redis_cache(config)
 
@@ -87,7 +89,6 @@ def test_report_creation(mocker):
     mocker.patch("requests.post", return_value=RequestsResponse)
     mocker.patch("requests.get", return_value=RequestsResponse)
 
-    config = Config(APP_ID="fmw", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
     db_connection = get_mongodb_connection(config)
     redis_cache = get_redis_cache(config)
 
@@ -207,7 +208,6 @@ def test_report_creation(mocker):
 # pytest -s -v tests/test_report.py::test_report_metadata_connected_apps
 def test_report_metadata_connected_apps():
 
-    config = Config(APP_ID="odb-service", FRONTEND_URL="", PUBLIC_TOKEN_REPORT_URL="")
     db_connection = get_mongodb_connection(config)
     redis_cache = get_redis_cache(config)
 

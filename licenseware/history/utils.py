@@ -1,4 +1,6 @@
 import os
+import json
+import inspect
 
 from .func import get_value_from_func
 
@@ -30,16 +32,56 @@ def get_filepath(func, func_args, func_kwargs):
 
 def get_filename(func, func_args, func_kwargs):
     filepath = get_value_from_func(func, func_args, func_kwargs, "filepath")
-    return os.path.basename(filepath) if filepath else None
+    if filepath is not None:
+        return os.path.basename(filepath)
+    return None
 
 
 def get_db_connection(func, func_args, func_kwargs):
-    repo = get_value_from_func(func, func_args, func_kwargs, "repo")
+    repo = get_value_from_func(func, func_args, func_kwargs, "repo", "db_connection")
     if repo is None:
         return
-    return repo.db_connection
+    if hasattr(repo, "db_connection"):
+        return repo.db_connection
+    return repo
 
 
 def get_config(func, func_args, func_kwargs):
     config = get_value_from_func(func, func_args, func_kwargs, "config")
     return config
+
+
+def get_func_source(func):
+    source = (
+        str(inspect.getmodule(func))
+        .split("from")[1]
+        .strip()
+        .replace("'", "")
+        .replace(">", "")
+    )
+    return f"Method: {str(func).split(' ')[1]} from: {os.path.relpath(source)}"
+
+
+class ObjectHandler(json.JSONEncoder):
+    def default(self, obj):
+        return str(obj)
+
+
+def get_func_doc(func):
+    return func.__doc__.strip() if func.__doc__ else func.__name__
+
+
+def get_parsed_func_args(func_args: tuple):
+
+    if func_args is None:
+        return
+
+    return json.loads(json.dumps(func_args, cls=ObjectHandler))
+
+
+def get_parsed_func_kwargs(func_kwargs: dict):
+
+    if func_kwargs is None:
+        return
+
+    return json.loads(json.dumps(func_kwargs, cls=ObjectHandler))

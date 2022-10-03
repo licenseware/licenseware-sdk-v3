@@ -1,8 +1,8 @@
 import datetime
 
-from licenseware import Config, ReportPublicToken
+from licenseware import ReportPublicToken
 
-from . import tenant_id
+from . import tenant_id, config
 
 # pytest -s -v tests/test_report_public_token.py
 
@@ -31,9 +31,6 @@ def test_report_public_token(mocker):
 
     mocker.patch("requests.get", return_value=MockResponseGet)
     mocker.patch("requests.delete", return_value=MockResponseDelete)
-
-    # Start python3 mock_server.py for this test
-    config = Config(PUBLIC_TOKEN_REPORT_URL="http://localhost:4000/report-public-token")
 
     rpt = ReportPublicToken(
         tenant_id=tenant_id,

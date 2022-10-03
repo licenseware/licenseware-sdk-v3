@@ -2,14 +2,12 @@ from confluent_kafka import Consumer as KafkaConsumer
 from confluent_kafka import Producer as KafkaProducer
 
 from licenseware import Config, Consumer, EventType, Producer, TopicType
+from . import config
 
 # pytest -s -v tests/test_kafka.py
 
 
 def test_kafka_publish():
-
-    config = Config()
-
     def producer_client_factory(config: Config):
         producer_client = KafkaProducer({"bootstrap.servers": config.KAFKA_BROKER_URL})
         return producer_client
@@ -26,9 +24,6 @@ def test_kafka_publish():
 
 
 def test_kafka_subscriber():
-
-    config = Config()
-
     def consumer_client_factory(config: Config):
         consumer_client = KafkaConsumer(
             {

@@ -9,4 +9,3 @@ from .history import (
     log_success,
     remove_entities,
 )
-from .history_class import History
