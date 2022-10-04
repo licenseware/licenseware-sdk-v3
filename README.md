@@ -511,6 +511,7 @@ Each report component created needs to be `registered`in the `report_components/
 
 ```py
 from settings import config
+from app.dependencies.db import redis_cache
 from licenseware import RegisteredComponents
 
 from .all_devices.component import all_devices_component
@@ -518,7 +519,7 @@ from .all_devices.component import all_devices_component
 report_components = [all_devices_component]
 
 
-registered_components = RegisteredComponents(report_components, config)
+registered_components = RegisteredComponents(report_components, redis_cache, config)
 
 ```
 
