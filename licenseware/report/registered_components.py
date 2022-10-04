@@ -10,6 +10,8 @@ from licenseware.repository.mongo_repository.mongo_repository import MongoReposi
 from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.create_file import create_file
 from licenseware.utils.failsafe_decorator import failsafe
+from licenseware.utils.get_machine_info import get_machine_token
+from licenseware.redis_cache.redis_cache import RedisCache
 
 
 class RegisteredComponents:  # pragma no cover
@@ -17,8 +19,14 @@ class RegisteredComponents:  # pragma no cover
     This class acts as a proxy between the web framework and the implementation
     """
 
-    def __init__(self, components: List[NewReportComponent], config: Config) -> None:
+    def __init__(
+        self,
+        components: List[NewReportComponent],
+        redis_cache: RedisCache,
+        config: Config,
+    ) -> None:
         self.config = config
+        self.redis_cache = redis_cache
         self.components = components
         self.components_enum = Enum(
             "ReportComponentsEnum",
@@ -71,7 +79,7 @@ class RegisteredComponents:  # pragma no cover
 
         response = component.get_component_data_handler(
             data["tenant_id"],
-            self.config.machine_token,
+            get_machine_token(self.redis_cache),
             repo,
             filters,
             limit,
