@@ -97,6 +97,14 @@ class Config(BaseSettings):  # pragma no cover
     KAFKA_CONSUMER_POLL: float = 1.0
     KAFKA_SECURITY_PROTOCOL: str = "PLAINTEXT"
 
+    JAEGER_MODE: str = "grpc"
+    JAEGER_COLLECTOR_ENDPOINT_GRPC_ENDPOINT: str = "jaeger-collector:14250"
+    JAEGER_COLLECTOR_THRIFT_URL: str = "http://jaeger-collector:14268"
+    JAEGER_AGENT_HOST_NAME: str = "jaeger-agent"
+    JAEGER_AGENT_PORT: int = 6831
+    OPEN_TELEMETRY_HOST: str = "127.0.0.1"
+    OPEN_TELEMETRY_PORT: int = 6831
+
     CELERY_BROKER_REDIS_DB: int = 1
     CELERY_BACKEND_REDIS_DB: int = 2
     CELERY_BEATS_REGISTRATION_INTERVAL: int = 600  # 10 minutes
