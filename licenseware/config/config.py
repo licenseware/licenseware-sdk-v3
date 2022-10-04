@@ -104,6 +104,7 @@ class Config(BaseSettings):  # pragma no cover
     JAEGER_AGENT_PORT: int = 6831
     OPEN_TELEMETRY_HOST: str = "127.0.0.1"
     OPEN_TELEMETRY_PORT: int = 6831
+    SENTRY_DSN: str
 
     CELERY_BROKER_REDIS_DB: int = 1
     CELERY_BACKEND_REDIS_DB: int = 2

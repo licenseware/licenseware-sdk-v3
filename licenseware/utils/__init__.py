@@ -15,3 +15,4 @@ from .mongo_query_from_filters import get_mongo_query_from_filters
 from .shortid import shortid
 from .ttl_cache import ttl_cache
 from .xss_protection import xss_protection
+from .sentry_capture_exception_decorator import sentry_capture_exception
