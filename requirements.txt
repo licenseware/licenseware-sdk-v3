@@ -1,7 +1,7 @@
 sentry>=22
 sentry-sdk>=1
 PyJWT~=2.4
-flower~=1.2
+flower==0.9.7dow
 fastapi~=0.78
 pydantic[dotenv]==1.10.2
 loguru~=0.6
