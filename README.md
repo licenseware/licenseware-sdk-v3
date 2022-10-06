@@ -23,6 +23,7 @@
 - install virtualenv: `pip3 install virtualenv`;
 - create virtualenv: `virtualenv ./`;
 - activate virtualenv: `source ./bin/activate`;
+- [install these before requirements.txt](https://stackoverflow.com/questions/63859803/cant-install-xmlsec-using-pip-command);
 - install dependencies: `pip3 install -r requirements.txt`;
 - install dependencies: `pip3 install -r requirements-tests.txt`;
 - running tests: `make run-tests`;
