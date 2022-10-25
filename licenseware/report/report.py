@@ -37,13 +37,10 @@ class NewReport:
 
     def __post_init__(self):
 
-        assert self.config.APP_ID is not None
         assert self.config.FRONTEND_URL is not None
         assert self.config.PUBLIC_TOKEN_REPORT_URL is not None
         assert self.config.APP_SECRET is not None
 
-        self.app_id = self.config.APP_ID
-        ns = get_altered_strings(self.app_id).dash
         reportid = get_altered_strings(self.report_id).dash
 
         self._ensure_parrent_is_first_in_connected_apps()
@@ -52,9 +49,9 @@ class NewReport:
 
         self.report_components: Dict[str, NewReportComponent] = dict()
         self.report_components_metadata = None
-        self.url = f"/{ns}/reports/{reportid}"
-        self.public_url = f"/{ns}/public-reports/{reportid}"
-        self.snapshot_url = f"/{ns}/snapshot-reports/{reportid}"
+        self.url = f"/reports/{reportid}"
+        self.public_url = f"/public-reports/{reportid}"
+        self.snapshot_url = f"/snapshot-reports/{reportid}"
 
     def attach(self, component_id: str):
 
@@ -92,7 +89,7 @@ class NewReport:
         )
 
         metadata = {
-            "app_id": self.app_id,
+            "app_id": self.config.APP_ID,
             "report_id": self.report_id,
             "name": self.name,
             "description": self.description,
@@ -137,11 +134,11 @@ class NewReport:
     def _ensure_parrent_is_first_in_connected_apps(self):
 
         if self.connected_apps is None:
-            self.connected_apps = [self.app_id]
+            self.connected_apps = [self.config.APP_ID]
 
-        if self.app_id not in self.connected_apps:
-            self.connected_apps.append(self.app_id)
+        if self.config.APP_ID not in self.connected_apps:
+            self.connected_apps.append(self.config.APP_ID)
 
-        if self.connected_apps[0] != self.app_id:
-            del self.connected_apps[self.connected_apps.index(self.app_id)]
-            self.connected_apps = [self.app_id] + self.connected_apps
+        if self.connected_apps[0] != self.config.APP_ID:
+            del self.connected_apps[self.connected_apps.index(self.config.APP_ID)]
+            self.connected_apps = [self.config.APP_ID] + self.connected_apps

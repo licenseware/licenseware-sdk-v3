@@ -25,17 +25,12 @@ class NewApp:
 
     def __post_init__(self):
 
-        assert self.config.APP_ID is not None
-
-        self.app_id = self.config.APP_ID
-        appid = get_altered_strings(self.app_id).dash
-
         self.attached_uploaders: Dict[alias.UploaderId, NewUploader] = {}
         self.attached_reports: Dict[alias.ReportId, NewReport] = {}
         self.attached_components: Dict[alias.ReportComponentId, NewReportComponent] = {}
 
-        self.datatables_url = f"/{appid}/datatables"
-        self.history_report_url = f"/{appid}/reports/history-report"
+        self.datatables_url = f"/datatables"
+        self.history_report_url = f"/reports/history-report"
 
     def attach_uploaders(self, uploaders: List[NewUploader]):
 
@@ -79,7 +74,7 @@ class NewApp:
     def get_metadata(self):
 
         metadata = {
-            "app_id": self.app_id,
+            "app_id": self.config.APP_ID,
             "status": States.AVAILABLE,
             "name": self.name,
             "description": self.description,

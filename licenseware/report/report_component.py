@@ -36,14 +36,9 @@ class NewReportComponent:
 
     def __post_init__(self):
 
-        assert self.config.APP_ID is not None
-
         if isinstance(self.filters, ReportFilter):  # pragma no cover
             self.filters = self.filters.metadata
 
-        self.app_id = self.config.APP_ID
-
-        appid = get_altered_strings(self.app_id).dash
         compid = get_altered_strings(self.component_id).dash
 
         if self.component_type is None:
@@ -55,9 +50,9 @@ class NewReportComponent:
         if hasattr(self.style_attributes, "metadata"):
             self.style_attributes = self.style_attributes.metadata
 
-        self.url = f"/{appid}/report-components/{compid}"
-        self.public_url = f"/{appid}/public-report-components/{compid}"
-        self.snapshot_url = f"/{appid}/snapshot-report-components/{compid}"
+        self.url = f"/report-components/{compid}"
+        self.public_url = f"/public-report-components/{compid}"
+        self.snapshot_url = f"/snapshot-report-components/{compid}"
 
     def get_metadata(self):
 
@@ -65,7 +60,7 @@ class NewReportComponent:
             return
 
         metadata = {
-            "app_id": self.app_id,
+            "app_id": self.config.APP_ID,
             "component_id": self.component_id,
             "description": self.description,
             "url": self.url,
