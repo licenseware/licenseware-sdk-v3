@@ -1,6 +1,6 @@
-from licenseware import Config, get_user_info
+from licenseware import get_user_info
 
-from . import tenant_id, config
+from . import config, tenant_id
 
 # pytest -s -v tests/test_get_user_info.py
 

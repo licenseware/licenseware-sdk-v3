@@ -1,15 +1,9 @@
 import os
 import shutil
 
-from licenseware import (
-    create_csv_file,
-    create_file,
-    create_json_file,
-    create_xlsx_file,
-)
+from licenseware import create_csv_file, create_file, create_json_file, create_xlsx_file
 
 from . import config
-
 
 # pytest -s -v tests/test_create_files.py
 

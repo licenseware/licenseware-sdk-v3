@@ -6,6 +6,7 @@ from pymongo import MongoClient
 
 from licenseware import History, MongoRepository, history
 from licenseware.history.metadata import get_metadata
+
 from . import config
 
 

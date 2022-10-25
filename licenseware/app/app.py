@@ -8,7 +8,6 @@ from licenseware.constants.states import States
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
-from licenseware.utils.alter_string import get_altered_strings
 
 
 @dataclass

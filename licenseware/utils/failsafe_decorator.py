@@ -1,5 +1,6 @@
 import traceback
 from functools import wraps
+
 from licenseware.constants.web_response import WebResponse
 
 from .logger import log
