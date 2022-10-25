@@ -94,15 +94,12 @@ class DataTable:
 
     def __post_init__(self):
 
-        assert self.config.APP_ID is not None
-
         self.crud_handler = self.crud_handler() if self.crud_handler else CrudHandler()
         assert isinstance(self.crud_handler, CrudHandler)
 
-        ns = get_altered_strings(self.config.APP_ID).dash
         compdash = get_altered_strings(self.component_id).dash
-        self.metadata_path = f"/{ns}/datatables"
-        self.path = f"/{ns}/datatables/{compdash}"
+        self.metadata_path = f"/datatables"
+        self.path = f"/datatables/{compdash}"
         self.type = "editable_table"
         self.style_attributes = StyleAttrs().width_full.metadata
 

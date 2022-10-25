@@ -79,9 +79,6 @@ class NewUploader:
 
     def __post_init__(self):
 
-        assert self.config.APP_ID is not None
-
-        self.app_id = self.config.APP_ID
         self.validation_parameters = (
             self.validation_parameters.dict()
             if self.validation_parameters is not None
@@ -96,13 +93,12 @@ class NewUploader:
         if self.used_collections is None:
             self.used_collections = [Collections.DATA]
 
-        ns = get_altered_strings(self.app_id).dash
         uploaderid = get_altered_strings(self.uploader_id).dash
 
-        self.upload_validation_url = f"/{ns}/uploads/{uploaderid}/validation"
-        self.upload_url = f"/{ns}/uploads/{uploaderid}/files"
-        self.quota_validation_url = f"/{ns}/uploads/{uploaderid}/quota"
-        self.status_check_url = f"/{ns}/uploads/{uploaderid}/status"
+        self.upload_validation_url = f"/uploads/{uploaderid}/validation"
+        self.upload_url = f"/uploads/{uploaderid}/files"
+        self.quota_validation_url = f"/uploads/{uploaderid}/quota"
+        self.status_check_url = f"/uploads/{uploaderid}/status"
 
     def get_metadata(self, parrent_app_metadata: dict = None):
 
