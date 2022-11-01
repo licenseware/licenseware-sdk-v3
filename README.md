@@ -44,7 +44,7 @@ These attributes and actions which define an uploader are needed to handle the f
 
 
 Define uploader encryption parameters
-```py
+```python
 
 from licenseware import UploaderEncryptionParameters
 
@@ -70,11 +70,11 @@ This is how the encryption will take place for `columns`:
 - Parameters can be given just as we did for `filepaths` and `filecontent` it can be either exact match `SpecificDeviceX` or regex match `SpecificDevice(.+?)`. The regex match will encrypt what it found between paranthesis. 
 
 If no encryption is needed don't provide any parameters this would be enough:
-```py
+```python
 rv_tools_encryption_parameters = UploaderEncryptionParameters()
 ``` 
 If you need to encrypt only the columns:
-```py
+```python
 rv_tools_encryption_parameters = UploaderEncryptionParameters(
     columns=["Device", "Host"]
 )
@@ -83,7 +83,7 @@ In a similar way this can be done for `filepaths` and `filecontent`.
 
 
 Define uploader validation parameters
-```py
+```python
 
 from licenseware import UploaderValidationParameters
 
@@ -127,7 +127,7 @@ These are all needed validation parameters, these may seem like a lot, but you'l
 
 Each field is `optional` so we can reduce the above uploader's validation parameters to this:
 
-```py
+```python
 rv_tools_validation_parameters = UploaderValidationParameters(
     filename_contains=["rv", "tools"],
     filename_endswith=FileTypes.GENERIC_EXCEL,
@@ -138,7 +138,7 @@ rv_tools_validation_parameters = UploaderValidationParameters(
 
 Creating the worker function which will handle the `event`
 
-```py
+```python
 
 from app.dependencies.workers import worker
 from licenseware import States, log
@@ -168,7 +168,7 @@ The worker function is responsibile for providing the processing information to 
 
 The `event` received will be a dictionary like this:
 
-```py
+```python
 event = {
     "tenant_id": tenant_id,
     "authorization": authorization,
@@ -190,7 +190,7 @@ event = {
 
 Ideally the file process event handler (`ProcessUplaoderIdEvent`) would look something like this:
 
-```py
+```python
 # rv_tools_data_worker.py
 
 from typing import List
@@ -232,7 +232,7 @@ class ProcessRVToolsEvent(metaclass=HistoryLogger):
 
 Attach to a new uploader what we defined up:
 
-```py
+```python
 
 from licenseware import FileTypes, NewUploader
 from settings import config
@@ -285,7 +285,7 @@ In the `NewUploader` object we gather all information about this uploader.
 
 Each uploader created needs to be `registered`in the `uploaders/__init__.py` file:
 
-```py
+```python
 
 from app.dependencies.pubsub import producer
 from app.dependencies.db import mongodb_connection, redis_cache
@@ -327,7 +327,7 @@ The same principles apply as with `Uploaders`.
 
 Below we contruct report filters. This step can be done after you have defined all report components.
 
-```py
+```python
 
 from licenseware import ReportFilter
 
@@ -374,7 +374,7 @@ In most cases you can get away by just providing the column name and allowed_val
 
 Using the `NewReport` class we fill the below parameters (filters can be filled later after you have defined all report components). 
 
-```py
+```python
 
 from app.dependencies.db import mongodb_connection, redis_cache
 from app.report_components import report_components
@@ -411,7 +411,7 @@ If `attach` is not used all provided `report_components` will be attached.
 
 You can create custom filters on which report components you need to attach:
 
-```py
+```python
 
 for rc in report_components:
     if rc.component_id in ["some_component_id1", "some_component_id2"]:
@@ -421,7 +421,7 @@ for rc in report_components:
 
 Each report created needs to be `registered`in the `reports/__init__.py` file:
 
-```py
+```python
 from settings import config
 from licenseware import RegisteredReports
 
@@ -446,7 +446,7 @@ A report can contain one or more report components. Here we declare a `summary` 
 
 - Declaring report component attributes
 
-```py
+```python
 
 summary = (
     SummaryAttrs()
@@ -459,12 +459,11 @@ summary = (
 )
 
 ```
-This way we inform front-end that it needs to use the Summary UI component and it needs to fill the component data as described in `SummaryAttrs`.
-
+This way we inform front-end that it needs to use the Summary UI component and it needs to fill the component data as described in `SummaryAttrs`. You can check more attributes and how they are used in `licenseware/reports/attributes_*.py` modules.
 
 - Declaring report component style attributes
 
-```py
+```python
 styles = (
     StyleAttrs()
     .width_one_third
@@ -476,7 +475,7 @@ Here we specify additional information to front-end about report component looks
 
 Next, we need to create a function which based on the parameters received will return component data from database. 
 
-```py
+```python
 
 def get_fmw_summary_component_data(*args, **kwargs):
     return "data from database"
@@ -486,7 +485,7 @@ def get_fmw_summary_component_data(*args, **kwargs):
 - Declaring the report component
 
 
-```py
+```python
 fmw_summary_component = NewReportComponent(
     title="Summary", 
     component_id="fmw_summary", 
@@ -501,7 +500,7 @@ Now that we have declared report component attributes, style attributes and the 
 
 
 - Attaching a report component to a report
-```py 
+```python 
 
 fmw_deployment_report.attach(fmw_summary_component)
 
@@ -510,7 +509,7 @@ fmw_deployment_report.attach(fmw_summary_component)
 
 Each report component created needs to be `registered`in the `report_components/__init__.py` file:
 
-```py
+```python
 from settings import config
 from app.dependencies.db import redis_cache
 from licenseware import RegisteredComponents
@@ -538,7 +537,7 @@ We have `uploaders` which handle files uploaded and sent to procesing, `reports`
 
 Ovewrite the `CrudHandler` methods if needed (in most cases you hopefully don't need to do that):
 
-```py
+```python
 from .crud_handler import CrudDeviceTable
 
 from app.common.infrastructure_service import InfraService
@@ -648,7 +647,7 @@ class CrudDeviceTable(CrudHandler):
 
 Define data table:
 
-```py
+```python
 from settings import config
 from licenseware import DataTable, ColumnTypes, CrudHandler
 from licenseware import ColumnTypes, DataTable
@@ -696,7 +695,7 @@ Method `column` has the following parameters, most of them with sensible default
 
 Each datatable component created needs to be `registered`in the `datatables/__init__.py` file:
 
-```py
+```python
 from licenseware import RegisteredDataTables
 from settings import config
 
@@ -719,7 +718,7 @@ The data to be useful needs to be saved somewhere that's where the `MongoReposit
 It includes handling of mongo `ObjectId` field which is not json parsable + some custom handling.
 
 First import the repo implementation:
-```py
+```python
 
 from marshmallow import Schema, fields
 from settings import config
@@ -765,7 +764,7 @@ The `data_validator` validator needs to return the data provided.
 We specified the `collection` and `data_validator` function on instantiation, but we can provide other collection names or validators on the repo method parameters (not recommended).
 
 Insert some special data:
-```py
+```python
 
 def custom_validator(data):
     assert "field_name" in data.keys()
@@ -788,7 +787,7 @@ The `data_validator` can be set to `None` while figuring out what to do with the
 
 Note that you could always create a new repo collection based on an existing created repo.
 
-```py
+```python
 
 repo_data = MongoRepository(
     mongo_connection, 
@@ -818,7 +817,7 @@ In order to have a history of the processing steps from begining to the end `lic
 
 Recomended way of using history:
 
-```py
+```python
 
 from typing import List
 from licenseware import WorkerEvent, HistoryLogger, get_mongodb_connection
@@ -847,7 +846,7 @@ class ProcessUploaderIdEvent(metaclass=HistoryLogger):
 
 Another usage example:
 
-```py
+```python
 
 from settings import config
 from app.dependencies.db.mongo import get_mongo_db_connection
@@ -895,7 +894,7 @@ Where the `history.log` decorator cannot be used you can create an instance of `
 
 Custom usage without using `history.log` decorator:
 
-```py
+```python
 
 import traceback
 from settings import config
@@ -948,7 +947,7 @@ Basic usage:
 
 On the kafka broker side define topics(channels)
 
-```py
+```python
 
 from licensware import Topic, TopicType
 from confluent_kafka.admin import AdminClient
@@ -967,7 +966,7 @@ topic.delete(TopicType.APP_EVENTS)
 
 On the app side define stream producer (publisher)
 
-```py
+```python
 from licenseware import Config, Producer
 from confluent_kafka import Producer as KafkaProducer
 from settings import config 
@@ -1000,7 +999,7 @@ We are using a factory function for getting the confluent kafka producer to reco
 
 You can also define a consumer (subscriber)
 
-```py
+```python
 from licenseware import Config, Consumer
 from confluent_kafka import Consumer as KafkaConsumer
 from settings import config
@@ -1047,7 +1046,7 @@ We are using a factory function for getting the confluent kafka consumer to reco
 For various reasons we may need to set and get small temporary chunks of data from redis.
 
 
-```py
+```python
 from settings import config
 from licenseware import RedisCache
 
