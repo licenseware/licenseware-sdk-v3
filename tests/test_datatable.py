@@ -1,8 +1,8 @@
 import unittest
 
 from licenseware import ColumnTypes, DataTable, ErrorAlreadyAttached
-from . import config
 
+from . import config
 
 # pytest -s -v tests/test_datatable.py
 

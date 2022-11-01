@@ -2,7 +2,7 @@ import datetime
 
 from licenseware import ReportPublicToken
 
-from . import tenant_id, config
+from . import config, tenant_id
 
 # pytest -s -v tests/test_report_public_token.py
 

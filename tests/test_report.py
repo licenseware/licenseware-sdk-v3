@@ -2,7 +2,6 @@ import unittest
 
 from licenseware import (
     BarHorizontalAttrs,
-    Config,
     ErrorAlreadyAttached,
     Icons,
     NewReport,
@@ -15,7 +14,6 @@ from licenseware import (
 )
 
 from . import config
-
 
 # pytest -s -v tests/test_report.py
 

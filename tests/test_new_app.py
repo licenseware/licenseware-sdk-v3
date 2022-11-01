@@ -16,7 +16,6 @@ from licenseware import (
 
 from . import config
 
-
 # pytest -s -v tests/test_new_app.py
 
 t = unittest.TestCase()

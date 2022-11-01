@@ -13,7 +13,7 @@ from licenseware import (
     get_redis_cache,
 )
 
-from . import tenant_id, config
+from . import config, tenant_id
 
 
 @pytest.fixture

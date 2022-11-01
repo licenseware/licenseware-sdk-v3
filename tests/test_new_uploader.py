@@ -1,5 +1,4 @@
 from licenseware import (
-    Config,
     FileTypes,
     NewUploader,
     UploaderEncryptionParameters,
@@ -12,7 +11,6 @@ from licenseware.uploader.default_handlers import (
 )
 
 from . import config
-
 
 # pytest -s -v tests/test_new_uploader.py
 

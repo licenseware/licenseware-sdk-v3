@@ -5,11 +5,10 @@ from licenseware import (
     MongoRepository,
     ValidationResponse,
     get_mongodb_connection,
-    login_user,
 )
 from licenseware.uploader.default_handlers import default_check_quota_handler
-from . import config, tenant_id
 
+from . import config, tenant_id
 
 # pytest -s -v tests/test_default_check_quota_handler.py
 

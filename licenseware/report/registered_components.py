@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 
 from licenseware.config.config import Config
 from licenseware.constants.web_response import WebResponse
+from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.report.report_component import NewReportComponent
 from licenseware.report.report_public_token import ReportPublicToken
 from licenseware.report.report_snapshot import ReportSnapshot
@@ -11,7 +12,6 @@ from licenseware.utils.alter_string import get_altered_strings
 from licenseware.utils.create_file import create_file
 from licenseware.utils.failsafe_decorator import failsafe
 from licenseware.utils.get_machine_info import get_machine_token
-from licenseware.redis_cache.redis_cache import RedisCache
 
 
 class RegisteredComponents:  # pragma no cover

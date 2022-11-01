@@ -1,4 +1,5 @@
 from licenseware import RedisCache
+
 from . import config
 
 # pytest -s -v tests/test_redis_cache.py

@@ -1,8 +1,10 @@
 import os
-import uuid
 import time
+import uuid
 from typing import List
-from licenseware import WorkerEvent, HistoryLogger, get_mongodb_connection
+
+from licenseware import HistoryLogger, WorkerEvent, get_mongodb_connection
+
 from . import config
 
 

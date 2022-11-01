@@ -2,6 +2,7 @@ import pytest
 from pymongo import MongoClient
 
 from licenseware import MongoRepository, Quota, login_user
+
 from . import config
 
 

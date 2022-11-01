@@ -2,6 +2,7 @@ from confluent_kafka import Consumer as KafkaConsumer
 from confluent_kafka import Producer as KafkaProducer
 
 from licenseware import Config, Consumer, EventType, Producer, TopicType
+
 from . import config
 
 # pytest -s -v tests/test_kafka.py
