@@ -1,7 +1,21 @@
 # Licenseware SDK v3
+
 <img src="./coverage.svg">
 
-
+[![Package Verions](https://img.shields.io/pypi/v/licenseware)](https://pypi.org/project/licenseware)
+[![Python Verions](https://img.shields.io/pypi/pyversions/licenseware)](https://pypi.org/project/licenseware)
+[![Package Downloads](https://img.shields.io/pypi/dw/licenseware)](https://pypi.org/project/licenseware)
+[![PyPi Wheel](https://img.shields.io/pypi/wheel/licenseware)](https://pypi.org/project/licenseware)
+[![Package Status](https://img.shields.io/pypi/status/licenseware)](https://pypi.org/project/licenseware)
+[![License](https://img.shields.io/pypi/l/licenseware)](https://github.com/licenseware/licenseware-sdk-v3/blob/main/LICENSE)
+[![CodeClimate Maintainability](https://img.shields.io/codeclimate/maintainability/licenseware/licenseware-sdk-v3)](https://codeclimate.com/github/licenseware/licenseware-sdk-v3)
+[![CodeClimate Issues](https://img.shields.io/codeclimate/issues/licenseware/licenseware-sdk-v3?label=codeclimate%20issues)](https://codeclimate.com/github/licenseware/licenseware-sdk-v3/issues)
+[![CodeClimate Tech Debt](https://img.shields.io/codeclimate/tech-debt/licenseware/licenseware-sdk-v3)](https://codeclimate.com/github/licenseware/licenseware-sdk-v3/trends/technical_debt)
+[![Commit Activity](https://img.shields.io/github/commit-activity/m/licenseware/licenseware-sdk-v3)](https://github.com/licenseware/licenseware-sdk-v3/graphs/commit-activity)
+[![Release Date](https://img.shields.io/github/release-date/licenseware/licenseware-sdk-v3)](https://github.com/licenseware/licenseware-sdk-v3/releases)
+[![Code Size](https://img.shields.io/github/languages/code-size/licenseware/licenseware-sdk-v3)](https://github.com/licenseware/licenseware-sdk-v3)
+[![Repo Size](https://img.shields.io/github/repo-size/licenseware/licenseware-sdk-v3)](https://github.com/licenseware/licenseware-sdk-v3)
+[![GitHub CR](https://ghcr-badge.deta.dev/licenseware/licenseware-sdk-v3/size?tag=latest&label=docker%20image&color=%235F9EA0)](https://github.com/orgs/licenseware/packages/container/package/licenseware-sdk-v3)
 
 # Contents
 
