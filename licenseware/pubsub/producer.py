@@ -43,7 +43,7 @@ class Producer:
         topic: TopicType,
         data: dict,
         delivery_report: Callable = None,
-        fresh_connect: bool = False,
+        fresh_connect: bool = True,
     ):
 
         if fresh_connect:
