@@ -21,6 +21,7 @@ from licenseware.uploader.default_handlers import (
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.alter_string import get_altered_strings
+from licenseware.meta.uploader_metadata_model import UploaderMetadataModel
 
 
 @dataclass
@@ -79,6 +80,8 @@ class NewUploader:
 
     def __post_init__(self):
 
+        self.app_id = self.config.APP_ID
+
         self.validation_parameters = (
             self.validation_parameters.dict()
             if self.validation_parameters is not None
@@ -100,31 +103,31 @@ class NewUploader:
         self.quota_validation_url = f"/uploads/{uploaderid}/quota"
         self.status_check_url = f"/uploads/{uploaderid}/status"
 
-    def get_metadata(self, parrent_app_metadata: dict = None):
+    def get_metadata(self, parrent_app_metadata: dict = None, as_dict: bool = True):
 
         if not self.registrable:
             return
 
-        metadata = {
-            "app_id": self.app_id,
-            "name": self.name,
-            "uploader_id": self.uploader_id,
-            "description": self.description,
-            "upload_url": self.upload_url,
-            "upload_validation_url": self.upload_validation_url,
-            "quota_validation_url": self.quota_validation_url,
-            "status_check_url": self.status_check_url,
-            "accepted_file_types": self.accepted_file_types,
-            "icon": self.icon,
-            "flags": self.flags,
-            "updated_at": datetime.datetime.utcnow().isoformat(),
-            "validation_parameters": self.validation_parameters,
-            "encryption_parameters": self.encryption_parameters,
-            "status": self._get_uploader_statuses(),
-            "parrent_app": parrent_app_metadata,
-        }
+        metadata = UploaderMetadataModel(
+            app_id=self.config.APP_ID,
+            name=self.name,
+            uploader_id=self.uploader_id,
+            description=self.description,
+            upload_url=self.upload_url,
+            upload_validation_url=self.upload_validation_url,
+            quota_validation_url=self.quota_validation_url,
+            status_check_url=self.status_check_url,
+            accepted_file_types=self.accepted_file_types,
+            icon=self.icon,
+            flags=self.flags,
+            updated_at=datetime.datetime.utcnow().isoformat(),
+            validation_parameters=self.validation_parameters,
+            encryption_parameters=self.encryption_parameters,
+            status=self._get_uploader_statuses(),
+            parrent_app=parrent_app_metadata,
+        )
 
-        return metadata
+        return metadata.dict() if as_dict else metadata
 
     def _get_uploader_statuses(self):
         results = self.redis_cache.get(f"uploader_status:{self.uploader_id}:*")

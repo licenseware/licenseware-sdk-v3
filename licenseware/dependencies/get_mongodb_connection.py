@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma no cover
     from licenseware.config.config import Config
+
 from pymongo import MongoClient
 
 
 def get_mongodb_connection(config: Config):
-    MONGO_CONNECTION_STRING = f"mongodb://{config.MONGO_USER}:{config.MONGO_PASSWORD}@{config.MONGO_HOST}:{config.MONGO_PORT}"
-    mongo_connection = MongoClient(MONGO_CONNECTION_STRING)[config.MONGO_DBNAME]
+    mongo_connection = MongoClient(config.mongo_connection_uri)[config.MONGO_DBNAME]
+    mongo_connection.list_collection_names()
     return mongo_connection

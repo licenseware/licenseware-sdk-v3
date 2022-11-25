@@ -197,7 +197,7 @@ class RegisteredUploaders:  # pragma no cover
             self.redis_cache,
             self.config,
         )
-        self.registry_updater(fresh_connect=True)
+        self.registry_updater()
 
         completed_status = "completed" if status == States.IDLE else "started"
         notification_title = (
@@ -211,7 +211,6 @@ class RegisteredUploaders:  # pragma no cover
             icon="Uploader",
             url=self.config.FRONTEND_URL
             + f"/uploaders?app_id={uploader.app_id}&uploader_id={uploader.uploader_id}",
-            fresh_connect=True,
             extra={
                 "app_id": uploader.app_id,
                 "uploader_id": uploader.uploader_id,

@@ -8,6 +8,11 @@ from licenseware.constants.states import States
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.report.report import NewReport, NewReportComponent
 from licenseware.uploader.uploader import NewUploader
+from licenseware.meta.app_metadata_model import (
+    AppMetaModel,
+    AppMetadataModel,
+    FullAppMetadataModel,
+)
 
 
 @dataclass
@@ -17,7 +22,7 @@ class NewApp:
     config: Config
     flags: List[str] = None
     icon: str = None
-    app_meta: List[dict] = None
+    app_meta: AppMetaModel = None
     features: List[dict] = None
     integration_details: List[dict] = None
     registrable: bool = True
@@ -70,39 +75,41 @@ class NewApp:
 
         return self.attached_components
 
-    def get_metadata(self):
+    def get_metadata(self, as_dict: bool = True):
 
-        metadata = {
-            "app_id": self.config.APP_ID,
-            "status": States.AVAILABLE,
-            "name": self.name,
-            "description": self.description,
-            "icon": self.icon,
-            "history_report_url": self.history_report_url,
-            "flags": self.flags,
-            "updated_at": datetime.datetime.utcnow().isoformat(),
-            "editable_tables_url": self.datatables_url,  # TODO - remove this field when fe updated
-            "datatables_url": self.datatables_url,
-            "features": self.features,
-            "app_meta": self.app_meta,
-            "integration_details": self.integration_details,
-        }
+        metadata = AppMetadataModel(
+            app_id=self.config.APP_ID,
+            status=States.AVAILABLE,
+            name=self.name,
+            description=self.description,
+            icon=self.icon,
+            history_report_url=self.history_report_url,
+            flags=self.flags,
+            updated_at=datetime.datetime.utcnow().isoformat(),
+            editable_tables_url=self.datatables_url,  # TODO - remove this field when fe updated
+            datatables_url=self.datatables_url,
+            features=self.features,
+            app_meta=self.app_meta,
+            integration_details=self.integration_details,
+        )
 
-        return metadata
+        return metadata.dict() if as_dict else metadata
 
-    def get_full_metadata(self):
+    def get_full_metadata(self, as_dict: bool = True):
 
         app_metadata = self.get_metadata()
         uploaders_metadata = self.get_uploaders_metadata(app_metadata)
+        reports_metadata = self.get_reports_metadata(app_metadata, uploaders_metadata)
+        report_components = self.get_components_metadata()
 
-        metadata = {
-            "app": app_metadata,
-            "uploaders": uploaders_metadata,
-            "reports": self.get_reports_metadata(app_metadata, uploaders_metadata),
-            "report_components": self.get_components_metadata(),
-        }
+        metadata = FullAppMetadataModel(
+            app=app_metadata,
+            uploaders=uploaders_metadata,
+            reports=reports_metadata,
+            report_components=report_components,
+        )
 
-        return metadata
+        return metadata.dict() if as_dict else metadata
 
     def get_uploaders_metadata(self, parrent_app_metadata: dict):
         uploaders_metadata = (

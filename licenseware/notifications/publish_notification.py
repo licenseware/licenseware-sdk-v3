@@ -13,7 +13,6 @@ def publish_notification(
     icon: str = None,
     url: str = None,
     updated_at: str = None,
-    fresh_connect: bool = False,
     extra: dict = None,
 ):
 
@@ -29,8 +28,6 @@ def publish_notification(
         "extra": extra,
     }
 
-    producer.publish(
-        topic=TopicType.APP_EVENTS, data=notification, fresh_connect=fresh_connect
-    )
+    producer.publish(topic=TopicType.APP_EVENTS, data=notification)
 
     return notification

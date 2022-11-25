@@ -20,6 +20,8 @@ def login_machine(config: Config, redis_cache: RedisCache, _retry_in: int = 0):
 
     _retry_in = _retry_in + 5
 
+    response = None
+
     try:
 
         response = requests.post(
@@ -41,9 +43,14 @@ def login_machine(config: Config, redis_cache: RedisCache, _retry_in: int = 0):
         time.sleep(_retry_in)
         login_machine(config, redis_cache, _retry_in)
 
-    machine_token = response.json()["Authorization"]
-    redis_cache.set("MACHINE_TOKEN", machine_token, expiry=None)
-    log.success("Machine login successful!")
+    if response is not None:
+        machine_token = response.json()["Authorization"]
+        redis_cache.set("MACHINE_TOKEN", machine_token, expiry=None)
+        log.success("Machine login successful!")
+    else:
+        log.error(f"Could not login '{config.MACHINE_NAME}'")
+        time.sleep(_retry_in)
+        login_machine(config, redis_cache, _retry_in)
 
 
 def cron_login_machine(config: Config, redis_cache: RedisCache):

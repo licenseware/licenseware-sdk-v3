@@ -36,6 +36,8 @@ class NewReportComponent:
 
     def __post_init__(self):
 
+        self.app_id = self.config.APP_ID
+
         if isinstance(self.filters, ReportFilter):  # pragma no cover
             self.filters = self.filters.metadata
 

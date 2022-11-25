@@ -13,6 +13,7 @@ def default_update_status_handler(
 ):  # pragma no cover
 
     data = {
+        "event_id": "TODO",
         "tenant_id": tenant_id,
         "uploader_id": uploader_id,
         "status": status,

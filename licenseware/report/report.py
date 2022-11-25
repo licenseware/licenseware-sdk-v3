@@ -8,12 +8,13 @@ from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
 from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.utils.alter_string import get_altered_strings
 
-from .default_handlers import (
+from licenseware.report.default_handlers import (
     DefaultMetadataHandler,
     default_get_tenants_with_data_handler,
 )
-from .report_component import NewReportComponent
-from .report_filter import ReportFilter
+from licenseware.report.registered_components import NewReportComponent
+from licenseware.report.report_filter import ReportFilter
+from licenseware.meta.report_metadata_model import ReportMetadataModel
 
 
 @dataclass
@@ -37,9 +38,7 @@ class NewReport:
 
     def __post_init__(self):
 
-        assert self.config.FRONTEND_URL is not None
-        assert self.config.PUBLIC_TOKEN_REPORT_URL is not None
-        assert self.config.APP_SECRET is not None
+        self.app_id = self.config.APP_ID
 
         reportid = get_altered_strings(self.report_id).dash
 
@@ -69,7 +68,10 @@ class NewReport:
         self.report_components_metadata = self._get_report_components_metadata()
 
     def get_metadata(
-        self, parrent_app_metadata: dict = None, uploaders_metadata: List[dict] = None
+        self,
+        parrent_app_metadata: dict = None,
+        uploaders_metadata: List[dict] = None,
+        as_dict: bool = True,
     ):
 
         if not self.registrable:
@@ -88,26 +90,26 @@ class NewReport:
             uploader_statuses, tenants_with_data
         )
 
-        metadata = {
-            "app_id": self.config.APP_ID,
-            "report_id": self.report_id,
-            "name": self.name,
-            "description": self.description,
-            "url": self.url,
-            "connected_apps": self.connected_apps,
-            "report_components": self.report_components_metadata,
-            "flags": self.flags,
-            "filters": self.filters,
-            "registrable": self.registrable,
-            "updated_at": datetime.datetime.utcnow().isoformat(),
-            "public_url": self.public_url,
-            "snapshot_url": self.snapshot_url,
-            "parrent_app": parrent_app_metadata,
-            "apps": apps_metadata,
-            "status": report_statuses,
-        }
+        metadata = ReportMetadataModel(
+            app_id=self.config.APP_ID,
+            report_id=self.report_id,
+            name=self.name,
+            description=self.description,
+            url=self.url,
+            connected_apps=self.connected_apps,
+            report_components=self.report_components_metadata,
+            flags=self.flags,
+            filters=self.filters,
+            registrable=self.registrable,
+            updated_at=datetime.datetime.utcnow().isoformat(),
+            public_url=self.public_url,
+            snapshot_url=self.snapshot_url,
+            parrent_app=parrent_app_metadata,
+            apps=apps_metadata,
+            status=report_statuses,
+        )
 
-        return metadata
+        return metadata.dict() if as_dict else metadata
 
     def _get_component_by_id(self, component_id: str):
         assert self.components is not None
