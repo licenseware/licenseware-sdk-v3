@@ -1,11 +1,13 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .app_metadata_model import AppMetadataModel
 
+from dataclasses import asdict, dataclass
 from typing import List
-from dataclasses import dataclass, asdict
+
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 

@@ -1,4 +1,5 @@
 import os
+
 from licenseware.constants.base_enum import BaseEnum
 from licenseware.dependencies import BaseSettings
 from licenseware.utils.alter_string import get_altered_strings

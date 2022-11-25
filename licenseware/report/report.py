@@ -5,16 +5,15 @@ from typing import Any, Callable, Dict, List
 from licenseware.config.config import Config
 from licenseware.constants import alias_types as alias
 from licenseware.exceptions.custom_exceptions import ErrorAlreadyAttached
+from licenseware.meta.report_metadata_model import ReportMetadataModel
 from licenseware.redis_cache.redis_cache import RedisCache
-from licenseware.utils.alter_string import get_altered_strings
-
 from licenseware.report.default_handlers import (
     DefaultMetadataHandler,
     default_get_tenants_with_data_handler,
 )
 from licenseware.report.registered_components import NewReportComponent
 from licenseware.report.report_filter import ReportFilter
-from licenseware.meta.report_metadata_model import ReportMetadataModel
+from licenseware.utils.alter_string import get_altered_strings
 
 
 @dataclass

@@ -10,6 +10,7 @@ from licenseware.constants.uploader_types import (
 )
 from licenseware.constants.web_response import WebResponse
 from licenseware.constants.worker_event_type import WorkerEvent
+from licenseware.meta.uploader_metadata_model import UploaderMetadataModel
 from licenseware.redis_cache.redis_cache import RedisCache
 from licenseware.uploader.default_handlers import (
     default_check_quota_handler,
@@ -21,7 +22,6 @@ from licenseware.uploader.default_handlers import (
 from licenseware.uploader.encryption_parameters import UploaderEncryptionParameters
 from licenseware.uploader.validation_parameters import UploaderValidationParameters
 from licenseware.utils.alter_string import get_altered_strings
-from licenseware.meta.uploader_metadata_model import UploaderMetadataModel
 
 
 @dataclass

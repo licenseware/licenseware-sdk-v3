@@ -7,6 +7,7 @@ from licenseware.dependencies import *
 from licenseware.exceptions import *
 from licenseware.history.history_class import History
 from licenseware.history.history_logger_metaclass import HistoryLogger
+from licenseware.meta import *
 from licenseware.notifications import *
 from licenseware.pubsub import *
 from licenseware.quota import *
@@ -15,4 +16,3 @@ from licenseware.report import *
 from licenseware.repository import *
 from licenseware.uploader import *
 from licenseware.utils import *
-from licenseware.meta import *

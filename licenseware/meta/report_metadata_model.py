@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .app_metadata_model import AppMetadataModel
 
+from dataclasses import asdict, dataclass
 from typing import List
-from dataclasses import dataclass, asdict
 
 
 @dataclass
